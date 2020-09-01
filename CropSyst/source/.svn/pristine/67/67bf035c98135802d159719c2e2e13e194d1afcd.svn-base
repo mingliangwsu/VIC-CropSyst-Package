@@ -1,0 +1,76 @@
+#error obsolete The only thing used now is the format filename, moved to CS::Arguments
+
+#include "arguments_CropSyst.h"
+#include "corn/seclusion.h"
+#include <string.h>
+
+namespace CropSyst
+{
+//______________________________________________________________________________
+Arguments::Arguments
+(CS::Identification &ID_)                                                        //160222
+: CS::Arguments      (ID_)                                                       //160222
+, scenario_directory (0)
+, V4_format_filename (0)                                                         //191104
+{}
+//_Arguments:constructor____________________________________________2015-04-15_/
+Arguments::Arguments
+(CS::Identification &ID_                                                         //160222
+,int32 cell_ID, int32 crop_index)
+: CS::Arguments(ID_)
+, scenario_directory(0)                                                          //150422
+{ // Constructor of VIC_CropSyst
+   char cell_ID_cstr[10];     int32_to_cstr(cell_ID,cell_ID_cstr);
+   char crop_index_cstr[10];  int32_to_cstr(crop_index,crop_index_cstr);
+   ID.set_number(cell_ID);                                                       //160222
+   CORN::OS::Directory_name_concrete CWD;
+   #ifdef VIC_CROPSYST_VERSION
+   scenario_directory_name = new CORN::OS::Directory_name_concrete(CWD);         //160504LML
+   #else
+   CORN::OS::Directory_name_concrete cell_ID_directory                           //161029
+      (CWD,cell_ID_cstr,CORN::OS::directory_entry);
+   scenario_directory_name = new CORN::OS::Directory_name_concrete               //161029
+      (cell_ID_directory,crop_index_cstr,CORN::OS::directory_entry);
+   #endif
+}
+//_Arguments:constructor____________________________________________2015-04-15_/
+Arguments::~Arguments()
+{  delete scenario_directory; scenario_directory = 0;
+}
+//_Arguments:destructor_____________________________________________2015-04-15_/
+CropSyst::Scenario_directory &Arguments::provide__scenario_directory() provision_
+{
+   //std::clog << "provide_scenario_directory_name:\t"<<provide_scenario_directory_name() << std::endl;
+   if (!scenario_directory)
+      scenario_directory = new CropSyst::Scenario_directory(provide_scenario_directory_name(),false);
+   return *scenario_directory;
+}
+//_provide__scenario_directory_______________________________________2015-04-15_/
+bool Arguments::invalidate_scenario_directory()                    modification_
+{  delete scenario_directory; scenario_directory = 0;
+   return CS::Arguments::invalidate_scenario_directory();
+}
+//_invalidate_scenario_directory____________________________________2016-01-14_/
+bool Arguments::get_program_version(std::string &version)                  const
+{  version.append("5 ");       // get from CS version
+   CORN::Date_time_clad_64 now; // actually should be __Date__ ??
+   now.append_to_string(version _ISO_FORMAT_DATE_TIME);
+   return true;
+}
+//_get_program_version______________________________________________2016-12-20_/
+bool Arguments::get_end()
+{
+   bool got = CS::Arguments::get_end();
+   // Call super get_end first because we need verbosity for discover one        //200121
+/*TEMP DISABLED
+   V4_format_filename =
+      dynamic_cast<CORN::OS::File_name *>
+      (discover_one
+         (CORN::Inclusion("*.FMT",true)
+         ,CORN::OS::file_entry
+         ,CORN::OS::File_system::superdirectory_recursion_inclusive));
+*/
+   return got;
+}
+//_get_end_________________________________________________________2019-110-04_/
+}//_namespace CropSyst_________________________________________________________/

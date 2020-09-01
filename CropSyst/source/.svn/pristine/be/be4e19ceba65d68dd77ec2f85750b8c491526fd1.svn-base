@@ -1,0 +1,70 @@
+#ifndef phenology_AH
+#define phenology_AH
+#include "crop/phenology_I.h"
+#ifndef growth_stagesHPP
+#  include "crop/growth_stages.hpp"
+#endif
+#include "crop/crop_param_struct.h"
+#include "CS_suite/observation/CS_observation.h"
+#include "corn/chronometry/date_32.h"
+#include "CS_suite/simulation/CS_simulation_element.h"
+
+// Replaces Phenology_common
+
+namespace CropSyst
+{
+   class Phenology_adjustor;                                                     //140620
+//______________________________________________________________________________
+class Phenology_abstract // was common
+: public implements_ Phenology // _interface
+//181113 , public extends_ CS::Simulation_element_abstract                                    //181108
+{
+ protected:
+   const CORN::date32 &simdate_raw;                                              //181113
+ protected: // parameters
+   friend class Phenology_sequencer;                                             //140620
+   bool  is_perennial;
+   bool  is_fruit_tree;
+   cognate_ bool accrescence_initiated;                                          //190101
+ public:
+   nat16 season_duration_days;                                                   //181115
+      // (the number of full completed days in the season)
+   CORN::date32 planting_date;                                                   //181111
+   bool harvestable;                                                             //181111
+   nat16 harvest_DOY;
+ public:
+   Phenology_abstract // was common
+      (const CORN::date32 &today_raw_                                            //181108
+      ,bool  is_perennial_
+      ,bool  is_fruit_tree_);
+   virtual bool end_day()                                         modification_;
+   virtual bool start_season()                                    modification_;
+   inline virtual nat16 day_of_season()           const {return season_duration_days;/*181115 days_in_season;*/}
+   inline virtual const nat16 &ref_day_of_season()const {return season_duration_days;/*181115 days_in_season;*/;}
+
+   inline virtual nat16 get_season_duration_days()const {return season_duration_days;/*181115 days_in_season;*/;} //181115
+
+   inline virtual bool is_accrescence_initiated()                   affirmation_ {return accrescence_initiated;} //190101
+   inline virtual bool know_accrescence_initiated(bool initiated_)    cognition_ //190101
+      { return accrescence_initiated = initiated_; }
+ public:
+   inline virtual CORN::date32 get_planting_date()                         const //181111
+      { return planting_date; }
+   inline virtual bool activate_harvestable()       {return harvestable = true;} //181113
+   inline virtual bool activate_harvest()
+   {  harvest_DOY = simdate_raw % 100; return true;}                             //181114
+   inline virtual bool is_harvestable()      affirmation_ { return harvestable;} //181113
+   inline virtual bool is_harvested()        affirmation_ { return harvest_DOY;} //181114
+ public:
+   virtual bool reset
+      (Normal_crop_event_sequence from = NGS_RESTART
+      ,Normal_crop_event_sequence to   = NGS_TERMINATED)          modification_;
+   inline bool initialize()                                       modification_
+      { return reset((Normal_crop_event_sequence)NGS_NONE,(Normal_crop_event_sequence)(NGS_COUNT-1)) ; } //141202
+   RENDER_INSPECTORS_DECLARATION;
+};
+//_class_Phenology_abstract______________________________2018-11-09_2013-09-02_/
+
+} //namespace CropSyst
+#endif
+

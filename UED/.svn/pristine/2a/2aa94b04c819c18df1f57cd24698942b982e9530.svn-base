@@ -1,0 +1,206 @@
+#include "UED/convert/convert_response.h"
+#include "corn/OS/file_system_engine.h"
+#include "corn/seclusion.h"
+namespace UED {                                                                  //171120
+//______________________________________________________________________________
+Convertor_arguments::Convertor_arguments()
+: CORN::Arguments                   ()
+,UED_filename                       ("")
+,target_filename                    ("")
+,format_filename                    ("")
+,UED_filenames                      ()
+,calculate_daily                    (true)
+,location_info_imported             (false)
+,use_station_name                   (false)
+,format                             ("")
+,subformat                          ("")
+,units_system                       ("intrinsic")
+,year_earliest                      (0)
+,year_latest                        (9999)
+,date_time_earliest                 (0.0)
+,date_time_latest                   (9999365.999999)
+,seasonal                           (false)                                      //181106
+,offset_years                       (0)
+,prefix                             ("")
+,vapor_pressure_calculation         (0)
+,net_radiation_option               (0)
+,geolocation_is_provided_by_caller  (false)
+,geolocation                        ()
+,geolocation_record                 ("coordinate")                               //191007
+,allow_16bit_floats_in_UED          (false)                                      //150307
+{  set_current_section("convert");                                               //170328
+
+   /*191007 temp disabled until I implement Geolocation_record
+
+   geolocation_record.know(&geolocation);                                        //191007
+   */
+}
+//_Convertor_arguments:constructor_____________________________________________/
+bool Convertor_arguments::expect_structure(bool for_write)
+{
+   bool expected = CORN::Data_record::expect_structure(for_write);
+   expect_string  ("command"           ,operation,255);   // deprecated
+      // This was used by CS_explorer V4
+   expect_string  ("operation"         ,operation,255);
+   expect_file_name("UED_filename"     ,UED_filename);        // Used mainly (only?) for export (on import there could be multiple stations (each generating their own UED file)
+   expect_string  ("UED_filenames"     ,UED_filenames,2048);
+   //expect_string ("target_filename"  ,target_filename);        // Target filename (text file)
+   expect_file_name("target_filename"  ,target_filename);        // Target filename (text file)
+   expect_string  ("station_ID_filter" ,station_IDs_filter,1024);
+   expect_file_name("format_filename"  ,format_filename);     // I.e. TDF file
+   expect_string  ("format"            ,format,255);
+   expect_string  ("subformat"         ,subformat,255);
+   expect_string  ("units_system"      ,units_system,20);
+   set_current_section("years");
+      expect_int16   ("earliest"          ,year_earliest);
+      expect_int16   ("latest"            ,year_latest);
+      expect_int16   ("offset"            ,offset_years);
+   set_current_section("date_times");
+      expect_float64 ("earliest"          ,date_time_earliest);
+      expect_float64 ("latest"            ,date_time_latest);
+      expect_bool    ("seasonal"          ,seasonal);                            //181106
+   set_current_section("import");
+      expect_bool    ("calculate_daily"   ,calculate_daily);
+      expect_bool    ("use_station_name"  ,use_station_name);
+   set_current_section("export");
+      expect_string("prefix",prefix,255);
+      expect_bool    ("allow_16bit_floats",allow_16bit_floats_in_UED);           //150307
+   set_current_section("status");
+      expect_bool    ("location_info_imported",location_info_imported);
+   set_current_section("DYRESM");
+      expect_int16("vapor_pressure_calculation",vapor_pressure_calculation);
+      expect_int16("net_radiation_option",net_radiation_option);
+   if (!for_write || (for_write && geolocation_is_provided_by_caller))
+   {
+      set_current_section("geolocation");
+      /*NYI structure_defined &= */geolocation.setup_structure(*this,for_write);
+   }
+   set_current_section("convert");                                               //171120
+   structure_defined = true;                                                     //120314
+   return expected;                                                              //161103
+}
+//_expect_structure_________________________________________________1998-04-05_/
+/*200202 Moved to get_end
+continue_here,
+look for import
+and export
+and set operation in get_end
+
+bool Convertor_arguments::recognize
+(const std::string &paramstring)                                   modification_
+{  bool recognized = false;
+   // This is an optional mode command line option where the
+   // command can be simply specified on the command line instead of command=XXX.
+   // This is provided for old export import/export utilities that used this form
+   if (paramstring == "import")
+   {  operation = paramstring;                                                   //171120
+      recognized = true;
+   } else if (paramstring=="export")
+   {  operation = paramstring;                                                   //171120
+      recognized = true;
+   }
+   return recognized || CORN::Arguments::recognize(paramstring);
+}
+//_recognize____________________________________________2017-11-20__2017-03-28_/
+*/
+/*moved to get end
+bool Convertor_arguments::s_ubmit_DEN
+(CORN::OS::Directory_entry_name *param_DEN)                          submission_
+{  bool recognized = false;
+      // May need to process CORN::Arguments first because
+      // need any reponse files processes first
+      // (otherwise the EXE filename case will consume the param_DEN//
+   if ( (param_DEN->has_extension(L"UED"))
+      ||(param_DEN->has_extension(L"ued"))) // currently accepting lower case
+   {
+      UED_filename.set_DEN(*param_DEN);
+      if (operation.length() == 0) operation = "export";
+      else operation = "import";
+      delete param_DEN;
+      recognized = true;
+   } else
+   if ( param_DEN->has_extension(L"TDF"))
+   {  format_filename.set_DEN(*param_DEN);
+      delete param_DEN;
+      recognized = true;
+   } else
+   {
+      std::wstring param_name(param_DEN->get_name());                            //170725
+      if ((param_name.find('[') != std::string::npos)
+       || (param_name.find('=') != std::string::npos))                           //170725
+      {  // most likely VV entry not a filename
+         recognized = false;                                                     //170725
+         delete param_DEN;
+         return false;                                                           //180309
+      }
+      else                                                                       //170725
+      {
+
+// This case should no longer be needed
+
+         // There was a problem in the logic only applicable to when not arg 0.
+
+         if (  !param_DEN->has_extension(L"rsp")                                  //171110
+             &&!param_DEN->has_extension(L"RSP"))                                 //171110
+         {
+            //190325 target_filename.set_DEN(*param_DEN);
+         }
+      }
+   }
+   return recognized || CORN::Arguments::s_ubmit_DEN(param_DEN);
+}
+//_s_ubmit_DEN_______________________________________________________2018-02-13_/
+*/
+bool Convertor_arguments::get_end()
+{
+   bool ended = CORN::Arguments::get_end();
+   if (date_time_earliest == 0)
+       date_time_earliest = 1;
+
+   if (operation.length() == 0) operation = "export";                            //191103
+   else operation = "import";
+
+   // Original covertors and command keyword, this is deprecated
+   if (args_unrecognized.find_cstr("import")) operation = "import";              //200202
+   if (args_unrecognized.find_cstr("export")) operation = "export";              //200202
+
+   CORN::Inclusion UED_pattern("*.UED",true);                                    //191103
+   if (operation == "import")                                                    //191103
+   {
+      CORN::OS::Directory_entry_name *found_UED_fname
+         = dynamic_cast<CORN::OS::Directory_entry_name *>
+            (discover_one
+               (UED_pattern
+               ,CORN::OS::file_entry
+               ,CORN::OS::File_system::superdirectory_recursion_inclusive)
+            );
+      if (found_UED_fname)
+         UED_filename.set_DEN(*found_UED_fname);
+    else // export the UED file would be created
+    {
+      CORN::Item *ued_fname_raw = discover_one(UED_pattern);
+      if (ued_fname_raw)
+      {  std::wstring buffer;
+         ued_fname_raw->key_wstring(buffer);
+         UED_filename.set_wstring(buffer);
+      }
+    }
+   }
+   CORN::Inclusion TDF_pattern("*.TDF",true);                                    //191103
+   CORN::OS::Directory_entry_name *TDF_filename
+       = dynamic_cast<CORN::OS::Directory_entry_name *>
+            (discover_one
+               (TDF_pattern
+               ,CORN::OS::file_entry
+               ,CORN::OS::File_system::superdirectory_recursion_inclusive)
+            );
+   if (TDF_filename)
+   {
+      format_filename.set_DEN(*TDF_filename);
+      ended &= true;
+   }
+   return ended;
+}
+//_get_end__________________________________________________________2017-06-16_
+}//_namespace_UED___________________________________________________2017-11-20_/
+

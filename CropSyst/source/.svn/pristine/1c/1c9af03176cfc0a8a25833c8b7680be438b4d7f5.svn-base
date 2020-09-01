@@ -1,0 +1,153 @@
+#ifndef phenology_2013H
+#define phenology_2013H
+#include "crop/phenology_A.h"
+namespace CropSyst
+{
+//______________________________________________________________________________
+class Phenology_2013
+: public extends_ Phenology_abstract
+{
+ protected: // external references
+   const Crop_parameters_struct::Phenology &phenology_parameter;
+   const float64 &thermal_time_cumulative;
+ public:
+   Normal_crop_event_sequence growth_stage;
+
+ public:
+   CORN::Date_clad_32 start_date     [NGS_COUNT];                                //140620
+      // rename start_date to initiation_date
+   nat16 days_since_start_of  [NGS_COUNT];
+   nat16 duration_of          [NGS_COUNT];
+   nat16 start_day_in_season  [NGS_COUNT];                                       //140620
+   nat16 start_day_in_season_senescence;                                         //160211
+   nat16 start_day_in_season_senescence_full;                                    //160211
+   CORN::Date_clad_32 start_date_tuber_initiation;                               //141217
+      // This could be a reference to   start_date[filling]
+
+ public:
+   Phenology_2013
+      (const Crop_parameters_struct::Phenology &_phenology_parameter
+      ,const float64 &thermal_time_cumulative_ref
+      ,bool  _is_perennial
+      ,bool  _is_fruit_tree
+      ,const CORN::date32 &today_raw_);
+ public: // simulation element implementation
+   virtual bool start_day()                                       modification_;
+   virtual bool end_day()                                         modification_;
+   virtual bool start_season()                                    modification_;
+
+   virtual bool is_in_germination()                                affirmation_; //181108
+   virtual bool has_emerged()                                      affirmation_; //101030 was is_in_season
+   virtual bool is_in_accrescence()                                affirmation_;
+   //181108 virtual bool is_in_vegetative_growth()                          affirmation_;
+   virtual bool is_flowering()                                     affirmation_;
+   virtual bool is_in_anthesis()                                   affirmation_;
+   virtual bool is_in_tuberization()                               affirmation_; //150825
+   virtual bool is_in_yield_formation()                            affirmation_;
+   inline virtual bool is_in_fructescence()                        affirmation_  { assert(false); return false;} //181109
+   inline virtual bool is_in_veraison()                            affirmation_  { assert(false); return false;} //181109
+   inline virtual bool is_in_rapid_fruit_development()             affirmation_  { /* assert(false);*/ return false;} //181109
+
+   virtual bool is_in_culminescence()                              affirmation_; //181107
+   virtual bool is_in_senescence()                                 affirmation_; //141125
+
+
+   virtual bool is_maturity_first_day()                            affirmation_; //181108
+   virtual bool is_maturing()                                      affirmation_; //181108
+      // (the crop has reached maturity initiation but not yet culmination);
+   virtual bool has_matured_new()                                  affirmation_; //181108
+   /*
+   virtual bool is_harvestable()                                   affirmation_;//181109
+   */
+   virtual bool is_harvested()                                     affirmation_; //170820
+   virtual bool is_in_quiescence()                                 affirmation_; //181108
+   virtual bool is_dormant()                                       affirmation_;
+   virtual bool is_in_growth_period()                              affirmation_;
+   virtual bool is_in_growing_season()                             affirmation_; //130903
+   virtual bool is_early
+      (Normal_crop_event_sequence growth_stage
+      ,nat16 days)                                                 affirmation_; //181108
+   virtual bool reset
+      (Normal_crop_event_sequence from = NGS_RESTART
+      ,Normal_crop_event_sequence to   = NGS_TERMINATED)          modification_;
+
+ public:
+   inline virtual nat16 get_days_since_start_of(Normal_crop_event_sequence growth_stage) const
+      { return days_since_start_of[growth_stage]; }
+   inline virtual nat16 get_duration_of(Normal_crop_event_sequence growth_stage)   const
+      { return duration_of[growth_stage]; }
+   inline virtual const CORN::Date_const &get_initiation_date                    //160609_151005
+      (Normal_crop_event_sequence growth_stage)                            const
+      { return start_date[growth_stage]; }
+   inline virtual CORN::date32 get_finalization_date                             //170529_151005
+      (Normal_crop_event_sequence growth_stage)                            const
+      {  CORN::Date_clad_32 finalization_date(start_date[growth_stage]);
+         finalization_date.inc_days(duration_of[growth_stage]);
+         return finalization_date.get_date32();                                  //170529
+      }
+   inline virtual nat16 get_start_day_in_season
+      (Normal_crop_event_sequence growth_stage)                            const //160523
+      { return start_day_in_season[growth_stage]; }
+
+   inline virtual void clear_days_since_start_of_harvest()          assignation_
+      { days_since_start_of[NGS_HARVEST] = 0; }
+   inline virtual float64 get_thermal_time_cumulative
+      (bool adjusted_for_clipping) const
+      { UNUSED_arg(adjusted_for_clipping); return thermal_time_cumulative; }         //130904
+
+    //virtual Normal_crop_event_sequence get_growth_stage_sequence()   const;
+   inline virtual Normal_crop_event_sequence get_growth_stage_sequence()   const
+      { return growth_stage; }
+
+
+   virtual bool activate_sowing()                                                  ; //181108
+   virtual bool activate_emergence()                                               ; //181108
+   virtual bool activate_accrescence()                                             ; //181108
+   inline virtual bool activate_culminescence()                                      //181108
+      { /*assert (false); */return false; }
+   inline virtual bool activate_senescence()                                         //181108
+      { assert (false); return false; }
+   virtual bool activate_tuberization()                                            ; //181108
+   inline virtual bool activate_fructescence()             { growth_stage = FGS_FRUCTESCENCE; return true; } //190214
+   inline virtual bool activate_veraison()                 { growth_stage = FGS_VERAISON; return true; } //190214
+   inline virtual bool activate_rapid_fruit_development()  { growth_stage = FGS_RAPID_FRUIT_DEVELOPMENT; return true; } //190214
+   virtual bool activate_anthesis()                                                ; //181108
+   virtual bool activate_yield_formation() /*181113 know_filling() */              ; //181108
+   virtual bool activate_maturity()                                                ; //181108
+   virtual bool activate_quiescence
+      ();                                                                        //190424
+      //190424 (bool apply_dormancy)                                                    ; //181108
+   virtual bool activate_restart()                                                 ; //181108
+   virtual bool activate_harvestable()                                             ; //181108
+   virtual bool activate_harvest()                                                 ; //181108
+   virtual nat16 get_season_duration_days()                                    const; //181111
+
+
+   //moved to absract virtual CORN::date32 get_planting_date()                             const; //181111
+   inline virtual CORN::date32 get_restart_date()                              const { assert(false); return false;} //181111
+   inline virtual CORN::date32 get_emergence_date()                            const { assert(false); return false;} //181111
+   inline virtual CORN::date32 get_anthesis_date()                             const { assert(false); return false;} //181111
+   inline virtual CORN::date32 get_tuberization_date()                         const { assert(false); return false;} //181111
+   inline virtual CORN::date32 get_maturity_date()                             const { assert(false); return false;} //181111
+   inline virtual CORN::date32 get_yield_formation_date()                      const { assert(false); return false;} //181111 // was get_initial_fruit_growth_date
+   inline virtual CORN::date32 get_culminescence_date()                        const { assert(false); return false;} //181111 // was get_initial_fruit_growth_date
+   // virtual CORN::date32 get_harvest_date()                              const=0; //181111
+   inline virtual CORN::date32 get_quiescence_init_date()                      const { assert(false); return false;} //181111
+   inline virtual CORN::date32 get_quiescence_culm_date()                      const { assert(false); return false;} //181111
+   //#ifdef CROP_ORCHARD
+   inline virtual CORN::date32 get_fructescence_date()                   const { assert(false); return false;} //181111 // was get_initial_fruit_growth_date
+   // inline virtual CORN::date32 get_bud_break_date()                      const { assert(false); return false;} //181111
+   inline virtual CORN::date32 get_rapid_fruit_growth_date()             const { assert(false); return false;} //181111
+   //deleteme inline virtual CORN::date32 get_chill_requirement_satisfied_date()    const { assert(false); return false;} //181111
+   // #endif
+
+
+};
+//#define Phenology_201x Phenology_2013
+//_Phenology_2013___________________________________________________2018-08-11_/
+
+//______________________________________________________________________________
+} //namespace CropSyst
+
+#endif
+

@@ -1,0 +1,338 @@
+#ifdef VIC_CROPSYST_VERSION
+#include "VIC_soil.h"
+//160629LML #include "CS_suite/observation/CS_inspection.h"
+//160629LML #include "CS_suite/observation/CS_inspector.h"
+namespace VIC
+{
+//______________________________________________________________________________
+Soil::Soil
+(const CORN::date32       &today
+,const CS::Annual_temperature   &_annual_temperature                             //150424
+, const layer_data_struct *VIC_layer // array
+, const soil_con_struct &_VIC_soil_con
+)
+: CropSyst::Soil
+(0
+ ,false                                                                          //161031LML
+#ifdef OLD_EVAPORATE                                                             //160629LML
+,evaporation_potential_remaining
+#endif
+,today
+,_annual_temperature                                                             //150424
+#ifdef SOIL_TEMPERATURE
+,weather
+#endif
+)
+, layers()
+, hydraulic_properties(_VIC_soil_con)                                            //150331
+, hydrology(layers,hydraulic_properties,_VIC_soil_con,VIC_layer)
+, temperature(VIC_layer)
+, temperature_profile_hourly(temperature)                                          //150424
+, VIC_soil_con(_VIC_soil_con)
+{
+    delete Soil_base::layers;
+    delete Soil_base::hydraulic_properties;
+    Soil_base::layers = 0;
+    Soil_base::hydraulic_properties = 0;
+}
+//_2014-12-07_RLN_______________________________________________________________
+float64 *Soil_hydrology::get_liquid_water_content_layers_volumetric
+(soil_layer_array64(water_content_layers))                                 const
+{
+   assert(false); return 0; // RLN Need to implement
+}
+//_2014-12-07_RLN_______________________________________________________________
+float64 Soil_hydrology::get_liquid_water_content_volumetric(nat8 layer)    const
+{
+   nat8 VIC_layer_index = layer-1; //RLN Need to check
+   return VIC_layer[VIC_layer_index].moist / m_to_mm(VIC_soil_con.depth[VIC_layer_index]);
+}
+//_2014-12-07_RLN_______________________________________________________________
+float64 Soil_hydrology::get_ice_content_volumetric(nat8 layer)             const
+{
+   nat8 VIC_layer_index = layer-1; //RLN Need to check
+   double ice = 0.0;
+#ifdef VCS_V5
+   for (int frost_area = 0; frost_area < options.Nfrost; frost_area++) {
+      ice += VIC_layer[VIC_layer_index].ice[frost_area] * VIC_soil_con.frost_fract[frost_area];
+   }
+   ice /= m_to_mm(VIC_soil_con.depth[VIC_layer_index]);
+#else
+   ice = VIC_layer[VIC_layer_index].ice / m_to_mm(VIC_soil_con.depth[VIC_layer_index]);
+#endif
+   return ice;
+}
+//_2014-12-07_RLN_______________________________________________________________
+float64 Soil_hydrology::get_water_potential(nat8 layer)                    const
+{
+   //assert(false); return 0; // RLN Need to implement
+    return calc_water_potential(layer, true /*consider_ice*/, false /*FC_PWP_based*/);  //150608LML copied from C:\dev\CropSyst\source\soil\hydrology.cpp Soil_hydrology_abstract::get_water_potential
+}
+//_2015-06-08_LML_______________________________________________________________
+//_1998-10-30___________________________________________________________________
+float64 Soil_hydrology::calc_water_potential( nat8 layer,bool consider_ice,bool FC_PWP_based) const
+{ // Water retention curve.
+   //150608 copied from C:\dev\CropSyst\source\soil\hydrology.cpp Soil_hydrology_abstract::calc_water_potential
+   float64 water_content_sublayer = get_liquid_water_content_volumetric(layer);  //990316
+   float64 saturation_water_content_sublayer =                                   //980730
+                 hydraulic_properties_ref.get_saturation_water_content_volumetric(layer,ICE_WATER_CONTENT_RELEVENCE_UNKNOWN_140822);  //051204
+   float64 air_entry_pot_sublayer = get_air_entry_pot(layer,consider_ice,FC_PWP_based);     //980730
+   float64 b_sublayer = hydraulic_properties_ref.get_Campbell_b(layer,FC_PWP_based);       //980730
+   float64 ice_content_sl = consider_ice                                         //990315
+     ?get_ice_content_volumetric(layer)                                          //060505
+      : 0.0;                                                                     //990315
+   float64 sat_water_cont = saturation_water_content_sublayer - ice_content_sl;  //990331
+   float64 result =
+     (  (water_content_sublayer < saturation_water_content_sublayer)
+      &&(water_content_sublayer > 0.0000001)  //prevent FP overflow              //990606
+      &&(sat_water_cont > 0.0)) // prevent div 0                                 //041111
+     ? (air_entry_pot_sublayer * pow((water_content_sublayer/ sat_water_cont),-b_sublayer)) //990331
+     : air_entry_pot_sublayer;
+   return result;
+}
+//160629LML____________________________________________________________________/
+float64 Soil_hydrology::calc_available_water_fraction(nat8 sublayer, bool real_wilt_based) const
+{
+   //160629LML Copied (with some adjustments) from C:\dev\CropSyst\source\soil\hydrology.cpp
+   float64 field_capacity_sl=hydraulic_properties_ref.get_field_capacity_volumetric(sublayer);
+   float64 perm_wilt_sl     =hydraulic_properties_ref.get_permanent_wilt_point_volumetric(sublayer);
+   float64 wilt_point_sl = real_wilt_based
+      ? real_wilt_point[sublayer]
+      : perm_wilt_sl;
+   float64 avail_water_sl =  CORN_must_be_between
+   (((get_liquid_water_content_volumetric(sublayer) - wilt_point_sl) /
+    (field_capacity_sl       - wilt_point_sl))
+   ,0.0,1.0);
+   if (sublayer > soil_layers.get_number_uninundated_layers())
+      avail_water_sl = 1.0;
+   return avail_water_sl;
+}
+//160629LML____________________________________________________________________/
+float64 Soil_hydrology::calc_available_water_depth_to(float64 depth) calculation_
+{
+   //160629LML Copied (with some adjustments) from C:\dev\CropSyst\source\soil\hydrology.cpp
+   float64 AW_to_depth = 0;
+   float64 remaining_depth = depth;
+   nat8 to_layer = soil_layers.get_layer_at_depth(depth);
+   for (nat8 lyr = 1; lyr < to_layer; lyr++)
+   {  float64 lyr_thickness = soil_layers.get_thickness_m(lyr);
+      float64 perm_wilt_lyr = hydraulic_properties_ref.get_permanent_wilt_point_volumetric(lyr);
+      float64 WC_lyr        = get_liquid_water_content_volumetric(lyr);
+      float64 AW_volumetric = WC_lyr - perm_wilt_lyr;
+      float64 AW_depth_layer = AW_volumetric * lyr_thickness;
+      AW_to_depth += AW_depth_layer;
+      remaining_depth -= lyr_thickness;
+   }
+   // add bit in final layer
+   float64 perm_wilt_last     = hydraulic_properties_ref.get_permanent_wilt_point_volumetric(to_layer);
+   float64 WC_last            = get_liquid_water_content_volumetric(to_layer);
+   float64 AW_volumetric_last = WC_last - perm_wilt_last;
+   float64 AW_depth_layer_last= AW_volumetric_last * remaining_depth;
+   AW_to_depth += AW_depth_layer_last;
+   return AW_to_depth;
+}
+//160812LML_____________________________________________________________________
+float64 Soil_hydrology::calc_ice_depth_to(float64 depth)            calculation_
+{
+   float64 ICE_to_depth = 0;
+   float64 remaining_depth = depth;
+   nat8 to_layer = soil_layers.get_layer_at_depth(depth);
+   for (nat8 lyr = 1; lyr < to_layer; lyr++)
+   {  float64 lyr_thickness = soil_layers.get_thickness_m(lyr);
+      float64 ICE_lyr        = get_ice_content_volumetric(lyr);
+      float64 ICE_depth_layer = ICE_lyr * lyr_thickness;
+      ICE_to_depth += ICE_depth_layer;
+      remaining_depth -= lyr_thickness;
+   }
+   // add bit in final layer
+   float64 ICE_last            = get_ice_content_volumetric(to_layer);
+   float64 ICE_depth_layer_last= ICE_last * remaining_depth;
+   ICE_to_depth += ICE_depth_layer_last;
+   return ICE_to_depth;
+}
+//170525LML_____________________________________________________________________
+float64 Soil_hydrology::get_water_plus_ice_content_volumetric  (nat8 layer) const
+{
+    float64 ice =
+        #ifdef VCS_V5
+            VIC_layer[layer-1].ice[0];                                           //170525LML NIY
+        #else
+            VIC_layer[layer-1].ice;
+        #endif
+    return (ice + VIC_layer[layer-1].moist) / soil_layers.get_thickness_mm(layer);
+}
+//_2015-03-18___________________________________________________________________
+float64 Soil_hydrology::get_water_filled_porosity(nat8 layer, CORN::Hour for_hour)                                    const
+{  float64 wc =
+      (for_hour == 24)                                                           //070117
+      ? get_water_plus_ice_content_volumetric(layer) // claudio conf             //070827
+      : get_water_plus_ice_content_volumetric_at(layer,for_hour); // claudio conf //070827
+   return  wc / hydraulic_properties_ref.get_saturation_water_content_volumetric(layer,ICE_WATER_CONTENT_RELEVENCE_UNKNOWN_140822);
+}
+
+//_2015-10-22RLN___________________________________________________________________
+float64 Soil_hydrology::extract_water(float64 water_uptake_m[] ,nat8 start_layer)
+{
+    //start_layer: CropSyst layer, start from 1
+   double total_wateruptake(0.0);   //(m)
+   for (int i = start_layer-1; i <= options.Nlayer-1; i++) {
+       VIC_layer[i].VCS.transpiration_daily = m_to_mm(water_uptake_m[i+1]);
+       total_wateruptake += mm_to_m(VIC_layer[i].VCS.transpiration_daily);
+       //printf("VIC_layer(%d) Transpiration(%f)\n",i,VIC_layer[i].transpiration_daily);
+   }
+   return total_wateruptake;
+}
+//_2015-05-29___________________________________________________________________
+float64 Soil_hydrology::calc_available_water(nat8 layer , bool real_wilt_based) const
+{
+    /*150529LML used in Soil_disturbance::process
+    revised from Soil_hydrology_abstract::calc_available_water */
+    //190806LML float64 field_capacity_sl   = VIC_soil_con.Wcr[layer-1] / m_to_mm(VIC_soil_con.depth[layer-1]);
+    float64 field_capacity_sl   = VIC_soil_con.VCS.Field_Capacity[layer-1] / m_to_mm(VIC_soil_con.depth[layer-1]); //190806LML
+    float64 wilt_point_sl       = VIC_soil_con.Wpwp[layer-1] / m_to_mm(VIC_soil_con.depth[layer-1]);
+    float64 avail_water_sl =  CORN_must_be_between
+    (((get_liquid_water_content_volumetric(layer) - wilt_point_sl) /
+     (field_capacity_sl       - wilt_point_sl))
+    ,0.0,1.0);
+    return avail_water_sl;
+}
+//_2015-05-29___________________________________________________________________
+float64 Soil_hydrology::get_air_entry_pot(nat8 layer,bool consider_ice_content,bool FC_PWP_based) const
+{
+    //150529LML revised from C:\dev\CropSyst\source\soil\hydrology.cpp
+    float64 air_entry_pot_sl = hydraulic_properties_ref.get_air_entry_potential(layer,FC_PWP_based);  //990321
+        nat8 num_sublayers = soil_layers.get_number_layers();                   //060505
+       if (num_sublayers && // don't check this condition when initializing the soil //991030
+           (layer > num_sublayers))
+       // Special case for F.D. which looks a sublayers + 1                          //991030
+             air_entry_pot_sl = get_air_entry_pot(layer-1,consider_ice_content,FC_PWP_based);//991030
+       else                                                                          //991030
+       {  float64 soil_b_sl = hydraulic_properties_ref.get_Campbell_b(layer,FC_PWP_based);  //990321
+          float64 ice_content_sl =                                                   //990321
+             get_ice_content_volumetric(layer);                                   //060505
+          if ((ice_content_sl > 0.0) && consider_ice_content )                       //990321
+          {  float64 sat_WC_ice_adjusted = hydraulic_properties_ref.get_saturation_water_content_volumetric(layer,ice_content_sl); //140822_051204
+             float64 sat_WC_total =        hydraulic_properties_ref.get_saturation_water_content_volumetric(layer,0.0); //051204
+             air_entry_pot_sl =                                                      //990321
+                (ice_content_sl > sat_WC_ice_adjusted)                               //140822_990331
+                ? 0.0 /*air_entry_pot_sl*/                                           //990331
+                :  // 050729 Was returning 0.0, but this causes div/0 in caller.     //990331
+                   // WARNING not sure what to return in this case, but it can't be 0.0
+                  air_entry_pot_sl *                                                 //990321
+                  pow (sat_WC_ice_adjusted / sat_WC_total                             //140822
+                      ,- soil_b_sl);            //990321
+          }
+       }
+       return air_entry_pot_sl;
+}
+//2017-06-28____________________________________________________________________
+float64 Soil_hydrology::calc_water_depth_profile(bool liquid_and_ice)      const
+{  float64 water_depth_profile = 0.0;
+   for (uint8 i = 1 ; i <= soil_layers.get_number_layers(); i++)             //980724
+   {  float64 wc_sl = liquid_and_ice
+            ? get_water_plus_ice_content_volumetric(i)                           //990316
+            : get_liquid_water_content_volumetric(i);                            //990316
+      water_depth_profile += wc_sl * soil_layers.get_thickness_m(i);
+   }
+   return water_depth_profile;
+}
+//_2015-04-03___________________________________________________________________
+bool Soil_layers::set_thickness_by_depth(nat8 tolayer)
+{
+    if (get_depths_provided()) {
+        for (nat8 layer = 1; layer <= tolayer; layer++)
+        {
+            float64 thick = layer > 1 ? get_depth_m(layer) - get_depth_m(layer-1)
+                                      : get_depth_m(layer);
+            set_thickness_m(layer,thick);
+        }
+        set_thickness_provided(true);
+        return true;
+    } else {
+        return false;
+    }
+}
+//_2015-04-03___________________________________________________________________
+bool Soil_layers::set_depth_by_thickness(nat8 tolayer)
+{
+    if (get_thickness_provided()) {
+        float64 todepth = 0;
+        for (nat8 layer = 1; layer <= tolayer; layer++)
+        {
+            todepth += get_thickness_m(layer);
+            set_depth_m(layer,todepth);
+        }
+        set_depths_provided(true);
+        return true;
+    } else {
+        return false;
+    }
+}
+//_2015-03-18___________________________________________________________________
+Soil_layers::Soil_layers()
+: depths_provided(false)
+,thickness_provided(false)
+{}
+//_2015-03-18___________________________________________________________________
+Soil_layers::~Soil_layers() {};
+//_2015-03-18___________________________________________________________________
+
+
+
+
+} // namespace VIC
+/*
+//LML 150318 copy from C:\dev\VIC_CropSyst\crop\VIC_soil_hydrology.c
+int today_is_irrigation(
+                        double MAD_crop_specific
+                        ,int rec
+                        ,double applied_irrigation
+                        )
+{
+//irrigation_pattern_struct *irrig_pattern;
+#if (FULL_IRRIGATION==TRUE)
+    int i=0;
+    double soil_water_deficit=0.0;
+    double sum_of_PWP=0.0;
+    double sum_of_FC=0.0;
+    double accumulative_soil_depth=0.0;
+    double total_available_water=0.0;
+    for (i=0; i<options.Nlayer-1; i++){ ///we do not count on last layer water for decision of irrigation
+        double layer_thickness_mm = soil_con_global->depth[i] *1000;
+        double root_depth_mm = VIC_CropSyst_get(VC_root_depth_mm);
+        if(root_depth_mm>0){
+            int keyvan=1;
+        }
+        accumulative_soil_depth += layer_thickness_mm;
+        //if (root_depth_mm >= accumulative_soil_depth){ ///keyvan just turned it off at this time but this method makes more sense
+
+        sum_of_FC += soil_con_global->Wcr[i];//0.7;//*soil_con_global->depth[i]*1000;
+        sum_of_PWP += soil_con_global->Wpwp[i];
+        // total_available_water=sum_of_FC - sum_of_PWP;
+        //}
+    }
+    total_available_water=sum_of_FC - sum_of_PWP;
+    soil_water_deficit=refill_water_depth_mm();
+    //LML 141015 soil_water_deficit=VIC_CropSyst_get_return;
+    //if(refill_water_depth_mm()>20){
+    if (applied_irrigation>0){
+        return (total_available_water>0.0 &&
+                ((soil_water_deficit/total_available_water)>MAD_crop_specific));
+    }
+    else {
+        return 0;
+    }
+#else
+    //today_is_deficit_irrigation()
+    return (irrig_patt[rec].irrig_amount>0);
+#endif
+};
+*/
+
+RENDER_INSPECTORS_DEFINITION(VIC::Soil_hydrology)
+{
+    KNOW_EMANATOR(global_today,true);
+    //150922 RLN NYI
+    return &emanator;
+}
+#endif //VIC_CROPSYST_VERSION

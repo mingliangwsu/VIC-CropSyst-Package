@@ -1,0 +1,340 @@
+#include "format/structure_factory_A.h"
+#include "container/text_list.h"
+#include <algorithm>
+#include <iostream>
+namespace structural
+{
+//______________________________________________________________________________
+Factory_abstract::Factory_abstract(Map *document_map_)
+: Factory                                                                     ()
+, map_stack                                                                   ()
+, map_count                                                                  (0)
+, document_map                                                   (document_map_)
+, current_map                                                                (0)
+{
+   for (int i = 0; i < 127; i++) map_stack[i] = 0;
+   map_stack[map_count++] = current_map = document_map_;
+}
+//_Factory_abstract:constructor_____________________________________2020-03-20_/
+Construct *Factory_abstract::render
+(const char *type_tag)
+{
+
+   // The tag is the type of structure to be rendered
+// tag does not have introducer (I.e. str not !!str)
+
+   // Normally this will be implemented in derived classes, but may want
+   // to default to a generic Map
+
+   return 0; //NYI
+}
+//_render___________________________________________________________2020-03-15_/
+Pair_key_value *Factory_abstract::render_key_value
+(const char *key_compact
+,const char *type_tag)
+{  Pair_key_value *rendered = 0;
+   // The key may be simple xxx  or compact xxx:yyy
+   // The tag is the type of structure to be rendered
+
+   /*
+   if (type_tag)
+   {
+      if (type_tag == "xxx")
+      {
+         rendered = new Pair_key_xxxx
+      } else
+
+   } else
+   */
+      rendered = new
+         Pair_key_value
+            (new Scalar_string_clad(key_compact)
+            ,new Scalar_string_clad(""));
+   return rendered;
+}
+//_render_key_value_________________________________________________2020-03-15_/
+Pair_key_value &Factory_abstract::provide_key_value
+(const char *key_compact
+,const char *type_tag)
+{
+    // The key may be simple xxx  or compact xxx:yyy
+    // The tag is the type of structure to be rendered
+
+
+
+}
+//_provide_key_value________________________________________________2020-03-15_/
+bool Factory_abstract::expect_map
+(const char *compact_key
+,const char *type_tag)                                              expectation_
+{
+   std::string compact_key_clad(compact_key);
+   size_t colon_pos = compact_key_clad.find(":");
+   if (colon_pos == std::string::npos)
+   {  // using indentation model
+      nat8 key_indentation = 0;
+      for (nat8 i = 0; compact_key[i] == ' '; i++)
+          key_indentation++;
+      if (key_indentation > map_count)
+      {
+         if (key_indentation = map_count+1)
+         {
+            std::string key_name(compact_key,key_indentation);
+            Scalar_string_clad *key = new Scalar_string_clad(key_name);
+            Pair_key_value *pair = current_map->provide_key_value_pair(key);
+            Pair_key_map *pair_as_key_map = dynamic_cast<Pair_key_map *>(pair);
+            if (pair_as_key_map)
+            {
+               Map *value_as_map = dynamic_cast<Map *>(&pair_as_key_map->map);
+               map_stack[map_count++] = value_as_map;
+               map_stack[map_count] = 0;
+               current_map = value_as_map;
+            } else return false;
+               // Should not occur but would indicate the programmer had defined
+               // an item (probably scalar) with the same name as the map at the same level.
+            }
+         else
+         {
+            std::cerr << "error: too much indentation in structure expectation" << std::endl;
+            return false;
+         }
+      }
+      else if (key_indentation < map_count)
+      {
+         while (map_count > key_indentation)
+         {
+            map_stack[map_count--] = 0;
+            current_map = map_stack[map_count];
+         }
+      }
+      else if (key_indentation == map_count)
+      {
+         // same indentation level, no change of map
+      }
+   }
+   else
+   {  // compact map qualification (i.e. xxx:yyy:zzz)
+      // Currently assuming fully qualified
+      // Generally all espectations would be fully qualified,
+      // but it is perfectly acceptable to have following qualifications
+      // using indentation idiom, so we maintain the stack.
+      CORN::Text_list qualification(compact_key,':');
+      map_count = 0;
+      map_stack[0] = current_map = document_map;
+      for (CORN::Item_string *key_name
+            = dynamic_cast<CORN::Item_string *>(qualification.pop_at_head())
+          ;key_name
+          ;key_name
+             = dynamic_cast<CORN::Item_string *>(qualification.pop_at_head()))
+      {
+         Scalar_string_clad *key = new Scalar_string_clad(key_name);
+         Pair_key_value *pair = current_map->provide_key_value_pair(key);
+            // key relinquished
+            // item provided
+         Pair_key_map *pair_as_key_map = dynamic_cast<Pair_key_map *>(pair);
+         if (pair_as_key_map)
+         {
+            Map *value_as_map = dynamic_cast<Map *>(&(pair_as_key_map->map));
+            map_stack[map_count++] = value_as_map;
+            map_stack[map_count] = 0;
+            current_map = value_as_map;
+         } else return false;
+            // Should not occur but would indicate the programmer had defined
+            // an item (probably scalar) with the same name as the map at the same level.
+      }
+   }
+   return true;
+}
+//_____________________________________________________________________________/
+Pair_key_value *Factory_abstract::provide_map_scalar(const char *compact) provision_
+{  Pair_key_value *key_value_pair_scalar=0;
+   Key_string *scalars_key = 0;
+   std::string compact_string(compact);
+   size_t rightmost_colon_pos = compact_string.rfind(":");
+   if (rightmost_colon_pos == std::string::npos)
+   {
+      nat8 key_indentation = 0;
+      for (nat8 i = 0; compact[i] == ' '; i++)
+          key_indentation++;
+      if (key_indentation)
+      {
+         if (key_indentation == map_count)
+         {  // if the indentation is the same as the map_count this is probably an error
+            return 0;
+            // There appears to be an error in map structure expectation definition
+         } else if (key_indentation == (map_count+1))
+         {  std::string scalars_key_raw(compact_string,key_indentation);
+            scalars_key = new Key_string(scalars_key_raw);
+         }
+         else
+         while (map_count > key_indentation)
+         {
+            map_stack[map_count--] = 0;
+            current_map = map_stack[map_count];
+         }
+      } else
+      {  scalars_key = new Key_string(compact);
+         /*
+         we are at document map
+         and the compact specifies scalar value  (this normally would be the case unless it is a simple map
+         it is the scalars key
+         */
+      }
+   } else
+   {  nat8 colon_count
+      = std::count(compact_string.begin(), compact_string.end(), ':');
+      if (colon_count > map_count)
+      {
+         std::cerr << "error: there are more maps in the qualification than have currently been encountered in map expectation" << std::endl;
+         return 0;
+      } else
+      {  // pop the qua maps
+         while (map_count > colon_count)
+         {
+            map_stack[colon_count--] = 0;
+            current_map = map_stack[colon_count];
+         }
+         std::string scalars_key_raw(compact,rightmost_colon_pos);
+         scalars_key = new Key_string(compact);
+      }
+   }
+   if (scalars_key) // we can instantiate Pair_key_value
+   {
+      key_value_pair_scalar = new Pair_key_value(scalars_key,0);
+         // the value for the pair will be empty, to be provided by caller.
+      current_map->take(key_value_pair_scalar);
+   }
+   return key_value_pair_scalar;
+}
+//_________________________________________________________________2020-03-20_/
+bool Factory_abstract::expect(const char *compact,std::string &as_str) expectation_
+{  return expect_T<Scalar_string_cowl,std::string>(compact,as_str);
+/*obsolete now use expect_T
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_string_cowl *scalar = new Scalar_string_cowl(as_str);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,bool &as_bool)    expectation_
+{
+   return expect_T<Scalar_bool,bool>(compact,as_bool);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_bool *scalar = new Scalar_bool(as_bool);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,char &as_char)    expectation_
+{
+   return expect_N<Scalar_number,char>(compact,as_char);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_number *scalar = new Scalar_number();
+   scalar->associate_value<char>(as_char);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,nat8 &as_nat8)    expectation_
+{
+   return expect_N<Scalar_number,nat8>(compact,as_nat8);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_number *scalar = new Scalar_number();
+   scalar->associate_value<nat8>(as_nat8);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,nat16 &as_nat16)  expectation_
+{
+   return expect_N<Scalar_number,nat16>(compact,as_nat16);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_number *scalar = new Scalar_number();
+   scalar->associate_value<nat16>(as_nat16);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,nat32 &as_nat32)  expectation_
+{
+   return expect_N<Scalar_number,nat32>(compact,as_nat32);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_number *scalar = new Scalar_number();
+   scalar->associate_value<XXXX>(as_XXXX);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,int8 &as_int8)    expectation_
+{
+   return expect_N<Scalar_number,int8>(compact,as_int8);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_number *scalar = new Scalar_number();
+   scalar->associate_value<XXXX>(as_XXXX);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,int16 &as_int16)  expectation_
+{
+   return expect_N<Scalar_number,int16>(compact,as_int16);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_number *scalar = new Scalar_number();
+   scalar->associate_value<XXXX>(as_XXXX);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,int32 &as_int32)  expectation_
+{
+   return expect_N<Scalar_number,int32>(compact,as_int32);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_number *scalar = new Scalar_number();
+   scalar->associate_value<XXXX>(as_XXXX);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,float32 &as_float32) expectation_
+{
+   return expect_N<Scalar_number,float32>(compact,as_float32);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_number *scalar = new Scalar_number();
+   scalar->associate_value<XXXX>(as_XXXX);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,float64 &as_float64) expectation_
+{
+   return expect_N<Scalar_number,float64>(compact,as_float64);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_number *scalar = new Scalar_number();
+   scalar->associate_value<XXXX>(as_XXXX);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+bool Factory_abstract::expect(const char *compact,Enum_abstract &as_enum) expectation_
+{
+   return expect_T<Scalar_enum,Enum_abstract>(compact,as_enum);
+/*obsolete now use expect_N
+   Pair_key_value *key_value_pair = provide_map_scalar(compact);
+   Scalar_number *scalar = new Scalar_number();
+   scalar->associate_value<XXXX>(as_XXXX);
+   return key_value_pair->take_value(scalar) != 0;
+*/
+}
+//_____________________________________________________________________________/
+}//_namespace_structural_______________________________________________________/
+

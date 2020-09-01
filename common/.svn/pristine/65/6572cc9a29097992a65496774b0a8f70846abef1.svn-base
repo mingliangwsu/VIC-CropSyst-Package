@@ -1,0 +1,363 @@
+#include "coordinates.h"
+#include "corn/OS/file_system_engine.h"
+#include "common/geodesy/geolocation_item.h"
+#include "corn/seclusion.h"
+#include <assert.h>
+
+namespace geodesy
+{
+//______________________________________________________________________________
+Coordinates::Arguments::Arguments
+(CORN::Data_record &data_rec_)                                                   //191014
+: data_rec                                                           (data_rec_) //191014
+, geocoordinates_filename                                                    (0)
+, ID_fieldname                                                            ("ID") //171111
+//NYI , predefined_extent()
+, cell_dimension                                                              ()
+, precision_latitude                                                         (2)
+, precision_longitude                                                        (2)
+, CS_geocoordinates_dir_raw() //191103                                                      (0) //180318
+, zone                                                                       (0) //180816
+, zone_designator                                                            (0) //180816
+{}
+//_Coordinates::Arguments:constructor_______________________________2016-08-25_/
+Coordinates::Arguments::~Arguments()
+{  delete geocoordinates_filename;
+}
+//_Coordinates::Arguments:destructor________________________________2016-08-25_/
+/*191103 obsolete now using CORN::Arguments::discover_one
+bool Coordinates::Arguments::s_ubmit_DEN
+(CORN::OS::Directory_entry_name *param_DEN)                          submission_
+{  bool recognized = false;
+   if ( (param_DEN->has_extension(L"DBF"))
+      ||(param_DEN->has_extension(L"dbf")))
+   {  if (CORN::OS::file_system_engine.exists(*param_DEN))
+      {  geocoordinates_filename = param_DEN;
+         recognized=true;
+      }
+   }
+   if ( (param_DEN->has_extension(L"TXT"))
+      ||(param_DEN->has_extension(L"txt"))
+      ||(param_DEN->has_extension(L"DAT"))
+      ||(param_DEN->has_extension(L"dat")))
+   {  if (CORN::OS::file_system_engine.exists(*param_DEN))
+      {  geocoordinates_filename = param_DEN;
+         recognized=true;
+      }
+   }
+   return recognized;
+}
+//_Coordinates::Arguments::s_ubmit_DEN_______________________________2018-02-13_/
+bool Coordinates::Arguments::s_ubmit_DEN_unqualified
+(CORN::OS::Directory_entry_name *param_DEN_unqualified)              submission_
+{
+   bool recognized = false;
+   if ( (param_DEN_unqualified->has_extension(L"DBF"))
+      ||(param_DEN_unqualified->has_extension(L"dbf")))
+   {
+      geocoordinates_filename =
+            CORN::OS::file_system_engine.find_file_name
+               (param_DEN_unqualified->w_str()
+               ,CORN::global_arguments->start_directory                          //191014
+               ,CORN::OS::File_system::superdirectory_recursion_inclusive
+               //NYI may want to specify logical root
+               );
+      recognized = geocoordinates_filename != 0;
+   }
+   return recognized;
+}
+//_Coordinates::Arguments::s_ubmit_DEN_unqualified___________________2018-02-13_/
+*/
+/*2019-10-14 obsolete, moved to get_end
+bool Coordinates::Arguments::r_ecognize(const std::string &paramstring) modification_
+{  bool recognized = false;                                                      //190224
+   Geocoordinate_format surmised_format;                                         //161122
+   if (!recognized)
+   {
+   if (paramstring.find("km") != std::string::npos)
+   {  std::string length_km_str(paramstring,0,paramstring.length()-2);
+      cell_dimension.length_km = CORN::cstr_to_float32(length_km_str.c_str());
+      recognized = cell_dimension.length_km > 0;
+   }
+   else if (paramstring.find("m") != std::string::npos)
+   {  std::string length_m_str(paramstring,0,paramstring.length()-1);
+      float32 length_m = CORN::cstr_to_float32(length_m_str.c_str());
+      cell_dimension.length_km = m_to_km(length_m);
+      recognized = length_m > 0; //190225 true;
+   }
+
+// Warning eventually this needs to be Coordinate::Item
+//   else                                                                          //180318
+//   {
+//      // Warning eventually this needs to be Coordinate::Item
+//
+//      Geocoordinate_item *geocoord = new Geocoordinate_item(paramstring);
+//      if (geocoord->is_valid()) // if the argument is a geocoordinate ISO format
+//      {
+//         specific_geocoordinates.take(geocoord);
+//         recognized = true;
+//      }
+//      else delete geocoord;
+//   }
+
+   return recognized;                                                            //191014
+}
+//_Coordinates::Arguments::r_ecognize___________________________________________/
+*/
+bool Coordinates::Arguments::expect_structure(bool for_write)
+{  bool expected
+   =  data_rec.expect_nat8("--precision_latitude" ,precision_latitude,10)
+   && data_rec.expect_nat8("--precision_longitude",precision_longitude,10)
+   && data_rec.expect_string("--ID",ID_fieldname)
+   && data_rec.expect_string("--UTMzone",UTMzone)
+   && data_rec.expect_string("--CS_geocoordinates",CS_geocoordinates_dir_raw);
+   //&& data_rec.expect_directory_entry_name("--CS_geocoordinates",CS_geocoordinates_dir);
+
+/*NYI need Extent using Coordinate::Item
+   && data_rec.epxect_string("--extent",predefined_extent);                      //180318
+*/
+   ;
+   return true;
+}
+//_expect_structure_________________________________________________2019-10-14_/
+/*191103 moved, implemented as expect_structure
+bool Coordinates::Arguments::r_ecognize_assignment
+      (const std::string &variable
+      ,const std::string &value)                                  modification_
+{  bool recognized = false;
+   if (variable == "--CS_geocoordinates")                                        //180318
+   {
+      CS_geocoordinates_dir = new CORN::OS::Directory_name_concrete(value);
+      recognized = true;
+   }
+//NYI need Extent using Coordinate::Item
+//   else if (variable == "--extent")                                              //180318
+//   {  predefined_extent.set(value);
+//      recognized = true;
+//   }
+  return recognized;
+}
+//_Coordinates::Arguments::r_ecognize_assignment_____________________2017-08-28_/
+*/
+
+bool Coordinates::Arguments::take(CORN::Item_string *arg)
+{  bool taken = false;
+   if (arg)
+   {  if (arg->find("km") != std::string::npos)
+      {  std::string length_km_str((*arg),0,arg->length()-2);
+         cell_dimension.length_km = CORN::cstr_to_float32(length_km_str.c_str());
+         taken = cell_dimension.length_km > 0;
+      }
+      else if (arg->find("m") != std::string::npos)
+      {  std::string length_m_str((*arg),0,arg->length()-1);
+         float32 length_m = CORN::cstr_to_float32(length_m_str.c_str());
+         cell_dimension.length_km = m_to_km(length_m);
+         taken = length_m > 0;
+      }
+      if (taken) { delete arg; arg = 0;}
+   }
+   return taken;
+}
+//_take_____________________________________________________________2020-02-15_/
+
+bool Coordinates::Arguments::get_end()
+{  bool ended = true;                                                            //191014
+
+   /* conceptual provide option to reference coordinate to
+      centroid or SW NW  NE WE corner of grid cell
+      (Note that ESRI grids are SW corner oriented
+      currently always centroid
+   else if (paramstring == "centroid")
+   {  centroid = true
+      recognized = true;
+   }
+   */
+   if (!geocoordinates_filename) // discover
+   {
+      CORN::Seclusion recognizable_point_file_types(true);
+      recognizable_point_file_types.include_pattern_cstr("*.DBF");
+      recognizable_point_file_types.include_pattern_cstr("*.dat");
+      recognizable_point_file_types.include_pattern_cstr("*.txt");
+      geocoordinates_filename = dynamic_cast<CORN::OS::Directory_entry_name *>
+         (CORN::global_arguments->discover_one
+            (recognizable_point_file_types
+            ,CORN::OS::file_entry
+            ,CORN::OS::File_system::superdirectory_recursion_inclusive));
+   } else
+      if (CORN::is_approximately<float32>(cell_dimension.length_km,0.0,0.00000001))
+      {  std::cerr << "A points file or cell dimension must be specified" << std::endl;
+         ended = false;
+      }
+   if (!UTMzone.empty())
+   {  std::string zone_str(UTMzone,0,3);
+      zone = CORN::cstr_to_int16(zone_str.c_str(),10);
+      zone_designator = UTMzone[3];
+      ended &= true;
+   }
+   return ended;                                                                 //161023
+}
+//_Coordinates::Arguments::get_end_____________________________________________/
+
+
+
+/*191103 Now using Arguments_discover_one
+bool Coordinates::Arguments::geocoordinates_find_qualified_filename()
+{ // The filename may be unqualified or directory may have changed so search for it
+   bool found = false;
+   if (CORN::global_arguments->verbose_flag)
+      std::clog << "searching for: " << geocoordinates_filename->c_str() << std::endl;
+   std::wstring name_with_ext;
+   geocoordinates_filename->get_name_with_extension(name_with_ext);
+   CORN::OS::File_name *found_geocoords_filename = CORN::OS::file_system_engine.
+   find_file_name
+   (name_with_ext
+   ,CORN::global_arguments->start_directory
+   ,CORN::OS::File_system::Recursion::superdirectory_recursion_inclusive);
+   if (found_geocoords_filename)
+      geocoordinates_filename = found_geocoords_filename;
+   // At this point the geocoord filename should be fully qualified.
+   return found_geocoords_filename != 0;
+}
+//_geocoordinates_find_qualified_filename______________________________________/
+*/
+/*Now using CORN::Arguments::dicover_one
+bool Coordinates::Arguments::geocoordinates_find_file_given_extension(const char *extension_raw)
+{  if (CORN::global_arguments->is_verbose(2))
+      std::clog
+      << "info: searching path directories for geocoordinates."
+      << extension_raw << std::endl;
+   CORN::OS::Directory_entry_name_concrete CWD;
+   std::wstring geocoordinate_ext = L"geocoordinates.";
+      CORN::append_ASCIIZ_to_wstring(extension_raw,geocoordinate_ext);
+   geocoordinates_filename
+      =  CORN::OS::file_system_engine.find_file_name
+         (geocoordinate_ext.c_str(),CWD
+         ,CORN::OS::File_system::superdirectory_recursion_inclusive
+         ,0,FILENAME_CASE_INSENSITIVITY);
+   if (!geocoordinates_filename) // if still not found
+   {  if (CORN::global_arguments->is_verbose(2))
+         std::clog << "info: searching path directories for any file(s) with extension:" << extension_raw<< std::endl;
+      CORN::Unidirectional_list any_EXT_files;
+      std::string wildcard_and_ext = "*.";
+      CORN::append_ASCIIZ_to_string(extension_raw,wildcard_and_ext);
+      CORN::Inclusion EXT_inclusion(wildcard_and_ext.c_str(),true);
+      nat32 matching_file_count = CORN::OS::file_system_engine.list_DENs
+         (CWD,&any_EXT_files,0,EXT_inclusion
+         ,CORN::OS::File_system::superdirectory_recursion_inclusive);
+      if (matching_file_count == 1)
+      {  geocoordinates_filename = dynamic_cast<CORN::OS::File_name *>(any_EXT_files.pop_at_head());
+         if (CORN::global_arguments->is_verbose(2))
+            std::clog
+            << "info: presuming the one file found contains point geocoordinates" << std::endl
+            << "file: " << geocoordinates_filename->c_str() << std::endl;
+      }
+      else if (matching_file_count > 1)
+      {  // Multiple DBF files were found in the path.
+         // List them and prompt user which one
+         int32 selection = 0;
+         do
+         {  int f = 0;
+            if (CORN::global_arguments->verbose_flag || !CORN::global_arguments->quiet)                                               //170223
+            {  std::clog << "Multiple potential dbf tables found" << std::endl;
+               FOR_EACH_IN(matching_file, CORN::OS::File_name, any_EXT_files, each_matching)
+               {  f++;
+                  std::clog  << (int) f << '\t' << matching_file->c_str() << std::endl;
+               } FOR_EACH_END(each_matching)
+            }
+            if (CORN::global_arguments->quiet)                                   //170223
+               // select the last listed (closest) table file.
+               selection = matching_file_count;                                  //170223
+            else
+            {  std::cout << "Enter file number (enter 0 if none of these)" << std::endl;
+               std::cin >> selection;
+            }
+            if (selection > 0)
+            {  nat32 selection_index = selection - 1;
+               geocoordinates_filename = dynamic_cast<CORN::OS::File_name *>
+                  (any_EXT_files.get_at(selection_index));
+               any_EXT_files.detach(geocoordinates_filename);
+            }
+         } while (selection > (int) matching_file_count);
+      }
+   }
+   return geocoordinates_filename != 0;
+}
+//_Coordinates::Arguments::geocoordinates_find_file_given_extension____________/
+*/
+/*191103 obsolete Arugments now has discover_one
+bool Coordinates::Arguments::geocoordinates_find(bool must_exist)
+{  bool provided = false;
+   // At this point geocoordinates file was not specified on the command line
+   if (!must_exist)
+   {  if (CORN::global_arguments->is_verbose(2))
+      {  std::clog << "info: searching for optional Geocoordinates (points) file." << std::endl; }
+         std::clog
+         << "info: Geocoordinates file was not specified on the command line" << std::endl;
+      }
+   if (! geocoordinates_find_file_given_extension("dbf"))
+   {  if (! geocoordinates_find_file_given_extension("dat"))
+      {  if (CORN::global_arguments->is_verbose(2))
+            std::clog << "info: no geocoordinate DBF file found in the path." << std::endl;
+         if (must_exist)
+         {  std::clog << "prompt: Enter required geocoordinates filename to proceed." << std::endl;
+            std::clog << "  this may be a .DBF or .dat tab or space delimited text file with one column header line identifying  ISO6709 geocoordinate or latitude and longitude and elevation (optional)." << std::endl;
+            std::string geocoord_filename;
+            std::cin >> geocoord_filename;
+            bool entered = geocoord_filename.length();
+            if (entered)
+               geocoordinates_filename = new CORN::OS::File_name_concrete(geocoord_filename);
+         }
+      }
+   }
+   provided = (geocoordinates_filename != 0)
+      && CORN::OS::file_system_engine.exists(*geocoordinates_filename);
+   return !must_exist || provided;                                               //190925
+}
+//_Coordinates::Arguments::geocoordinates_find_________________________________/
+*/
+bool Coordinates::Arguments::is_specified_geocoordinates()          affirmation_
+{  return geocoordinates_filename  // soil points file specified
+      || specific_geocoordinates.count();
+}
+//_Coordinates::Arguments::is_specified_geocoordinates______________2019-09-25_/
+Coordinates::Item::Item()
+: CORN::Item()
+, geocoordinate(0)
+, UTM_coordinate(0)
+{}
+//______________________________________________________________________________
+Coordinates::Item::Item(Geocoordinate     *geocoordinate_)
+: CORN::Item()
+, geocoordinate(geocoordinate_)
+, UTM_coordinate(0)
+{}
+//______________________________________________________________________________
+Coordinates::Item::Item(UTM_Coordinate    *UTM_coordinate_)
+: CORN::Item()
+, geocoordinate(0)
+, UTM_coordinate(UTM_coordinate_)
+{}
+//______________________________________________________________________________
+Geocoordinate &Coordinates::Item::geo()                               provision_
+{  if (!geocoordinate)
+      geocoordinate = new Geocoordinate();
+   return *geocoordinate;
+}
+//_Coordinate::Item::geo________________________________________________________
+UTM_Coordinate &Coordinates::Item::UTM()                              provision_
+{  if (!UTM_coordinate)
+      UTM_coordinate = new UTM_Coordinate();
+   return *UTM_coordinate;
+}
+//_Coordinate::Item::UTM________________________________________________________
+bool Coordinates::Item::is_in_northern_hemisphere()                 affirmation_
+{  return
+      geocoordinate
+      ? geocoordinate->is_in_northern_hemisphere()
+      : UTM_coordinate
+         ? UTM_coordinate->is_in_northern_hemisphere()
+         : false;
+}
+//_Coordinate::Item::is_in_northern_hemisphere__________________________________
+}//_namespace geodesy__________________________________________________________/
+

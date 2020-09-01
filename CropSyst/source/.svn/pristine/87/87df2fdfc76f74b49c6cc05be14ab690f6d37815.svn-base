@@ -1,0 +1,23 @@
+#define VERBOSE
+#include "arguments_CropSyst.h"
+#include "CropSyst/source/CropSyst_engine_V5.h"
+//______________________________________________________________________________
+namespace CropSyst {
+CORN::Date_clad_32 no_date(0);                                                   //190620
+}
+//______________________________________________________________________________
+bool quick_and_dirty_disable_chem_balance_when_watertable = false;               //150424
+namespace CORN { namespace OS {
+File_system &file_system() { return CORN::OS::file_system_logical; }
+}}
+//______________________________________________________________________________
+int main(int argc, const char *argv[])
+{
+   CORN::Command_options_data_source command_line_options(argc,argv);            //160908
+   CS::Simulation_run_result run_result = RUN_SUCCESS;
+   CropSyst::version5::Simulation_engine simulation(command_line_options);       //160513
+   run_result =  simulation.run();
+   return run_result;                                                            //040806
+}
+//______________________________________________________________________________
+

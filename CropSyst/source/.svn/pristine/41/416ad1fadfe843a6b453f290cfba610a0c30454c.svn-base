@@ -1,0 +1,218 @@
+#ifndef canopy_cover_curveH
+#define canopy_cover_curveH
+#include "corn/primitive.h"
+#include "corn/const.h"
+#include "crop/phenology_I.h"
+
+namespace CropSyst
+{
+//______________________________________________________________________________
+interface_ Canopy_cover_curve
+{
+
+   virtual bool parameterize
+      (float64 cover_maximum_CO2_adj
+      ,float64 initial_cover)                                 initialization_=0;
+   #if (!PHENOLOGY_VERSION || (PHENOLOGY_VERSION==2013))
+   virtual bool start_senescence()                              modification_=0;
+   #endif
+   #if ((PHENOLOGY_VERSION==2018))
+   virtual bool know_accrescence   (const Phenology::Period *accrescence)    modification_=0;
+   virtual bool know_senescence    (const Phenology::Period *senescence)     modification_=0;
+   virtual bool know_culminescence (const Phenology::Period *culminescence)  modification_=0;
+      // The know methods return true if the period is set not null
+   #endif
+   virtual float64 calculate
+      (
+      #if (!PHENOLOGY_VERSION || (PHENOLOGY_VERSION==2013))
+      float64 cumulative_thermal_time
+      #endif
+      )    calculation_=0;
+};
+//_2017-12-20_____________________________________Canopy_cover_curve_|interface/
+class Canopy_cover_curve_common   // rename to Canopy_cover_curve_abstract
+: public implements_ Canopy_cover_curve
+{protected:
+   #if (!PHENOLOGY_VERSION || (PHENOLOGY_VERSION==2013))
+   contribute_ float64 cumulative_thermal_time;                                 //130703
+   #endif
+   #if (PHENOLOGY_VERSION==2018)
+   #ifndef RELATIVE_TO_PERIODS
+   contribute_ const float64 &cumulative_thermal_time;                                 //130703
+   #endif
+   const Phenology::Period *accrescense;
+   const Phenology::Period *senescence;                                          //181108
+   const Phenology::Period *culminescence;
+   #endif
+
+ protected: // parameters
+   #if (!PHENOLOGY_VERSION || (PHENOLOGY_VERSION==2013))
+   float64 thermal_time_end_vegetative_growth;
+   float64 thermal_time_start_season;                                            //171219
+   float64 thermal_time_beginning_senescence;
+   bool in_senescence;                                                           //141124
+   #endif
+   #ifndef RELATIVE_TO_PERIODS
+   const float32 &thermal_time_season_end;                                       //171219
+   #endif
+   const float32 &canopy_cover_season_end;                                       //171009
+   float64 cover_maximum_CO2_adj;                                                //141123
+   float64 cover_initial;
+ public: // structors
+   Canopy_cover_curve_common
+      (
+      /*181109 now knowing periods
+      #if ((PHENOLOGY_VERSION==2018))
+      const Phenology &phenology
+      #endif
+      */
+      #if (!PHENOLOGY_VERSION || (PHENOLOGY_VERSION==2013))
+       float64 thermal_time_end_vegetative_growth
+      ,float64 thermal_time_beginning_senescence
+      ,float64 thermal_time_start_season
+      ,
+      #endif
+      #if (PHENOLOGY_VERSION==2018)
+      #ifndef  RELATIVE_TO_PERIODS
+        const float64 &cumulative_thermal_time,
+      #endif
+      #endif
+      #ifndef  RELATIVE_TO_PERIODS
+         const float32 &thermal_time_season_end,
+      #endif
+       const float32 &canopy_cover_season_end
+      );
+ public:
+   virtual bool parameterize
+      (float64 cover_maximum_CO2_adj
+      ,float64 cover_initial)                                   initialization_;
+ public:
+   virtual float64 calculate
+      (
+      #if (!PHENOLOGY_VERSION || (PHENOLOGY_VERSION==2013))
+      float64 cumulative_thermal_time
+      #endif
+      )      calculation_;
+   virtual float64 calc_during_accrescence()                     calculation_=0;
+   virtual float64 calc_during_culminescence()                   calculation_=0;
+   virtual float64 calc_during_senescence()                      calculation_=0;
+   #if ((PHENOLOGY_VERSION==2018))
+   inline virtual bool know_accrescence   (const Phenology::Period *accrescence_)   modification_ { accrescense    =accrescence_     ; return accrescense    != 0; }
+   inline virtual bool know_culminescence (const Phenology::Period *culminescence_) modification_ { culminescence  =culminescence_   ; return culminescence  != 0; }
+   inline virtual bool know_senescence    (const Phenology::Period *senescence_)    modification_ { senescence     =senescence_      ; return senescence     != 0; }
+   #endif
+
+};
+//_2017-12-20__________________________________Canopy_cover_curve_common_|class/
+/*180601 obsolete but dont delete until 2020
+class Canopy_cover_curve_2013
+: public extends_ Canopy_cover_curve_common                                      //171220
+{
+ protected: // parameters
+      // some arbitrary point (was maturity)   actually disabled since 2011
+   float64 fract_season_to_reach_half_max_cover;
+ private: // calculated parameters
+   float64 b_Coefficient;
+   float64 asym_CC;
+   float64 asym_CC_senescence;
+   float64 shape_factor;
+   float64 C_low;
+   const float64 &cover_latest_vegetative;   // reference to Canopy_cover_abstract::cover_latest_vegetative
+   float64 actual_CC_max;
+public: // Canopy_cover_curve implementation
+   virtual bool parameterize
+      (float64 cover_maximum_CO2_adj
+      ,float64 cover_initial)                                   initialization_;
+   virtual bool start_senescence()                                modification_; //141124
+ public: // Canopy_cover_curve_common implementation
+   virtual float64 calc_during_accrescence()                       calculation_; //141123 was calc_during_vegetative_growth
+   virtual float64 calc_during_culminescence()                     calculation_;
+   virtual float64 calc_during_senescence()                        calculation_;
+ public: // structors
+   Canopy_cover_curve_2013
+      (float64 thermal_time_end_vegetative_growth
+      ,float64 thermal_time_beginning_senescence
+      ,float64 thermal_time_start_season
+      ,float64 thermal_time_season_end                                           //171219_171009
+      ,float64 canopy_cover_season_end                                           //171219_171009
+      ,float64 fract_season_to_reach_half_max_cover
+      ,const float64 &cover_latest_vegetative
+      );
+};
+*/
+//_2013-06-11____________________________________Canopy_cover_curve_2013_|class/
+class Canopy_cover_curve_2017
+//: public implements_ Canopy_cover_curve_common
+: public extends_ Canopy_cover_curve_common
+{
+ protected:
+   float64 B1;
+   float64 B2;
+   float64 shape_coef_vegetative;   // rename shape_coef_accrescent
+   float64 shape_coef_senescent;
+   float64 CCmax_asymptotic;
+   float64 CCmax2_actual;
+   float64 CCend_asymptotic; // at end season
+
+   const float32 &thermal_time_fractional_at_half_cover_max;                     //181015
+   const float32 &thermal_time_fractional_at_half_cover_senescence;              //181015
+ protected:
+   mutable float64 cover_current;
+ public: // structors
+   Canopy_cover_curve_2017
+      (
+      /*now knowing periods
+      #if ((PHENOLOGY_VERSION==2018))
+       const Phenology &phenology_
+      #endif
+      */
+      #if (!PHENOLOGY_VERSION || (PHENOLOGY_VERSION==2013))
+       float64 thermal_time_end_vegetative_growth
+      ,float64 thermal_time_beginning_senescence
+      ,float64 thermal_time_start_season
+      /*NYN
+      ,float64 canopy_cover_season_end
+      ,float64 fract_season_to_reach_half_max_cover
+      */
+      ,
+      #endif
+      #if (PHENOLOGY_VERSION==2018)
+      #ifndef  RELATIVE_TO_PERIODS
+       const float64 &cumulative_thermal_time,
+      #endif
+      #endif
+      #ifndef  RELATIVE_TO_PERIODS
+       const float32 &thermal_time_season_end,
+      #endif
+       const float32 &canopy_cover_season_end_
+      ,float64 shape_coef_accrescent_
+      ,float64 shape_coef_senescent_
+      ,const float32 &thermal_time_fractional_at_half_cover_max_                 //181015
+      ,const float32 &thermal_time_fractional_at_half_cover_senescence_);        //181015
+ public: // Canopy_cover_curve implementation
+   virtual bool parameterize
+      (float64 cover_maximum_CO2_adj
+      ,float64 cover_initial)                                   initialization_;
+   virtual float64 set_cover_at_max_canopy
+      (float64 CC_at_max_canopy)  assignation_
+      {  UNUSED_arg(CC_at_max_canopy); return 0.0;}
+      // This class doesn't used cover_at_max_canopy
+      // if Canopy_cover_curve_2013 is removed, this function can be removed
+   #if (!PHENOLOGY_VERSION || (PHENOLOGY_VERSION==2013))
+   virtual bool start_senescence()                                modification_;
+   #endif
+   #if ((PHENOLOGY_VERSION==2018))
+   virtual bool know_accrescence  (const Phenology::Period *accrescence_)   modification_; //181230
+   virtual bool know_culminescence(const Phenology::Period *culminescence_) modification_; //181230
+   virtual bool know_senescence   (const Phenology::Period *senescence_)    modification_;
+   #endif
+
+ public: // Canopy_cover_curve_common implementation
+   virtual float64 calc_during_accrescence()                       calculation_;
+   virtual float64 calc_during_culminescence()                     calculation_;
+   virtual float64 calc_during_senescence()                        calculation_;
+};
+//_2017-12-20___________________________________Canopy_cover_curve_2017_|class_/
+} // namespace CropSyst
+#endif
+

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="../../../../../../dev/corn/build/CB/10/CORN_static.cbp" />
+		<Project filename="VIC_CropSyst_4.cbp" active="1">
+			<Depends filename="../../../../../../dev/corn/build/CB/10/CORN_static.cbp" />
+		</Project>
+	</Workspace>
+</CodeBlocks_workspace_file>

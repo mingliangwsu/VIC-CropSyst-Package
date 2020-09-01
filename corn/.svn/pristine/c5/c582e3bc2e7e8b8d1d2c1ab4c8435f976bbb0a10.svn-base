@@ -1,0 +1,53 @@
+#ifndef VV_documentH
+#define VV_documentH
+#include "corn/format/structural.h"
+namespace CORN
+{
+//______________________________________________________________________________
+// KV is Key-Value
+class KV_Document
+: public extends_ structural::Mapping_clad
+{
+   // NYI
+};
+namespace VV
+{
+//_2017-01-28___________________________________________________________________
+class Document
+: public extends_ structural::Mapping_clad // list of Sections
+{
+ public:
+   typedef structural::Mapping_clad Section;
+
+   //___________________________________________________________________________
+ protected:
+   //Section *current_section;
+   Section *current_section;
+ public:
+   inline Document()
+      : structural::Mapping_clad(0)
+      // Currently documents don't have specifier but essentially
+      {}
+ public:
+   virtual bool expect_structure()                               expectation_=0;
+      // Derived classes must implement this method
+      // to associate the structure of the
+   /* Conceptual
+      Provide a mechanism to define a structure using
+      a template file with ontology definitions.
+      A where onology definitions are bound to data values.
+
+
+   */
+ public:
+//   structural::Mapping /*Section*/
+   Section &expect_section(const char          *section_name)      expectation_;
+   Section &expect_section(const wchar_t       *section_name)      expectation_;
+   Section &expect_section(const std::string   &section_name)      expectation_;
+   Section &expect_section(const std::wstring  &section_name)      expectation_;
+};
+//_2017-01-28___________________________________________________________________
+} // namespace VV
+} // namespace CORN
+
+#endif

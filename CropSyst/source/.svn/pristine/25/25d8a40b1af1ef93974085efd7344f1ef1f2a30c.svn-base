@@ -1,0 +1,70 @@
+#include "crop/phenology_A.h"
+#include "CS_suite/observation/CS_inspector.h"
+#include "corn/parameters/parameter.h"
+namespace CropSyst
+{
+//______________________________________________________________________________
+Phenology_abstract::Phenology_abstract
+(const CORN::date32 &simdate_raw_                                                //181108
+,bool              is_perennial_
+,bool              is_fruit_tree_)
+: simdate_raw                                                     (simdate_raw_) //181113
+, is_perennial                                                   (is_perennial_)
+, is_fruit_tree                                                 (is_fruit_tree_)
+, season_duration_days                                                       (0) //181115
+, planting_date                                                              (0)
+, harvestable                                                            (false)
+, harvest_DOY                                                                (0)
+, accrescence_initiated                                                  (false) //190101
+{}
+//_2013-09-02___________________________________________________________________
+bool Phenology_abstract::end_day()                                 modification_
+{
+   // note that Phenology_2013 increments in start day
+   // this is preserved for compatibility, butbut it should be incremented
+   // at the end of the day. (the number of full days in the season)
+   season_duration_days++;
+   return true;
+}
+//_end_day__________________________________________________________2018-11-14_/
+bool Phenology_abstract::start_season()                            modification_
+{  harvestable             = false;
+   season_duration_days    = 0; //181115
+   harvest_DOY             = 0;
+   return reset();                                                               //110506
+}
+//_2013-09-02___________________________________________________________________
+bool Phenology_abstract::reset
+(Normal_crop_event_sequence from
+,Normal_crop_event_sequence to)                                    modification_
+{
+   harvestable             = false;
+   harvest_DOY             = 0;
+   season_duration_days = 0;
+      // Make sure that start_day is called after reset
+      // or set this to 1;
+   return true;
+}
+//_Phenology_common::reset__________________________________________2013-09-02_/
+CORN::Parameter_properties_literal PP_crop_season_duration=
+{"season_duration","duration","phenology","Season duration","hint_NYN","URL_NYN",UT_day,"days"};
+//_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+RENDER_INSPECTORS_DEFINITION(CropSyst::Phenology_abstract)
+{
+   #ifdef CS_OBSERVATION
+   // using crop emanator                                                        //160616
+   /*NYI
+   for each stages (that is relevent to this type of crop)
+   {
+      std::string ontology_days_since_start_of_XXX("phenology/days_since_start_of/");
+      ontology_days_since_start_of_XXX.append(growth_stages[gs]);
+      inspectors.append(new CS::Inspector(days_since_start_of[gs],UT_day,context,ontology_days_since_start_of_XXX, value_statistic));//CSVP_crop_base_season_duration,PP_crop_season_duration,UT_day,STAT_value_bit,CORN::mean_statistic) ); // not sure if I want max or mean for the annual aggregation, I think it is not applicable to annual aggregation/
+   */
+
+//NYI   inspectors.append(new CS::Inspector(days_since_start_of[NGS_GERMINATION],UT_day,*context/*emanator*/,"phenology/days_since_start_of/season", CORN::value_statistic));//CSVP_crop_base_season_duration,PP_crop_season_duration,UT_day,STAT_value_bit,CORN::mean_statistic) ); /* not sure if I want max or mean for the annual aggregation, I think it is not applicable to annual aggregation*/
+   #endif
+   return 0; // doesn't have its own emanator emanator;
+}
+//_2013-09-18________________________________________render_variable_recorders_/
+}// namespace CropSyst
+

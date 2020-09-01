@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="VIC_CropSyst_4" />
+		<Option execution_dir="../../../CB/bin/Debug" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/VIC4_0_7_cropcpp" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="-g /home/keyvan/project/data/Yakima/test_cluster/global_param_4.1.2-e" />
+				<Option host_application="VIC4_0_7_cropcpp" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-x c++" />
+					<Add option="-DUSE_WEATHER_PROVIDER" />
+					<Add option="-DxOLD_SUBLAYERING" />
+					<Add option="-DxCROP_PARAMETERS_HARDCODED" />
+					<Add option="-DCS_VERSION=5" />
+					<Add option="-DVIC_PROVIDED_ET_obsolete" />
+					<Add option="-DCS_VERSION_NUMBERS=5,0,0" />
+					<Add option="-DCROPSYST_MAX_DESCRIPTION_LENGTH=128" />
+					<Add option="-DCROPSYST_VV_BOOL_FORM=CORN::VV_bool_entry::form_true" />
+					<Add option="-DCROPSYST_ON=TRUE" />
+					<Add option="-DxCROPSYST_ON2=TRUE" />
+					<Add directory="../crop" />
+					<Add directory="../../../../../../dev" />
+					<Add directory="../../../../VIC_CropSyst_4.1.2.e" />
+					<Add directory="../../CodeBlocks" />
+					<Add directory="../../../../../../dev/CropSyst/source" />
+					<Add directory="../../../../../../dev/USDA/NRCS" />
+				</Compiler>
+				<Linker>
+					<Add library="../../../../../../dev/corn/build/CB/10/libCORN_static.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/VIC4_0_7_cropcpp" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DUSE_WEATHER_PROVIDER" />
+					<Add option="-DxOLD_SUBLAYERING" />
+					<Add option="-DxCROP_PARAMETERS_HARDCODED" />
+					<Add option="-DCS_VERSION=5" />
+					<Add option="-DVIC_PROVIDED_ET_obsolete" />
+					<Add option="-DCS_VERSION_NUMBERS=5,0,0" />
+					<Add option="-DCROPSYST_MAX_DESCRIPTION_LENGTH=128" />
+					<Add option="-DCROPSYST_VV_BOOL_FORM=CORN::VV_bool_entry::form_true" />
+					<Add directory="../crop" />
+					<Add directory="../../../../../../dev" />
+					<Add directory="../../../../VIC_CropSyst_4.1.2.e" />
+					<Add directory="../../CodeBlocks" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="../../../../../../dev/corn/build/CB/10/libCORN_static.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wredundant-decls" />
+			<Add option="-Wmissing-declarations" />
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add option="-DUSE_WEATHER_PROVIDER" />
+			<Add option="-DxOLD_SUBLAYERING" />
+			<Add option="-DxCROP_PARAMETERS_HARDCODED" />
+			<Add option="-DCS_VERSION=5" />
+			<Add option="-DCROPSYST_VERSION=5" />
+			<Add option="-DVIC_PROVIDED_ET" />
+			<Add option="-DCS_VERSION_NUMBERS=5,0,0" />
+			<Add option="-DCROPSYST_MAX_DESCRIPTION_LENGTH=128" />
+			<Add option="-DCROPSYST_VV_BOOL_FORM=CORN::VV_bool_entry::form_true" />
+			<Add option="-DxVIC_PROVIDED_SOIL_HYDROLOGY" />
+			<Add option="-DVIC_CROPSYST_VERSION=2" />
+			<Add option="-DVIC_CROPSYST" />
+			<Add option="-DCROPSYST_ON=TRUE" />
+			<Add option="-DxCROPSYST_ON2=TRUE" />
+			<Add directory="../../../crop" />
+			<Add directory="../../../../VIC_CropSyst_4.1.2.e" />
+			<Add directory="../../CodeBlocks" />
+			<Add directory="../../../crop/CropSyst/crop" />
+			<Add directory="../../../crop/CropSyst" />
+			<Add directory="../../../crop/common" />
+			<Add directory="../../../../../../dev" />
+			<Add directory="../../../../../../dev/common" />
+			<Add directory="../../../../../../dev/CropSyst/source" />
+		</Compiler>
+		<Linker>
+			<Add library="../../../../../../dev/corn/build/CB/10/libCORN_static.a" />
+		</Linker>
+		<Unit filename="../../../../../../dev/CropSyst/source/crop/CO2_response.cpp" />
+		<Unit filename="../../../../../../dev/CropSyst/source/crop/canopy_cover_continuum.cpp" />
+		<Unit filename="../../../../../../dev/CropSyst/source/crop/canopy_cover_curve.cpp" />
+		<Unit filename="../../../../../../dev/CropSyst/source/crop/crop_param_V5.cpp" />
+		<Unit filename="../../../../../../dev/CropSyst/source/crop/crop_param_class.cpp" />
+		<Unit filename="../../../../../../dev/CropSyst/source/crop/crop_param_struct.cpp" />
+		<Unit filename="../../../../../../dev/CropSyst/source/crop/crop_types.cpp" />
+		<Unit filename="../../../../../../dev/CropSyst/source/crop/phenology_common.cpp" />
+		<Unit filename="../../../../../../dev/CropSyst/source/crop/phenology_interface.cpp" />
+		<Unit filename="../../../../../../dev/USDA/NRCS/soil/survey/domains.cpp" />
+		<Unit filename="../../../../../../dev/common/geodesy/geocoordinate.cpp" />
+		<Unit filename="../../../../../../dev/common/geodesy/geolocation.cpp" />
+		<Unit filename="../../../../../../dev/common/physical_parameter.cpp" />
+		<Unit filename="../../../../../../dev/common/physics/property.cpp" />
+		<Unit filename="../../../../../../dev/common/residue/residue_const.cpp" />
+		<Unit filename="../../../../../../dev/common/residue/residue_decomposition_param.cpp" />
+		<Unit filename="../../../../../../dev/common/soil/SCS/SCS.cpp" />
+		<Unit filename="../../../../../../dev/common/weather/parameter/WC_air_temperature.cpp" />
+		<Unit filename="../../../CalcAerodynamic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../CalcBlowingSnow.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../IceEnergyBalance.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../LAKE.h" />
+		<Unit filename="../../../SnowPackEnergyBalance.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../StabilityCorrection.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../advected_sensible_heat.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../alloc_atmos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../arno_evap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_air_temperature.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_atmos_energy_bal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_cloud_cover_fraction.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_forcing_stats.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_longwave.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_rainonly.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_root_fraction.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_snow_coverage.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_surf_energy_bal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_veg_params.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../calc_water_energy_balance_errors.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../call_crop_model.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../canopy_evap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../check_files.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../check_state_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../close_files.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../cmd_proc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../compress_files.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../compute_dz.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../compute_pot_evap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../compute_treeline.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../compute_zwt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../correct_precip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../coupling_functions_VIC.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../crop/CropSyst/static_phrases.cpp" />
+		<Unit filename="../../../crop/VIC_crop.cpp" />
+		<Unit filename="../../../crop/VIC_crop.h" />
+		<Unit filename="../../../crop/VIC_crop_C_interface.cpp" />
+		<Unit filename="../../../crop/VIC_crop_C_interface.h" />
+		<Unit filename="../../../crop/VIC_crop_biomass.cpp" />
+		<Unit filename="../../../crop/VIC_crop_biomass.h" />
+		<Unit filename="../../../crop/VIC_crop_canopy_growth.h" />
+		<Unit filename="../../../crop/VIC_crop_common.cpp" />
+		<Unit filename="../../../crop/VIC_crop_common.h" />
+		<Unit filename="../../../crop/VIC_crop_param.cpp" />
+		<Unit filename="../../../crop/VIC_crop_param.h" />
+		<Unit filename="../../../crop/VIC_crop_phenology.cpp" />
+		<Unit filename="../../../crop/VIC_crop_phenology.h" />
+		<Unit filename="../../../crop/VIC_crop_root.cpp" />
+		<Unit filename="../../../crop/VIC_crop_root.h" />
+		<Unit filename="../../../crop/VIC_crop_transpiration.cpp" />
+		<Unit filename="../../../crop/VIC_crop_transpiration.h" />
+		<Unit filename="../../../crop/VIC_crop_variable_codes.h" />
+		<Unit filename="../../../crop/VIC_crop_weather.cpp" />
+		<Unit filename="../../../crop/VIC_max_canopy_adj.cpp" />
+		<Unit filename="../../../crop/VIC_soil_hydrology.c">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="../../../crop/VIC_soil_hydrology.h" />
+		<Unit filename="../../../crop/WSDA_croptype.h" />
+		<Unit filename="../../../crop/biometeorology/ET_common.h" />
+		<Unit filename="../../../crop/biometeorology/ET_model.h" />
+		<Unit filename="../../../crop/biometeorology/ET_reference.h" />
+		<Unit filename="../../../crop/biometeorology/ET_reference_interface.h" />
+		<Unit filename="../../../crop/options.h" />
+		<Unit filename="../../../crop/soil/hydrology_interface.h" />
+		<Unit filename="../../../crop/soil/layers_interface.h" />
+		<Unit filename="../../../crop/unit_tests/VIC_crop_test_soil_WC.h" />
+		<Unit filename="../../../crop/unit_tests/VIC_crop_test_weather.h" />
+		<Unit filename="../../../crop/weather/ET_and_plant_influential_elements.h" />
+		<Unit filename="../../../crop/weather/current_elements_interface.h" />
+		<Unit filename="../../../crop/weather/loc_param.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_ET_reference.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_air_temperature.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_atmospheric_pressure.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_dew_point_temperature.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_precipitation.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_relative_humidity.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_solar_radiation.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_temperature.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_vapor_pressure.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_vapor_pressure_act.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_vapor_pressure_deficit.h" />
+		<Unit filename="../../../crop/weather/parameter/WP_wind_speed.h" />
+		<Unit filename="../../../crop/weather/parameter/weather_parameter.h" />
+		<Unit filename="../../../crop/weather/plant_influential_elements.h" />
+		<Unit filename="../../../crop/weather/solar_rad.h" />
+		<Unit filename="../../../crop/weather/sun.h" />
+		<Unit filename="../../../crop/weather/weather_crop_interface.h" />
+		<Unit filename="../../../crop/weather/weather_interface.h" />
+		<Unit filename="../../../crop/weather/weather_provider.h" />
+		<Unit filename="../../../crop/weather/weather_types.h" />
+		<Unit filename="../../../display_current_settings.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../dist_prec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../estimate_T1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../free_crop.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../free_dist_prcp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../free_vegcon.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../frozen_soil_old.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../full_energy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../func_atmos_energy_bal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../func_atmos_moist_bal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../func_canopy_energy_bal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../func_surf_energy_bal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../get_dist.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../get_force_type.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../get_global_param.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../global.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../global.h" />
+		<Unit filename="../../../ice_melt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../initialize_atmos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../initialize_crop.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../initialize_global.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../initialize_lake.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../initialize_model_state.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../initialize_new_storm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../initialize_snow.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../initialize_soil.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../initialize_veg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../irrigation_lib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../irrigation_lib.h" />
+		<Unit filename="../../../lakes.eb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../latent_heat_from_snow.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../make_cell_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../make_dist_prcp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../make_dmy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../make_energy_bal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../make_in_and_outfiles.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../make_snow_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../make_veg_var.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../massrelease.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../modify_Ksat.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../mtclim42_vic.h" />
+		<Unit filename="../../../mtclim_constants_vic.h" />
+		<Unit filename="../../../mtclim_parameters_vic.h" />
+		<Unit filename="../../../mtclim_vic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../mtclim_wrapper.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../newt_raph_func_fast.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../nrerror.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../open_debug.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../open_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../open_state_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../output_list_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../parse_output_info.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../penman.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../prepare_full_energy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../put_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_arcinfo_ascii.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_atmos_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_croplib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_cropparam.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_forcing_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_initial_model_state.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_lakeparam.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_snowband.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_soilparam.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_soilparam_arc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_veglib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../read_vegparam.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../redistribute_during_storm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../root_brent.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../runoff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../set_output_defaults.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../snow.h" />
+		<Unit filename="../../../snow_intercept.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../snow_melt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../snow_utility.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../soil_conduction.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../soil_thermal_eqn.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../solve_snow.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../store_moisture_for_debug.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../surface_fluxes.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../svp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../user_def.h" />
+		<Unit filename="../../../vicNl.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../vicNl.h" />
+		<Unit filename="../../../vicNl_def.h" />
+		<Unit filename="../../../vicerror.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../water_energy_balance.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../water_under_ice.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../wgtpar.h" />
+		<Unit filename="../../../write_atmosdata.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../write_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../write_debug.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../write_forcing_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../write_header.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../write_layer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../write_model_state.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../write_snow_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../write_soilparam.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../write_vegparam.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../write_vegvar.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,35 @@
+#ifndef collate_engineH
+#define collate_engineH
+
+
+#if (COLLATOR_VERSION==2014)
+#include "output_collator_2014.h"
+#else
+#include "output_collator_2019.h"
+#endif
+
+
+namespace UED
+{
+//______________________________________________________________________________
+class Collate_engine
+{
+ public:
+   //___________________________________________________________________________
+ protected:
+//   #if (COLLATOR_VERSION==2014)
+//   Output_collator_2014::Arguments
+//   #else
+   UED::Arguments_collator
+//   #endif
+      &arguments;
+ public:
+   Collate_engine
+      (UED::Arguments_collator &arguments);                                                    //170328
+   bool process();
+   nat32 process_UED(const std::wstring &UED_name);                              //180119
+};
+//_class_Collate_engine_____________________________________________2014-09-03_/
+} // namespace UED
+#endif
+

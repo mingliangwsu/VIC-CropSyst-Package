@@ -1,0 +1,451 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{5E08F099-A43D-45CD-9F3F-FB952ED3899B}</ProjectGuid>
+			<ProjectVersion>12.0</ProjectVersion>
+			<MainSource>VIC_crop_test_compare_VB.cpp</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<BCC_PCHWithExternalTypeFiles>false</BCC_PCHWithExternalTypeFiles>
+			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
+			<Defines>xVERSION_2010_05_05;VIC_PROVIDED_ETx;USE_WEATHER_PROVIDER=1;CS_VERSION=5;MATCH_VB;xxxVB_VERSION_DATE=20100505;VB_VERSION_DATE=20110110;xxVB_VERSION_DATE=20100720;xOLD_SUBLAYERING;CROP_PARAMETERS_HARDCODEDx;obsPEREN_FRUIT;xREFACTOR;REFACTOR;VIC_PROVIDED_SOIL_HYDROLOGY;VIC_PROVIDED_ET;$(Defines)</Defines>
+			<BCC_Defines>UNIT_TEST;$(BCC_Defines)</BCC_Defines>
+			<LinkPackageStatics>tmsd2010.lib;tmsxlsd2010.lib</LinkPackageStatics>
+			<LinkPackageImports>rtl.bpi;vcl.bpi;adortl.bpi;dbrtl.bpi;bdertl.bpi;vclx.bpi;xmlrtl.bpi;vclactnband.bpi;vclimg.bpi;vcldb.bpi;VclSmp.bpi;Tee.bpi</LinkPackageImports>
+			<BCC_PCHUsage>None</BCC_PCHUsage>
+			<OutputExt>exe</OutputExt>
+			<PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;vclimg.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;vcltouch.bpi;dsnap.bpi;dsnapcon.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;inet.bpi;intrawebdb_100_140.bpi;Intraweb_100_140.bpi;VclSmp.bpi;vclie.bpi;inetdb.bpi;webdsnap.bpi;websnap.bpi;inetdbbde.bpi;inetdbxpress.bpi;soaprtl.bpi;vclribbon.bpi;DbxCommonDriver.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbexpress.bpi;dbxcds.bpi;RNAutoControls_basic_package.bpi</PackageImports>
+			<Multithreaded>true</Multithreaded>
+			<AllPackageLibs>rtl.lib;vcl.lib;tmsd2010.lib;adortl.lib;dbrtl.lib;bdertl.lib;vclx.lib;xmlrtl.lib;vclactnband.lib;vclimg.lib;vcldb.lib;VclSmp.lib;tmsxlsd2010.lib;Tee.lib</AllPackageLibs>
+			<ProjectType>CppVCLApplication</ProjectType>
+			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
+			<DynamicRTL>true</DynamicRTL>
+			<UsePackages>true</UsePackages>
+			<IncludePath>..\..\..\..\..\common\geodesy\geometry\;..\..\..\..\..\common\geodesy\;..\..\..\..\..\CropSyst\source\soil\;..\..\..\..\..\CropSyst\source\;..\..\..\..\..\CropSyst\source\crop\;..\..\..\..\..\USDA\NRCS\soil\survey\;..\..\..\;..\..\..\..\..\common\biometeorology\;..\..\..\..\..\VIC\crop\unit_tests\;..\..\..\..\..\VIC\crop\unit_tests\RS2010\;C:\dev\USDA\NRCS;..\..\..\..\..\common\weather\database\;..\..\..\..\..\common\geolocation\;..\..\..\..\..\common\soil\SCS\;..\..\..\..\..\VIC\crop\;..\..\..\..\..\common\weather\parameter\;..\..\..\..\..\common\soil\;..\..\..\..\..\common\geolocation\geometry\;..\..\..\..\..\common\weather\;..\..\..\..\..\common\physics\;..\..\..\..\VIC_CropSyst\crop\unit_tests\RS\2010\;..\..\..\..\common\physics\;..\..\soil\;..\..\..\..\USDA\NRCS\soil\survey\;..\..\..\..\common\geolocation\geometry\;..\..\..\..\common\soil\SCS\;..\..\..\..\common\soil\;..\..\..\..\cropsyst\cpp\soil\;$(BDS)\include;$(BDS)\include\vcl;$(BDS)\include\dinkumware;c:\dev\common;..\..\..\..\common\biometeorology\;..\..\..\..\common\weather\database\;..\..\..\..\common\geolocation\;..\..\..\..\common\weather\parameter\;..\..\..\..\common\weather\;..\..\..\..\cropsyst\cpp\crop\;..\..\..\..\cropsyst\cpp\;c:\dev\VIC\crop;C:\dev\VIC\crop\unit_tests\RS2010\;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(CG_BOOST_ROOT);..\..\;..\;..\..\..;C:\dev\CropSyst;C:\dev\CropSyst\source;C:\dev\VIC_CropSyst;$(IncludePath)</IncludePath>
+			<ILINK_LibraryPath>..\..\..\..\..\common\geodesy\geometry\;..\..\..\..\..\common\geodesy\;..\..\..\..\..\CropSyst\source\soil\;..\..\..\..\..\CropSyst\source\;..\..\..\..\..\CropSyst\source\crop\;..\..\..\;..\..\..\..\..\common\biometeorology\;..\..\..\..\..\VIC\crop\unit_tests\;..\..\..\..\..\VIC\crop\unit_tests\RS2010\;..\..\..\..\..\USDA\NRCS\soil\survey\;..\..\..\..\..\common\weather\database\;..\..\..\..\..\common\geolocation\;..\..\..\..\..\common\soil\SCS\;..\..\..\..\..\VIC\crop\;..\..\..\..\..\common\weather\parameter\;..\..\..\..\..\common\soil\;..\..\..\..\..\common\geolocation\geometry\;..\..\..\..\..\common\weather\;..\..\..\..\..\common\physics\;..\..\..\..\VIC_CropSyst\crop\unit_tests\RS\2010\;..\..\..\..\common\physics\;..\..\CropSyst\crop\;..\..\..\..\USDA\NRCS\soil\survey\;..\..\..\..\cropsyst\cpp\crop\;..\..\..\..\common\geolocation\geometry\;..\..\..\..\common\soil\SCS\;..\..\..\..\common\soil\;..\..\..\..\cropsyst\cpp\soil\;..\..\geolocation\;..\..\weather\;..\..\weather\parameter\;..\..\..\..\common\weather\provider\;..\..\..\..\common\weather\parameter\;..\..\biometeorology\;..\..\..\..\CS_suite\parameter_files\;..\..\soil\;..\..\..\..\common\biometeorology\;..\..\..\..\cropsyst\cpp\;..\..\..\..\common\weather\;..\..\..\..\corn\;..\..\..\..\common\weather\database\;..\..\..\..\common\geolocation\;C:\temp\lib\RS2010\release\;..\..\;..\;C:\dev\VIC\crop\unit_tests\RS2010\;$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+			<BCC_wpar>false</BCC_wpar>
+			<BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
+			<BCC_ExtendedErrorInfo>true</BCC_ExtendedErrorInfo>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<BCC_OptimizeForSpeed>false</BCC_OptimizeForSpeed>
+			<BCC_DisableOptimizations>true</BCC_DisableOptimizations>
+			<DCC_Optimize>false</DCC_Optimize>
+			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+			<Defines>_DEBUG;$(Defines)</Defines>
+			<BCC_InlineFunctionExpansion>false</BCC_InlineFunctionExpansion>
+			<IntermediateOutputDir>Debug</IntermediateOutputDir>
+			<BCC_UseRegisterVariables>None</BCC_UseRegisterVariables>
+			<DCC_Define>DEBUG</DCC_Define>
+			<BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
+			<TASM_DisplaySourceLines>true</TASM_DisplaySourceLines>
+			<BCC_StackFrames>true</BCC_StackFrames>
+			<ILINK_LibraryPath>$(BDS)\lib\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+			<ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+			<TASM_Debugging>Full</TASM_Debugging>
+			<BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<Defines>NDEBUG;$(Defines)</Defines>
+			<IntermediateOutputDir>Release</IntermediateOutputDir>
+			<ILINK_LibraryPath>$(BDS)\lib\release;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+			<TASM_Debugging>None</TASM_Debugging>
+		</PropertyGroup>
+		<ItemGroup>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_relative_humidity.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_relative_humidity.h</DependentOn>
+				<BuildOrder>37</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_vapor_pressure.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_vapor_pressure.h</DependentOn>
+				<BuildOrder>40</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\VIC_crop_test_weather.cpp">
+				<DependentOn>..\..\VIC_crop_test_weather.h</DependentOn>
+				<BuildOrder>60</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_crop_weather.cpp">
+				<DependentOn>..\..\..\VIC_crop_weather.h</DependentOn>
+				<BuildOrder>64</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_soil_hydrology.cpp">
+				<DependentOn>..\..\..\VIC_soil_hydrology.h</DependentOn>
+				<BuildOrder>65</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_solar_radiation.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_solar_radiation.h</DependentOn>
+				<BuildOrder>38</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\sun.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\sun.h</DependentOn>
+				<BuildOrder>43</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\biometeorology\ET_common.cpp">
+				<DependentOn>..\..\..\..\..\common\biometeorology\ET_common.h</DependentOn>
+				<BuildOrder>41</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\biometeorology\ET_model.cpp">
+				<DependentOn>..\..\..\..\..\common\biometeorology\ET_model.h</DependentOn>
+				<BuildOrder>41</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_temperature.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_temperature.h</DependentOn>
+				<BuildOrder>39</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_crop_param.cpp">
+				<DependentOn>..\..\..\VIC_crop_param.h</DependentOn>
+				<BuildOrder>60</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_dew_point_temperature.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_dew_point_temperature.h</DependentOn>
+				<BuildOrder>33</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\weather_provider.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\weather_provider.h</DependentOn>
+				<BuildOrder>43</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\database\weather_UED_database.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\database\weather_UED_database.h</DependentOn>
+				<BuildOrder>9</BuildOrder>
+			</CppCompile>
+			<LibFiles Include="C:\temp\lib\RS2010\release\UED_static.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>7</BuildOrder>
+			</LibFiles>
+			<CppCompile Include="..\..\..\..\..\common\physics\property.cpp">
+				<DependentOn>..\..\..\..\..\common\physics\property.h</DependentOn>
+				<BuildOrder>63</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\solar_rad.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\solar_rad.h</DependentOn>
+				<BuildOrder>43</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\soil\soil_param_struct.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\soil\soil_param_struct.h</DependentOn>
+				<BuildOrder>66</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\soil\soil_param.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\soil\soil_param.h</DependentOn>
+				<BuildOrder>66</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\soil\soil_param_class.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\soil\soil_param_class.h</DependentOn>
+				<BuildOrder>66</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\geodesy\geometry\terrestrial_geometry.cpp">
+				<DependentOn>..\..\..\..\..\common\geodesy\geometry\terrestrial_geometry.h</DependentOn>
+				<BuildOrder>68</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\soil\soil_properties_sublayers.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\soil\soil_properties_sublayers.h</DependentOn>
+				<BuildOrder>67</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\geodesy\geocoordinate.cpp">
+				<DependentOn>..\..\..\..\..\common\geodesy\geocoordinate.h</DependentOn>
+				<BuildOrder>67</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\geodesy\geolocation.cpp">
+				<DependentOn>..\..\..\..\..\common\geodesy\geolocation.h</DependentOn>
+				<BuildOrder>68</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\soil\hydraulic_properties.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\soil\hydraulic_properties.h</DependentOn>
+				<BuildOrder>66</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\crop\crop_param_struct.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\crop\crop_param_struct.h</DependentOn>
+				<BuildOrder>66</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\crop\crop_param_V5.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\crop\crop_param_V5.h</DependentOn>
+				<BuildOrder>66</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\crop\CO2_response.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\crop\CO2_response.h</DependentOn>
+				<BuildOrder>66</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\crop\crop_param_class.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\crop\crop_param_class.h</DependentOn>
+				<BuildOrder>66</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\crop\phenology_interface.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\crop\phenology_interface.h</DependentOn>
+				<BuildOrder>66</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\static_phrases.cpp">
+				<BuildOrder>66</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\crop\crop_types.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\crop\crop_types.h</DependentOn>
+				<BuildOrder>65</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\crop\growth_stages.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\crop\growth_stages.h</DependentOn>
+				<BuildOrder>65</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\cropsyst\cpp\soil\soil_param_V5.cpp">
+				<DependentOn>..\..\..\..\..\cropsyst\cpp\soil\soil_param_V5.h</DependentOn>
+				<BuildOrder>45</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="VIC_crop_test_compare_VB.cpp">
+				<BuildOrder>0</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\biometeorology\ET_reference.cpp">
+				<DependentOn>..\..\..\..\..\common\biometeorology\ET_reference.h</DependentOn>
+				<BuildOrder>40</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\soil\layering.cpp">
+				<DependentOn>..\..\..\..\..\common\soil\layering.h</DependentOn>
+				<BuildOrder>46</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_crop_C_interface.cpp">
+				<DependentOn>..\..\..\VIC_crop_C_interface.h</DependentOn>
+				<BuildOrder>63</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_crop_phenology.cpp">
+				<DependentOn>..\..\..\VIC_crop_phenology.h</DependentOn>
+				<BuildOrder>63</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_crop_root.cpp">
+				<DependentOn>..\..\..\VIC_crop_root.h</DependentOn>
+				<BuildOrder>63</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_crop_transpiration.cpp">
+				<DependentOn>..\..\..\VIC_crop_transpiration.h</DependentOn>
+				<BuildOrder>63</BuildOrder>
+			</CppCompile>
+			<LibFiles Include="C:\temp\lib\RS2010\release\corn_complete_static.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>22</BuildOrder>
+			</LibFiles>
+			<CppCompile Include="..\..\..\..\..\cropsyst\cpp\soil\soil_properties_sublayers.cpp">
+				<Suffix>_0</Suffix>
+				<BuildOrder>48</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_crop.cpp">
+				<DependentOn>..\..\..\VIC_crop.h</DependentOn>
+				<BuildOrder>63</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\soil\txtrhydr.cpp">
+				<DependentOn>..\..\..\..\..\common\soil\txtrhydr.h</DependentOn>
+				<BuildOrder>51</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\weather_parameter.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\weather_parameter.h</DependentOn>
+				<BuildOrder>30</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\storm_event.cpp">
+				<BuildOrder>38</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\cropsyst\cpp\soil\sublayers.cpp">
+				<DependentOn>..\..\..\..\..\cropsyst\cpp\soil\sublayers.h</DependentOn>
+				<BuildOrder>49</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\soil\SCS\SCS.cpp">
+				<BuildOrder>47</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\loc_param.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\loc_param.h</DependentOn>
+				<BuildOrder>43</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_max_canopy_adj.cpp">
+				<DependentOn>..\..\..\VIC_max_canopy_adj.h</DependentOn>
+				<BuildOrder>62</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\biometeorology\aerodynamics.cpp">
+				<DependentOn>..\..\..\..\..\common\biometeorology\aerodynamics.h</DependentOn>
+				<BuildOrder>41</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\USDA\NRCS\soil\survey\domains.cpp">
+				<DependentOn>..\..\..\..\..\USDA\NRCS\soil\survey\domains.h</DependentOn>
+				<BuildOrder>57</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_air_temperature.cpp">
+				<BuildOrder>31</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_vapor_pressure_deficit.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_vapor_pressure_deficit.h</DependentOn>
+				<BuildOrder>42</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\VIC_crop_test_compare_VB_common.cpp">
+				<DependentOn>..\..\VIC_crop_test_compare_VB_common.h</DependentOn>
+				<BuildOrder>3</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_vapor_pressure_act.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_vapor_pressure_act.h</DependentOn>
+				<BuildOrder>41</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_precipitation.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_precipitation.h</DependentOn>
+				<BuildOrder>35</BuildOrder>
+			</CppCompile>
+			<ResFiles Include="VIC_crop_test_compare_VB.res">
+				<BuildOrder>1</BuildOrder>
+			</ResFiles>
+			<CppCompile Include="..\..\..\..\..\common\weather\database\common_weather_creators.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\database\common_weather_creators.h</DependentOn>
+				<BuildOrder>12</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_crop_biomass.cpp">
+				<DependentOn>..\..\..\VIC_crop_biomass.h</DependentOn>
+				<BuildOrder>63</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="form_VIC_crop_test_compare_VB.cpp">
+				<Form>Form2</Form>
+				<DependentOn>form_VIC_crop_test_compare_VB.h</DependentOn>
+				<BuildOrder>2</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\VIC_crop_weather_soil.cpp">
+				<DependentOn>..\..\..\VIC_crop_weather_soil.h</DependentOn>
+				<BuildOrder>63</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_wind_speed.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_wind_speed.h</DependentOn>
+				<BuildOrder>43</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\CropSyst_VB_spreadsheet_data.cpp">
+				<DependentOn>..\..\CropSyst_VB_spreadsheet_data.h</DependentOn>
+				<BuildOrder>6</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_ET_reference.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_ET_reference.h</DependentOn>
+				<BuildOrder>34</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WP_atmospheric_pressure.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WP_atmospheric_pressure.h</DependentOn>
+				<BuildOrder>32</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WC_air_temperature.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WC_air_temperature.h</DependentOn>
+				<BuildOrder>68</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WC_dew_point_temperature.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WC_dew_point_temperature.h</DependentOn>
+				<BuildOrder>69</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WC_relative_humidity.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WC_relative_humidity.h</DependentOn>
+				<BuildOrder>70</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WC_solar_radiation.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WC_solar_radiation.h</DependentOn>
+				<BuildOrder>71</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WC_vapor_pressure.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WC_vapor_pressure.h</DependentOn>
+				<BuildOrder>72</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WC_vapor_pressure_act.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WC_vapor_pressure_act.h</DependentOn>
+				<BuildOrder>73</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\common\weather\parameter\WC_vapor_pressure_deficit.cpp">
+				<DependentOn>..\..\..\..\..\common\weather\parameter\WC_vapor_pressure_deficit.h</DependentOn>
+				<BuildOrder>74</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="..\..\..\..\..\CropSyst\source\soil\soil_param_V5.cpp">
+				<DependentOn>..\..\..\..\..\CropSyst\source\soil\soil_param_V5.h</DependentOn>
+				<Suffix>_0</Suffix>
+				<BuildOrder>74</BuildOrder>
+			</CppCompile>
+			<FormResources Include="form_VIC_crop_test_compare_VB.dfm"/>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Cpp.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Cpp.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>CPlusPlusBuilder.Personality.12</Borland.Personality>
+			<Borland.ProjectType>CppVCLApplication</Borland.ProjectType>
+			<BorlandProject>
+				<CPlusPlusBuilder.Personality>
+					<Source>
+						<Source Name="MainSource">VIC_crop_test_compare_VB.cpp</Source>
+					</Source>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">1</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">0</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">1033</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName"/>
+						<VersionInfoKeys Name="FileDescription"/>
+						<VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName"/>
+						<VersionInfoKeys Name="LegalCopyright"/>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName"/>
+						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+					</VersionInfoKeys>
+					<Debugging>
+						<Debugging Name="DebugSourceDirs"/>
+					</Debugging>
+					<Parameters>
+						<Parameters Name="RunParams"/>
+						<Parameters Name="Launcher"/>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="DebugCWD"/>
+						<Parameters Name="HostApplication"/>
+						<Parameters Name="RemoteHost"/>
+						<Parameters Name="RemotePath"/>
+						<Parameters Name="RemoteParams"/>
+						<Parameters Name="RemoteLauncher"/>
+						<Parameters Name="UseRemoteLauncher">False</Parameters>
+						<Parameters Name="RemoteCWD"/>
+						<Parameters Name="RemoteDebug">False</Parameters>
+						<Parameters Name="Debug Symbols Search Path"/>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<Excluded_Packages>
+						<Excluded_Packages Name="C:\Documents and Settings\All Users\Documents\RAD Studio\7.0\Bpl\EasyListviewD13D.bpl">MustangPeak EasyListview Designtime Package</Excluded_Packages>
+						<Excluded_Packages Name="C:\Documents and Settings\All Users\Documents\RAD Studio\7.0\Bpl\MPCommonLibD13D.bpl">Mustangpeak Common Library DesignTime Package</Excluded_Packages>
+						<Excluded_Packages Name="C:\Documents and Settings\All Users\Documents\RAD Studio\7.0\Bpl\VirtualTreesD13D.bpl">Virtual Treeview design time package</Excluded_Packages>
+						<Excluded_Packages Name="C:\Documents and Settings\All Users\Documents\RAD Studio\7.0\Bpl\VirtualShellToolsD13D.bpl">Virtual Shell Tools Designtime Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\bcboffice2k140.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\bcbofficexp140.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k140.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+					</Excluded_Packages>
+					<ProjectProperties>
+						<ProjectProperties Name="AutoShowDeps">False</ProjectProperties>
+						<ProjectProperties Name="ManagePaths">True</ProjectProperties>
+						<ProjectProperties Name="VerifyPackages">True</ProjectProperties>
+					</ProjectProperties>
+				</CPlusPlusBuilder.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

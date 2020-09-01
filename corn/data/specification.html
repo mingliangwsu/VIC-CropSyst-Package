@@ -1,0 +1,96 @@
+<H1>Data specification</H1>
+
+This is intended to be an enhancement/replacement of 
+<CODE>
+Tabular 
+Data
+Format  
+</CODE>
+specification files.
+
+
+<H2>
+Enhancements 
+</H2>
+
+<DL>
+<DT>Intermittent observation
+</DT>
+<DD>TDF only provided continuous time series sequences,
+intermittent observations were implemented as scalar values
+(in UED) 
+    XXX provides for observation timing models.
+    These may be 
+</DD
+    
+<DT>
+Direct association with period
+</DT>
+<DD>
+
+Previously there was no explicit association with periods,
+there either needed to be a file for each period or
+scalors or records were implicitly associated with a period by 
+having date stamp that fell within a defined period.
+It is possible that there are multiple overlapping periods.
+
+</DD>
+
+</UL>
+
+<PRE>
+
+<U>data_model_name</U>: &<U>model_anchor</U>
+   element: series <em>or</em> sequence  <em>or</em> scalar <em>or</em>  set  <em>or</em>  vector
+
+<U>temporality_name</U> : &<U>temporality_anchor</U>
+   model: continuous  <em>or</em> intermittent
+   <EM> #in the case of continuous:</EM>
+   units: <U>step inits code</U> 
+   interval: <U>number of temperal units</U>
+   <em>#in the case of intermittent:</EM>
+   index: [<U>value</U> <EM>or</EM> <U>values of the steps (I.e. dates)</U> ]
+
+
+   
+</PRE>   
+   
+<H2>   
+Data file/stream (YAML)   
+</H2>
+
+<PRE>   
+<U>period_name</U> : &<U>period_anchor</U>  
+   units: <U>units code</U>
+   start: <U>time_stamp</U>
+   stop:  <U>time_stamp</U>
+  
+   
+- [<U>ontology</U>, <U>time stamp</U>] :
+   model: <U>data_model_name</U>
+   temporality: <U>temporality_name</U>
+   period: <U>period name</U>
+   data: <U>scalar</U> <U>values</U>
+   
+</PRE>
+
+
+
+Referencing Excel 
+
+Accessing sheet cell
+../Budgets/Annual/Budget2010.xls#'Sheet3'!G43
+Accessing named range
+../Budgets/Annual/Budget2010.xls#DeptTotals
+
+https://superuser.com/questions/998158/link-to-a-row-or-cell-in-an-excel-sheet-via-url
+
+
+https://stackoverflow.com/questions/19185760/link-to-an-specific-sheet-cell-of-a-sharepoint-excel
+
+Querying Excel using URLs
+
+https://www.techrepublic.com/article/pull-data-into-microsoft-excel-with-web-queries/
+
+Linking into Excel
+https://word.tips.net/T000305_Hyperlinking_to_a_Specific_Excel_Worksheet.html

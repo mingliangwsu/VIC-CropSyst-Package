@@ -1,0 +1,5 @@
+
+
+#error the interpolate unit is obsolete,
+Now include intrepolator_temporal.cpp and interpolation.cpp and the
+specific interpolation classes in corn/math/numerical/interpolation directory

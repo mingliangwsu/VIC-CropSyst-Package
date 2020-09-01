@@ -1,0 +1,16 @@
+#error abandoned, delete this
+
+#ifndef photoperiodH
+#define photoperiodH
+namespace CropSyst
+{
+//____________________________________________________________________________
+class Photoperiod
+{
+
+
+
+};
+//____________________________________________________________________________
+} // namespace CropSyst
+#endif

@@ -76,15 +76,21 @@ bool Phenology_2013::start_day()                                   modification_
 bool Phenology_2013::end_day()                                     modification_
 {
    // Moved from start_day                                                       //200121
-   for (int gs = 0; gs < NGS_COUNT; gs++)
+   nat8 ngs_count = NGS_COUNT;
+   for (int gs = 0; gs < ngs_count; gs++)
    {  duration_of          [gs] += (growth_stage == gs) ? 1 : 0;
+       // days_since_start_of_0 will be set to 0 when the event is initiated
+      nat8 increment = (days_since_start_of_0[gs] >= 0) ? 1 : 0;                 //200904
       days_since_start_of_0  [gs] +=
+         increment;                                                              //200904
+      /*200904
          (growth_stage == gs)
          || (gs == NGS_SOWING)
          || (growth_stage == NGS_QUIESCENCE)
          || (//is_accrescence_initiated()                                         //190101
             has_emerged() && (growth_stage >= gs))
          ? 1 : 0;
+       */
    }
    if (accrescence)     accrescence    ->end_day();
    if (culminescence)   culminescence  ->end_day();
@@ -367,4 +373,3 @@ nat16 Phenology_2013::get_season_duration_days()                           const
 */
 //_get_season_duration_days_________________________________________2018-11-11_/
 }//_namespace CropSyst_________________________________________________________/
-

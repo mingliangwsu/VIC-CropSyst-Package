@@ -431,9 +431,9 @@ bool Land_unit_simulation::process_day()                           modification_
        if (VIC_veg_var.canopyevap < 0) {
            std::cerr << "ERROR: Negtive canopyevap!\n";
        }
-       std::clog << "\tendday_canopy_dew_mm:" << VIC_veg_var.Wdew
-                 << "\tcanopyevap:" << VIC_veg_var.canopyevap
-                 << std::endl;
+       //std::clog << "\tendday_canopy_dew_mm:" << VIC_veg_var.Wdew
+       //          << "\tcanopyevap:" << VIC_veg_var.canopyevap
+       //          << std::endl;
    }
 #endif
    return processed;

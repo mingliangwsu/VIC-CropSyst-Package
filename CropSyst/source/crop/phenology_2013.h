@@ -75,9 +75,11 @@ class Phenology_2013
       ,Normal_crop_event_sequence to   = NGS_TERMINATED)          modification_;
    virtual bool has_expired_accrescence()                          affirmation_; //190628
  public:
-   inline virtual nat16 get_days_since_start_of
+   inline virtual int16 get_days_since_start_of
       (Normal_crop_event_sequence growth_stage)                            const
-      { return days_since_start_of_0[growth_stage]; }
+      { nat8 GS_index = (nat8)growth_stage;
+        int16 days_since = days_since_start_of_0[GS_index];
+        return days_since; }
    inline virtual nat16 get_duration_of
       (Normal_crop_event_sequence growth_stage)                            const
       { return duration_of[growth_stage]; }

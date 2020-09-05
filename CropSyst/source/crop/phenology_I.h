@@ -86,7 +86,7 @@ interface_ Phenology
       // although the were be something initiated by the crop.
 
 
-   virtual nat16 get_days_since_start_of(Normal_crop_event_sequence event) const=0;
+   virtual int16 get_days_since_start_of(Normal_crop_event_sequence event) const=0;
    inline virtual bool started_today(Normal_crop_event_sequence growth_stage) affirmation_ //130903
       { return get_days_since_start_of(growth_stage) == 1; }
    virtual Normal_crop_event_sequence get_growth_stage_sequence()       const=0;

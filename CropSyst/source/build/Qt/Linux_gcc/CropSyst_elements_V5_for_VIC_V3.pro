@@ -10,16 +10,12 @@ TARGET = CropSyst_element_V5_for_VIC_V3
 CONFIG += staticlib
 DEFINES  += CS_VERSION=5 \
             CROPSYST_VERSION=5 \
-            xUSE_WEATHER_PROVIDER \
             WEATHER_PROVIDER_VERSION=5 \
             VIC_CROPSYST_VERSION=3 \
             EVENT_SCHEDULER_VERSION=1 \
-            XOLD_ORCHARD \
             CROP_ORCHARD \
-            OLD_PHENOLOGY_SEQUENCER \
-            LIU_DEBUG \
-            PHENOLOGY_VERSION=2013 \
-            CROPSYST_HANDLE_CANOPY_EVAP
+            CROPSYST_HANDLE_CANOPY_EVAP \
+            LIU_DEBUG
 INCLUDEPATH += ../../../../.. ../../.. ../.. ../../../../../common ../../../../../USDA/NRCS  ../../../../../../dev/corn
 QMAKE_CXXFLAGS += -fpermissive -O0
 QMAKE_CXXFLAGS += -Wno-reorder -Wno-unused-parameter -Wno-unused-but-set-parameter

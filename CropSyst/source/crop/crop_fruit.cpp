@@ -158,6 +158,7 @@ Crop_orchard_fruit::Crop_orchard_fruit
    // will be set at end of dormancy
 , fruit_bud_break_requirement                                                (0) //021125
    // will be set when chill requiment satisfied.
+, fruit_harvest_requirements                                                 (0) //200903
 , limit_max_LAI                                                          (false) //081103
 , harvested                                                              (false) //200603
 , seasons                                                          (seasons_ref) //190705
@@ -789,6 +790,7 @@ Crop_orchard_fruit::harvest
    harvested = true;
    harvestable = false;
    latest_harvest_date.set(simdate);                                             //200609
+   phenology.activate_harvest();                                                 //200903
    latest_harvest_fruit_dry_biomass = fruit_dry_biomass;                         //200608
    //crop.ref_reported()
    reported.season.biomass_production                                            //200609

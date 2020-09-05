@@ -12,7 +12,7 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DCS_VERSION=5 -DCROPSYST_VERSION=5 -DxUSE_WEATHER_PROVIDER -DWEATHER_PROVIDER_VERSION=5 -DVIC_CROPSYST_VERSION=3 -DEVENT_SCHEDULER_VERSION=1 -DXOLD_ORCHARD -DCROP_ORCHARD -DOLD_PHENOLOGY_SEQUENCER -DLIU_DEBUG -DPHENOLOGY_VERSION=2013 -DCROPSYST_HANDLE_CANOPY_EVAP -DQT_QML_DEBUG -DQT_CORE_LIB
+DEFINES       = -DCS_VERSION=5 -DCROPSYST_VERSION=5 -DWEATHER_PROVIDER_VERSION=5 -DVIC_CROPSYST_VERSION=3 -DEVENT_SCHEDULER_VERSION=1 -DCROP_ORCHARD -DCROPSYST_HANDLE_CANOPY_EVAP -DLIU_DEBUG -DQT_QML_DEBUG -DQT_CORE_LIB
 CFLAGS        = -pipe -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-write-strings -Wno-sign-compare -Wno-unused-value -g -fPIC -Wall -W -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -fpermissive -O0 -Wno-reorder -Wno-unused-parameter -Wno-unused-but-set-parameter -g -fPIC -Wall -W -D_REENTRANT $(DEFINES)
 INCPATH       = -I../../Linux_gcc -I. -I/home/liuming/dev -I/home/liuming/dev/CropSyst/source -I../../../../build -I/home/liuming/dev/common -I/home/liuming/dev/USDA/NRCS -I/home/liuming/dev/corn -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++

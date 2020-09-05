@@ -17,6 +17,8 @@
 #endif
 #include <iomanip>                                                               //160524LML
 
+#include "crop/phenology_I.h"
+
 #include "soil/chemicals_profile.h"                                              //150722LML
 #ifdef PRINT_VIC_SOIL_LAYERS_FOR_DEBUG
 
@@ -331,6 +333,8 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
     if (growth_season_only && !active_crop) doprint = false;
     else if (global_simdate /*200727RLN global_today*/.get_year() >= global_param.startyear
              && global_simdate /*200727RLN global_today*/.get_year() <= global_param.endyear) doprint = true;
+
+    //Crop_output_struct::last_yield = 0;
     if (doprint) {                                                               //For DEBUG!!!
         std::wstring wactive_crop_name(L"NOCROP");
         crop_data_struct &temp_vic_crop = active_land_unit->ref_VIC_crop();
@@ -516,9 +520,21 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
          //temp.Crop_name = active_crop_name.c_str()
          temp.Accum_DD = (active_crop ? active_crop->get_accum_degree_days() : 0);
          temp.Accum_DD_clip = (active_crop ? active_crop->get_accum_degree_days() : 0);
-         //obs std::string t = (active_crop ? active_crop->describe_growth_stage()      : "N/A");
-         strcpy(temp.Grow_Stage, "");
-         CORN::Text_list t;
+         //std::string t = (active_crop ? active_crop->describe_growth_stage()      : "N/A");
+#ifdef LIU_DEBUG
+         if (active_crop) {
+             CORN:Text_list t;
+             std::string str;
+             active_crop->describe_periods(t);
+             t.string_items(str,'&');
+             str.erase(std::remove(str.begin(),str.end(),' '), str.end());
+             strcpy(temp.Grow_Stage, str.c_str());
+         } else
+#endif
+             temp.Grow_Stage[0] = 0;
+
+
+         //CORN::Text_list t;
 
 
          //if (active_crop) {
@@ -539,12 +555,18 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
          //}
          //std::cerr << "TBD LML 200518!!!\n";
 
-
+         int16 day_since_start_of_harvest = (active_crop? active_crop->ref_phenology().get_days_since_start_of(NGS_HARVEST) : 0);
 
          temp.GAI = (active_crop ? active_crop->get_GAI(true)                : 0);
          temp.Green_Canopy_Cover = (active_crop ? active_crop->get_canopy_interception_global_green()     : 0);
          temp.Biomass_kg_m2 = (active_crop ? active_crop->get_canopy_biomass_kg_m2()   : 0);
-         temp.Yield_kg_m2 = (active_crop ? active_crop->get_latest_yield_kg_m2()     : 0);
+         temp.Yield_kg_m2 = active_crop? ((day_since_start_of_harvest==0) ? active_crop->get_latest_yield_kg_m2() : 0.0) : 0.0;
+/*debug
+         std::clog << "get_days_since_start_of:" <<  day_since_start_of_harvest
+                   << " Yield:" << temp.Yield_kg_m2
+                   << std::endl;
+*/
+         // temp.Yield_kg_m2 = (active_crop ? active_crop->get_latest_yield_kg_m2()     : 0);
          temp.Root_depth_mm = m_to_mm(active_crop ? active_crop->get_recorded_root_depth_m()   : 0);
          temp.VIC_PET_shortgrass_mm = active_land_unit->ref_VIC_cell().VCS.pot_evap_daily[PET_SHORT];
          temp.CropSyst_refET_mm = m_to_mm(CropSyst_ref_et_m);

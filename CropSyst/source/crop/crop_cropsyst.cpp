@@ -663,7 +663,7 @@ bool Crop_complete::in_growing_season()                             affirmation_
 nat8 Crop_complete::describe_periods(CORN::Text_list &descriptions)        const
 {
     bool test = true;
-    std::cerr << "test=describe_periods " << test << "\n";
+    //std::cerr << "test=describe_periods " << test << "\n";
 
 
    #if (!PHENOLOGY_VERSION || (PHENOLOGY_VERSION==2013))

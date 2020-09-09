@@ -866,6 +866,7 @@ int VIC_get_rotation_cycle_years(int rotation_or_crop_veg_class_code)
       // with no rotation.  In this case there is only one cycle year.
       VIC_know_project_directory(filenames.VCS.CropSyst_Working_dir);            //150527
       char rotation_or_crop_veg_class_code_cstr[10];
+      if (rotation_or_crop_veg_class_code > 10000) rotation_or_crop_veg_class_code -= 10000;                  //200909LML nonirrigated crops
       CORN::int32_to_cstr(rotation_or_crop_veg_class_code,
                           rotation_or_crop_veg_class_code_cstr,10,10,'\0');      //LML 150527 added '\0'
       CORN::OS::Directory_name_concrete project_database_directory

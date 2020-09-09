@@ -670,6 +670,7 @@ bool Land_unit_simulation::initialize()                            modification_
    int rotation_base_name = (rotation_or_crop_veg_class_code >= VEG_CLASS_CODE_START_SPECIFIC_SOWING)
                             ? (rotation_or_crop_veg_class_code / MULTIPLIER_FOR_SOWING_CODE)
                             : rotation_or_crop_veg_class_code;                   //170327LML
+   if (rotation_base_name > 10000) rotation_base_name -= 10000;                  //200909LML nonirrigated crops
    VIC::Rotation_parameters_enumerated *rotation =
       dynamic_cast<VIC::Rotation_parameters_enumerated *>
          (VIC::rotations_parameters.find
@@ -678,6 +679,7 @@ bool Land_unit_simulation::initialize()                            modification_
    {
       // This code is probably a single (established crop such as orchard)
       char rotation_or_crop_veg_class_code_cstr[10];
+      if (rotation_or_crop_veg_class_code > 10000) rotation_or_crop_veg_class_code -= 10000;                  //200909LML nonirrigated crops
       CORN::int32_to_cstr(rotation_or_crop_veg_class_code,rotation_or_crop_veg_class_code_cstr,10);
       CORN::OS::Directory_name_concrete project_database_directory
          (*VIC::project_directory,"Database");

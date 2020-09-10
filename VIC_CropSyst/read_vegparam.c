@@ -331,8 +331,9 @@ veg_con_struct *read_vegparam(FILE *vegparam,
         if (options.LAI_SRC == LAI_FROM_VEGPARAM) {
           veg_lib[veg_lib_index/*LML 141020 temp[i].veg_class*/].LAI[j] = atof( vegarr[j] );
           if (veg_lib[veg_lib_index/*LML 141020 temp[i].veg_class*/].overstory && veg_lib[veg_lib_index/*LML 141020 temp[i].veg_class*/].LAI[j] == 0) {
-            sprintf(ErrStr,"ERROR: cell %d, veg tile %d: the specified veg class (%d) is listed as an overstory class in the veg LIBRARY, but the LAI given in the veg PARAM FILE for this tile for month %d is 0.\n",gridcel, i+1, temp[i].veg_class+1, j+1);
-            nrerror(ErrStr);
+            sprintf(ErrStr,"Warning: cell %d, veg tile %d: the specified veg class (%d) is listed as an overstory class in the veg LIBRARY, but the LAI given in the veg PARAM FILE for this tile for month %d is 0.\n",gridcel, i+1, temp[i].veg_class+1, j+1);
+            veg_lib[veg_lib_index].LAI[j] = 0.001;
+            //nrerror(ErrStr);
           }
           if(veg_lib_index != -1){  //LML 141020 for crop, this adjustment should be conducted during run-time
             veg_lib[veg_lib_index/*LML 141020 temp[i].veg_class*/].Wdmax[j] =

@@ -278,7 +278,7 @@ veg_con_struct *read_vegparam(FILE *vegparam,
 
     if(temp[i].veg_class == -1/*LML 150413 veg_class == MISSING*/) {
 #ifdef VIC_CROPSYST_VERSION //KJC 02132011
-      sprintf(ErrStr,"The vegetation class id %i in vegetation tile %i from cell %i is not defined in the vegetation library nor in the crop file.", temp[i].veg_class, i, gridcel); //KJC 02132011
+      sprintf(ErrStr,"The vegetation class id %i in vegetation tile %i from cell %i is not defined in the vegetation library nor in the crop file.", gridcel, temp[i].VCS.veg_class_code, i, gridcel); //KJC 02132011
 #else //KJC 02132011
       sprintf(ErrStr,"The vegetation class id %i in vegetation tile %i from cell %i is not defined in the vegetation library file.", temp[i].veg_class, i, gridcel);
 #endif //KJC 02132011

@@ -98,7 +98,7 @@
 #define EXCESS_ICE FALSE
 
 /***** Define maximum array sizes for model source code *****/
-#define MAX_VEG        50      /* maximum number of vegetation types per cell ..Changed from 12 to 20- keyvan NOV072012*/
+#define MAX_VEG        200      /* maximum number of vegetation types per cell ..Changed from 12 to 20- keyvan NOV072012*/
 #define MAX_LAYERS     17       /* maximum number of soil moisture layers- changed from 3 to 17 considering 15 layers in layer1-keyvan NOV07/2012 */
 #define MAX_NODES      50      /* maximum number of soil thermal nodes */
 #define MAX_BANDS      10      /* maximum number of snow bands */

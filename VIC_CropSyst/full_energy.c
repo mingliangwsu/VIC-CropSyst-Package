@@ -544,6 +544,14 @@ int  full_energy(char                 NEWCELL,
           //171127LML Note: check height and tmp_wind, why use the last PET
           //vegetation type?
           double height = 0;                                                     //160516LML need check!!!
+          #ifndef FULL_IRRIGATION
+          irrigation_pattern_struct *irripattern = 0;
+          if (irrig_patt.find(veg_class_code) != irrig_patt.end() ) {
+              if (irrig_patt[veg_class_code].find(rec) != irrig_patt[veg_class_code].end()) {
+                  irripattern = &irrig_patt[veg_class_code][rec];
+              }
+          }
+          #endif
           ErrorFlag = surface_fluxes(//iveg, band, prcp->mu[iveg], rec, dmy, surface_flux_input);
                                      overstory, bare_albedo, height, ice0[band], moist0[band],
                                      #if EXCESS_ICE
@@ -570,7 +578,7 @@ int  full_energy(char                 NEWCELL,
                                     ,veg_con
 #endif
 #ifndef FULL_IRRIGATION
-                                    ,&irrig_patt[veg_class_code][rec]
+                                    ,irripattern
 #endif
 #endif
                             );

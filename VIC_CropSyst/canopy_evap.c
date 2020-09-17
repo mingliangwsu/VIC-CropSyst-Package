@@ -460,7 +460,7 @@ double canopy_evap(const soil_con_struct   &soil_con,
                } else {
 
                #ifndef USE_CROPSYST_CROP_IRRIGATION
-               #ifdef FULL_IRRIGATION
+               //#ifdef FULL_IRRIGATION
                #ifdef IRRIGATION_FROM_DEMAND
                total_irrig =
                  #ifdef MECHANISTIC_IRRIGATION
@@ -473,15 +473,18 @@ double canopy_evap(const soil_con_struct   &soil_con,
                  total_irrig = irrigation_capacity_mm;            //160104LML
                #else
                //Irrigation with capacity
-
                //190130RLN  Warning daily_irrigation_capacity_mm is not longer defined
                // I presume this is  irrigation_capacity_mm
-
                total_irrig = daily_irrigation_capacity_mm
                                             * delta_t / (double)SEC_PER_DAY;     //160509LML added time fraction
                #endif                                                            //IRRIGATION_FROM_DEMAND
-               #else                                                             //Deficit irrigation
-               total_irrig = amount_of_deficit_irrigation(rec,rotation_code);
+               //#else                                                             //Deficit irrigation
+               #ifndef FULL_IRRIGATION
+               //200917LML
+               //For proration irrigation, if the rotation is not listed in the
+               //irrigation pattern table, using full irrigation amount
+               double proration_irrigation = amount_of_deficit_irrigation(rec,rotation_code);
+               if (proration_irrigation >= 0) total_irrig = proration_irrigation;
                #endif                                                            //FULL_IRRIGATION==TRUE
                #else                                                             //Irrigation from CropSyst simulation
                total_irrig =

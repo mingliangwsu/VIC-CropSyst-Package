@@ -60,7 +60,7 @@ bool need_irrigation(double MAD_crop_specific
     bool irrigation = false;
     irrigation_demand = 0;                                                       //160509LML
     //irrigation_pattern_struct *irrig_pattern;
-    #ifdef FULL_IRRIGATION
+    //#ifdef FULL_IRRIGATION
     double accumulative_soil_depth  = 0.0;
     double maximum_available_water  = 0.0;
     double actual_available_water   = 0.0;
@@ -153,11 +153,14 @@ bool need_irrigation(double MAD_crop_specific
             }
         }
     }
-    #else
+    //#else
+    #ifndef FULL_IRRIGATION
     //today_is_deficit_irrigation()
     double amount_def_irr = amount_of_deficit_irrigation(rec,rotation_code);
-    irrigation = amount_def_irr > 0;
-    irrigation_demand = irrigation ? amount_def_irr : 0;
+    if (amount_def_irr >= 0) {                                                  //If == -1, not irrigation pattern, assume full irrigation.
+        irrigation = amount_def_irr > 0;
+        irrigation_demand = irrigation ? amount_def_irr : 0;
+    }
     #endif
 
     //if (irrigation)
@@ -180,9 +183,11 @@ double amount_of_deficit_irrigation(int rec, int rotation_code)
             return irrig_pattern.proration_rate >= 0 ?
                irrig_pattern.irrig_amount * irrig_pattern.proration_rate
                : irrig_pattern.irrig_amount * global_param.VCS.basin_wide_proration;
+        } else {
+            return 0.0;                                                         //if crop exist but no poration record, just set no irrigation
         }
     }
-    return 0.0;
+    return -1.0;                                                                //200917LML if the crop not in the irrigation table
 };
 
 #endif

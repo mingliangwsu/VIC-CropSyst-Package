@@ -147,8 +147,16 @@ int alloc_irrig_pattern(
     strcat(filenames->VCS.irrigation_pattern, latchar);
     strcat(filenames->VCS.irrigation_pattern, "_");
     strcat(filenames->VCS.irrigation_pattern, lngchar);
+    //If irrigation proration not exist, using full irrigation
+    if (FILE *file = fopen(filenames->VCS.irrigation_pattern, "r")) {
+        fclose(file);
+        filep->VCS.irrigation_pattern=open_file(filenames->VCS.irrigation_pattern, "rb");
+    } else {
+        std::clog << "Warning:"
+                  << filenames->VCS.irrigation_pattern
+                  << " not exist. Using full irrigation\n";
+    }
 
-    filep->VCS.irrigation_pattern=open_file(filenames->VCS.irrigation_pattern, "rb");
     return 0;
 }
 #endif
@@ -175,6 +183,8 @@ int read_irrig_pattern(FILE *infile,
                            int nrecs
                            )
 {
+  irrig_patt.clear();
+  if (infile) {
     double ustmp;
     double *irrigation_data;
     int rec = 0;
@@ -211,6 +221,9 @@ int read_irrig_pattern(FILE *infile,
     }
     //return(irrigation_data);
     return 0;
+  } else {
+      return 1;
+  }
 }
 #endif
 /*************************************************

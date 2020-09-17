@@ -198,8 +198,9 @@ global_param_struct get_global_param(filenames_struct *names,
   strcpy(options.VCS.crop_specfic_param_dir,"MISSING");/*KJC 06272011 */
   //strcpy(options.CO2_PPM,"MISSING");/*KJC 06272011 */
   options.VCS.CO2_PPM<-0;/*KJC 06272011 */
-  #if (FULL_IRRIGATION==TRUE)
+  #ifndef FULL_IRRIGATION
   strcpy(names->VCS.irrig_fpath_pfx,   "MISSING"); /* 130530 Keyvan*/
+  global.VCS.basin_wide_proration = 1.0;
   #endif
   strcpy(names->VCS.CO2_FILE,   "MISSING"); /* 130605 keyvan*/
   options.VCS.clay_input       = TRUE;                                           //170923LML
@@ -746,9 +747,14 @@ global_param_struct get_global_param(filenames_struct *names,
           sscanf(cmdstr,"%*s %d",&options.VCS.CO2_PPM);
 
       }
-      #if (FULL_IRRIGATION==FALSE)
-     else if ( strcasecmp("IRRIG_PATTERN",optstr)==0){
-        sscanf(cmdstr,"%*s %s",names->irrig_fpath_pfx);
+      #if !defined(FULL_IRRIGATION) || defined(OUTPUT_FULLIRRIGATION_PATTERN)
+      else if ( strcasecmp("IRRIG_PATTERN",optstr)==0){
+        sscanf(cmdstr,"%*s %s",names->VCS.irrig_fpath_pfx);
+      }
+      #endif
+      #ifndef FULL_IRRIGATION
+      else if( strcasecmp("BASIN_PRORATION",optstr)==0){
+          sscanf(cmdstr,"%*s %lf",&global.VCS.basin_wide_proration);
       }
       #endif
     // else if(options.clay_input==1){
@@ -982,10 +988,9 @@ global_param_struct get_global_param(filenames_struct *names,
   if (options.VCS.CO2_PPM == 0 )
     nrerror("CO2 concentration in ppm has NOT been defined.  Make sure that the global file defines this value on the line that begins with \"Co2_PPM\".");
   }
- #if (FULL_IRRIGATION== FALSE)
-  if ( strcmp ( names->irrig_fpath_pfx, "MISSING" ) == 0 )
+ #ifndef FULL_IRRIGATION
+  if ( strcmp ( names->VCS.irrig_fpath_pfx, "MISSING" ) == 0 )
     nrerror("No Irrigation pattern file has been defined.  Make sure that the global file defines the irrigation pattern file on the line that begins with \"IRRIG_PATTERN\".");
-
  #endif
 #endif
   if(options.ROOT_ZONES<0)

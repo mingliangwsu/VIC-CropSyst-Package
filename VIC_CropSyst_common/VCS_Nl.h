@@ -1,5 +1,6 @@
 #ifndef VCS_NL_H
 #define VCS_NL_H
+#include <map>
 #include <assert.h>
 #include <vector>
 #  include "crop/VIC_soil_hydrology.h"
@@ -78,7 +79,11 @@ double calc_irrigation_runoff(const int irrigation_index,
     /*const*/ double irrigation_amount_mm,
     /*const*/ double soil_toplayer_moist_mm,
     /*const*/ double max_allowable_deficit,
-    const soil_con_struct& soil_con);
+    const soil_con_struct& soil_con
+#ifndef FULL_IRRIGATION
+    ,double basin_proration_ratio
+#endif
+                              );
 void clear_cell_irrigation_water_fluxes(cell_data_struct *current_cell);         //150702LML
 int iscrop(int veg_class);
 CO2_conc_struct *read_CO2_conc(FILE *);
@@ -117,10 +122,11 @@ void print_state_flux_specific_veg_band(int dist,
                                         const soil_con_struct  *soil,
                                         const atmos_data_struct *atmos);
 #endif
-#if (FULL_IRRIGATION==FALSE)
-void alloc_irrig_pattern(int, irrigation_pattern_struct **,filep_struct *, filenames_struct *,
-              soil_con_struct *);
-double *read_irrig_pattern(FILE *, irrigation_pattern_struct*, int nrecs);
+#ifndef FULL_IRRIGATION
+int alloc_irrig_pattern(int, filep_struct *, filenames_struct *, soil_con_struct *);
+#endif
+#ifndef FULL_IRRIGATION
+int read_irrig_pattern(FILE *, std::map<int,std::map<int,irrigation_pattern_struct>> &irrig_patt, int nrecs);
 
 #endif
 void copy_and_split_veg_con_element(const veg_con_struct &from,

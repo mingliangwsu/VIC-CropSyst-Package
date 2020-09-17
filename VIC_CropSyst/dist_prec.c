@@ -31,8 +31,9 @@ int  dist_prec(atmos_data_struct   *atmos,
                #if VIC_CROPSYST_VERSION==2
                ,crop_data_struct *crops
                #endif
-               #if (FULL_IRRIGATION==FALSE)
-               ,irrigation_pattern_struct *irrig_patt //keyvan 130604
+               #ifndef FULL_IRRIGATION
+               //,irrigation_pattern_struct *irrig_patt //keyvan 130604
+               ,std::map<int,std::map<int,irrigation_pattern_struct>> &irrig_patt
                #endif
                ,int spinup_run                                                   //160922LML = 0                                               //150819LML
 #endif
@@ -227,7 +228,7 @@ int  dist_prec(atmos_data_struct   *atmos,
         #if VIC_CROPSYST_VERSION==2
         ,crops
         #endif
-        #if (FULL_IRRIGATION==FALSE)
+        #ifndef FULL_IRRIGATION
         ,irrig_patt //keyvan 130604
         #endif
         #endif //VIC_CROPSYST_VERSION
@@ -243,7 +244,7 @@ int  dist_prec(atmos_data_struct   *atmos,
         #if VIC_CROPSYST_VERSION==2
         ,crops
         #endif
-        #if (FULL_IRRIGATION==FALSE)
+        #ifndef FULL_IRRIGATION
         ,irrig_patt //keyvan 130604
         #endif
         #endif //VIC_CROPSYST_VERSION

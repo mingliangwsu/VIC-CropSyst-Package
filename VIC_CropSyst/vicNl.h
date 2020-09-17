@@ -299,7 +299,7 @@ double calc_surf_energy_bal(double             Le,
                 ,cell_data_struct  *cell_dry
                 ,int                veg_class_code
                 ,double           **aero_resist_ET
-                #if (FULL_IRRIGATION==FALSE)
+                #ifndef FULL_IRRIGATION
                 ,irrigation_pattern_struct *irrig_patt
                 #endif
 #endif //keyvan 11152012
@@ -452,8 +452,9 @@ int    dist_prec(atmos_data_struct *,dist_prcp_struct *,soil_con_struct *,
         #if VIC_CROPSYST_VERSION==2
 		, crop_data_struct * //keyvan added crop_data_struct
         #endif
-		#if (FULL_IRRIGATION==FALSE)
-        ,irrigation_pattern_struct *
+        #ifndef FULL_IRRIGATION
+        //,irrigation_pattern_struct *
+        ,std::map<int,std::map<int,irrigation_pattern_struct>> &irrig_patt
         #endif
         ,int spinup_run = 0                                                      //150819LML
 #endif
@@ -552,8 +553,9 @@ int    full_energy(char, int, int, atmos_data_struct *, dist_prcp_struct *,
             #if VIC_CROPSYST_VERSION==2
             ,crop_data_struct * //keyvan added crop_data_struct
             #endif
-            #if (FULL_IRRIGATION==FALSE)
-            , irrigation_pattern_struct * //keyvan 130604
+            #ifndef FULL_IRRIGATION
+            //, irrigation_pattern_struct * //keyvan 130604
+            ,std::map<int,std::map<int,irrigation_pattern_struct>> &
             #endif
 #endif
                    );
@@ -879,7 +881,7 @@ int surface_fluxes(char, double, double, double, double,
                    #if (VIC_CROPSYST_VERSION>=3)
                    ,veg_con_struct *
                    #endif
-                   #if (FULL_IRRIGATION==FALSE)
+                   #ifndef FULL_IRRIGATION
                    ,irrigation_pattern_struct *
                    #endif
                    #endif

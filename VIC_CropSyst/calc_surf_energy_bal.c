@@ -77,7 +77,7 @@ double calc_surf_energy_bal(double             Le,
                 ,cell_data_struct  *cell_dry
                 ,int                veg_class_code
                 ,double           **aero_resist_ET
-                #if (FULL_IRRIGATION==FALSE)
+                #ifndef FULL_IRRIGATION
                 ,irrigation_pattern_struct *irrig_patt
                 #endif
 #endif //keyvan 11152012

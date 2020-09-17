@@ -1,8 +1,9 @@
-
+#include <map>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>     //LML 140815
 #include "vicNl.h"
+#include "VCS_user_def.h"
 #ifdef VIC_CROPSYST_VERSION
 static char vcid[] = "$Id: read_croplib.c,v 4.1.1.1 2011/02/13 Kiran Chinnayakanahalli, kiran.c@wsu.edu $";
 #if (VIC_CROPSYST_VERSION==2)
@@ -117,101 +118,82 @@ void free_crop_rotation_lib(crop_rotation_lib_struct **crop_rotation_lib) {
 #endif
 */
 
-#if (FULL_IRRIGATION==FALSE)
+#ifndef FULL_IRRIGATION
 /******************************************
 allocate memory to irrigation pattern Keyvan 130530
 
 this function is developed to calculate
 effect of fdeficit irrigation
 ******************************************/
-alloc_irrig_pattern(
+int alloc_irrig_pattern(
                     int nrecs,
-                    irrigation_pattern_struct **irrig_patt,
+                    //std::map<int,std::map<int,irrigation_pattern_struct>> &irrig_patt, //irrigation_pattern_struct **irrig_patt,
                     filep_struct         *filep,
                     filenames_struct     *filenames,
                     soil_con_struct      *soil
                     )
 {
-extern option_struct    options;
-extern FILE *open_file(char string[], char type[]);
+    extern option_struct    options;
+    extern FILE *open_file(char string[], char type[]);
 
-/****making irrigation pattern file names, which contains the lan and long of each cell Keyvan 130710****/
-char   latchar[15], lngchar[15], junk[5];
-sprintf(junk, "%%.%if", options.GRID_DECIMAL);
-sprintf(latchar,  "%.5f", soil->lat);
-sprintf(lngchar, junk, soil->lng);
+    /****making irrigation pattern file names, which contains the lan and long of each cell Keyvan 130710****/
+    char   latchar[15], lngchar[15], junk[5];
+    sprintf(junk, "%%.%if", options.GRID_DECIMAL);
+    sprintf(latchar,  "%.5f", soil->lat);
+    sprintf(lngchar, junk, soil->lng);
 
-strcpy(filenames->irrigation_pattern, filenames->irrig_fpath_pfx);
-strcat(filenames->irrigation_pattern, "_");
-strcat(filenames->irrigation_pattern, latchar);
-strcat(filenames->irrigation_pattern, "_");
-strcat(filenames->irrigation_pattern, lngchar);
+    strcpy(filenames->VCS.irrigation_pattern, filenames->VCS.irrig_fpath_pfx);
+    strcat(filenames->VCS.irrigation_pattern, "_");
+    strcat(filenames->VCS.irrigation_pattern, latchar);
+    strcat(filenames->VCS.irrigation_pattern, "_");
+    strcat(filenames->VCS.irrigation_pattern, lngchar);
 
-filep->irrigation_pattern=open_file(filenames->irrigation_pattern,"rb");/*Keyvan 130530 */
-
-/*******allocate the memory******/
-*irrig_patt = (irrigation_pattern_struct *) calloc(nrecs, sizeof(irrigation_pattern_struct)+2);
-//int i;
-
-//for (i = 0; i < nrecs; i++)
-//irrig_patt[i].irrig_amount = (double *) calloc(1, sizeof(double));
-
+    filep->VCS.irrigation_pattern=open_file(filenames->VCS.irrigation_pattern, "rb");
+    return 0;
 }
 #endif
 /********************************************************************
 read irrigation pattern
 ********************************************************************/
-#if (FULL_IRRIGATION==FALSE)
-double *read_irrig_pattern(FILE *infile,
-                           irrigation_pattern_struct *irrig_patt,
+#ifndef FULL_IRRIGATION
+int read_irrig_pattern(FILE *infile,
+                           std::map<int,std::map<int,irrigation_pattern_struct>> &irrig_patt,
+                           //irrigation_pattern_struct *irrig_patt,
                            int nrecs
                            )
 {
-
-
-//extern param_set_struct param_set;
-//int endian;
-//int    i = 1;
-    //if(*(char *)&i == 1)
-      //endian = LITTLE;
-    //else
-      //endian = BIG;
-
-//fseek(infile,int ustmp,SEEK_SET);
-//rewind(infile);
-double ustmp;
-//fseek(infile,(int)ustmp,SEEK_SET);
- //double ustmp;
- double *irrigation_data;
-// *irrig_patt = (irrigation_pattern_struct *) calloc(nrecs, sizeof(irrigation_pattern_struct));
-irrigation_data = (double *)calloc(nrecs,sizeof(double));
- int rec = 0;
-//fseek(infile,Nbytes,SEEK_SET);
-while ( !feof(infile) && rec<nrecs)
-    {
-
- /*   if (endian != param_set.FORCE_ENDIAN[1]) {
-        ustmp = ((ustmp & 0xFF) << 8) | ((ustmp >> 8) & 0xFF);
-      }*/
-
-  // fread(&irrigation_data[rec],sizeof(double),1,infile);
-  /// fread(&ustmp,sizeof(double),1,infile); I should spend sometimes to fix it
-  //  irrigation_data[rec]=(double)ustmp;
-   /* if((double)ustmp>1){
-        int keyvan=1;
-    }*/
-    int day, month, year;
-//irrigation_data[rec]=(double)ustmp;
-   fscanf(infile,"%i %i %i %lf", &year, &month, &day, &irrigation_data[rec]);
-//   irrig_patt[rec].irrig_amount=irrigation_data[rec];
-    //if(year>1){
-    if(*irrigation_data>1){
-        int keyvan=1;
+    double ustmp;
+    double *irrigation_data;
+    int rec = 0;
+    //fseek(infile,Nbytes,SEEK_SET);
+    int rotation,year,doy;
+    double irrig_amount,proration,temp;
+    //doy is from 1
+    CORN::Date_clad_32 first_sim_day;
+    first_sim_day.set_YMD(global_param.startyear,global_param.startmonth,global_param.startday);
+    while ((temp = fscanf(infile,"%i %i %i %lf %lf\n",
+                   &year, &doy, &rotation, &irrig_amount, &proration)) != EOF) {
+        if (temp == 5) {
+            irrigation_pattern_struct irr;
+            irr.irrig_amount = irrig_amount;
+            irr.proration_rate = proration;
+            //int rec;
+            CORN::Date_clad_32 recday;
+            recday.set_YD(year,doy);
+            int rec = recday.days_between(first_sim_day,false);
+            //std::map<int,irrigation_pattern_struct> trec;
+            //trec.insert(std::pair<int,irrigation_pattern_struct>(rec,irr));
+            //irrig_patt.insert(std::pair<int,std::map<int,irrigation_pattern_struct>());
+            //irrig_patt[rotation].insert(std::pair<int,irrigation_pattern_struct>(rec,irr));
+            irrig_patt[rotation][rec] = irr;
+        }
+        else {
+            std::cerr << "Wrong irrigation pattern file format!\n";
+            return 1;
+        }
     }
-    rec++;
-    }
-
-return(irrigation_data);
+    //return(irrigation_data);
+    return 0;
 }
 #endif
 /*************************************************

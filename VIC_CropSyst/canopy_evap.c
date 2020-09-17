@@ -165,9 +165,10 @@ double canopy_evap(const soil_con_struct   &soil_con,
   bool is_crop = false;
   double mu = mu_orig;
   #ifdef VIC_CROPSYST_VERSION
+  int rotation_code = veg_con[iveg].VCS.veg_class_code;
   is_crop = iscrop
           #if (VIC_CROPSYST_VERSION>=3)
-          (veg_con[iveg].VCS.veg_class_code);
+          (rotation_code);
           #else
           (veg_class_code); //keyvan 1207/2012
           #endif
@@ -432,6 +433,9 @@ double canopy_evap(const soil_con_struct   &soil_con,
                                                  ,tmp_layer                      //150701LML
                                                  ,soil_con                       //150701LML
                                                  ,soil_water_demand_mm
+#ifndef FULL_IRRIGATION
+                                                 ,rotation_code
+#endif
                                                  ,fill_soil_deficit
                                                  ,irrigation_capacity_mm
                                                  ,&real_filled_water
@@ -456,7 +460,7 @@ double canopy_evap(const soil_con_struct   &soil_con,
                } else {
 
                #ifndef USE_CROPSYST_CROP_IRRIGATION
-               #if (FULL_IRRIGATION==TRUE)
+               #ifdef FULL_IRRIGATION
                #ifdef IRRIGATION_FROM_DEMAND
                total_irrig =
                  #ifdef MECHANISTIC_IRRIGATION
@@ -477,7 +481,7 @@ double canopy_evap(const soil_con_struct   &soil_con,
                                             * delta_t / (double)SEC_PER_DAY;     //160509LML added time fraction
                #endif                                                            //IRRIGATION_FROM_DEMAND
                #else                                                             //Deficit irrigation
-               total_irrig = amount_of_deficit_irrigation(rec);
+               total_irrig = amount_of_deficit_irrigation(rec,rotation_code);
                #endif                                                            //FULL_IRRIGATION==TRUE
                #else                                                             //Irrigation from CropSyst simulation
                total_irrig =
@@ -589,7 +593,11 @@ double canopy_evap(const soil_con_struct   &soil_con,
                ,irrig_over_soil
                ,tmp_layer[0].moist
                ,maximum_allowable_depletion
-               ,soil_con);
+               ,soil_con
+#ifndef FULL_IRRIGATION
+               ,global_param.VCS.basin_wide_proration
+#endif
+                     );
              //180531LML how to handle the deep percolation?
 #else
              runoff_from_irrig_sys = total_irrig

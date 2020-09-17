@@ -16,18 +16,21 @@
 #include "soil/layers.h"
 #include <assert.h>                                                              //150922LML
 
-extern bool need_irrigation(double MAD_crop_specific
-                               , double depletion_obs_depth_mm
-                               , int rec
-                               , double applied_irrigation
-                               , layer_data_struct *layer                        //150701LML
-                               , const soil_con_struct &soil_con                 //150701LML
-                               , double &irrigation_demand
-                               , bool fill_water_to_fc
-                               , double max_capacity                             //190724LML
-                               , double *real_added_water                        //190724LML
-                               , double top_layer_to_fc_fraction                 //190805LML control drip irrigations over fruit trees (vine in this case)
-                               );
+//extern bool need_irrigation(double MAD_crop_specific
+//                               , double depletion_obs_depth_mm
+//                               , int rec
+//                               , double applied_irrigation
+//                               , layer_data_struct *layer                        //150701LML
+//                               , const soil_con_struct &soil_con                 //150701LML
+//                               , double &irrigation_demand
+//#if (FULL_IRRIGATION==FALSE)
+//                               ,int rotation_code
+//#endif
+//                               , bool fill_water_to_fc
+//                               , double max_capacity                             //190724LML
+//                               , double *real_added_water                        //190724LML
+//                               , double top_layer_to_fc_fraction                 //190805LML control drip irrigations over fruit trees (vine in this case)
+//                               );
 namespace VIC
 {
 //190128RLN class Soil;

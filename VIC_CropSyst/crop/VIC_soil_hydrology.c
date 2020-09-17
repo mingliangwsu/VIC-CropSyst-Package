@@ -37,8 +37,9 @@ extern option_struct   options;
 extern crop_data_struct *crop_global;
 extern soil_con_struct *soil_con_global;
 extern double VIC_CropSyst_get_return;
-#if (FULL_IRRIGATION==FALSE)
-extern irrigation_pattern_struct *irrig_patt;
+extern global_param_struct global_param;
+#ifndef FULL_IRRIGATION
+extern std::map<int,std::map<int,irrigation_pattern_struct>> girrig_patt;       //irrigation_pattern_struct *girrig_patt;
 #endif
 bool need_irrigation(double MAD_crop_specific
                         ,double depletion_obs_depth_mm                            //180510LML
@@ -47,6 +48,9 @@ bool need_irrigation(double MAD_crop_specific
                         ,layer_data_struct *layer                          //150701LML
                         ,const soil_con_struct &soil_con                         //150701LML
                         ,double &irrigation_demand
+#ifndef FULL_IRRIGATION
+                        ,int rotation_code
+#endif
                         ,bool fill_water_to_fc                                   //190724LML
                         ,double max_capacity                                     //190724LML
                         ,double *real_added_water                                //190724LML
@@ -56,7 +60,7 @@ bool need_irrigation(double MAD_crop_specific
     bool irrigation = false;
     irrigation_demand = 0;                                                       //160509LML
     //irrigation_pattern_struct *irrig_pattern;
-    #if (FULL_IRRIGATION==TRUE)
+    #ifdef FULL_IRRIGATION
     double accumulative_soil_depth  = 0.0;
     double maximum_available_water  = 0.0;
     double actual_available_water   = 0.0;
@@ -151,8 +155,9 @@ bool need_irrigation(double MAD_crop_specific
     }
     #else
     //today_is_deficit_irrigation()
-    irrigation = irrig_patt[rec].irrig_amount > 0;
-    irrigation_demand = irrig_patt[rec].irrig_amount;
+    double amount_def_irr = amount_of_deficit_irrigation(rec,rotation_code);
+    irrigation = amount_def_irr > 0;
+    irrigation_demand = irrigation ? amount_def_irr : 0;
     #endif
 
     //if (irrigation)
@@ -166,23 +171,28 @@ bool need_irrigation(double MAD_crop_specific
     return irrigation;
 }
 //______________________________________________________________________________
+#ifndef FULL_IRRIGATION
+double amount_of_deficit_irrigation(int rec, int rotation_code)
+{
+    if (girrig_patt.find(rotation_code) != girrig_patt.end() ) {
+        if (girrig_patt[rotation_code].find(rec) != girrig_patt[rotation_code].end()) {
+            irrigation_pattern_struct &irrig_pattern = girrig_patt[rotation_code][rec];
+            return irrig_pattern.proration_rate >= 0 ?
+               irrig_pattern.irrig_amount * irrig_pattern.proration_rate
+               : irrig_pattern.irrig_amount * global_param.VCS.basin_wide_proration;
+        }
+    }
+    return 0.0;
+};
+
+#endif
+//______________________________________________________________________________
 #if (VIC_CROPSYST_VERSION < 3)
 /**************************************************************
 for implementing deficit irrigation
     130710
 **************************************************************/
-#if (FULL_IRRIGATION==FALSE)
-double amount_of_deficit_irrigation(
-                                int rec
-                                )
-{
-//irrigation_pattern_struct *irrig_pattern;
-double amount_mm=irrig_patt[rec].irrig_amount* PORTION_OF_IRRIGATION_DEMAND_IN_DEFICIT;
-return amount_mm;
 
-};
-
-#endif
 /*************************************************************
 calculate evaporation from irrigation systems           keyvan
 calculates the evaporation from irrigation systems based on
@@ -629,7 +639,11 @@ double calc_irrigation_runoff(
     /*const*/ double irrigation_amount_mm,                                           //reached to the surface
     /*const*/ double soil_toplayer_moist_mm,
     /*const*/ double max_allowable_deficit,
-    const soil_con_struct& soil_con)
+    const soil_con_struct& soil_con
+#ifndef FULL_IRRIGATION
+    ,double basin_proration_ratio
+#endif
+        )
 {
     //use Philip's equation
     double irrig_runoff = 0;
@@ -672,7 +686,7 @@ double calc_irrigation_runoff(
                               - soil_toplayer_moist_mm / 100.0
                              ) * ks * s_max, 0.5);
     double proration_ratio = 1.0;
-#if (FULL_IRRIGATION!=TRUE)
+#ifndef FULL_IRRIGATION
     proration_ratio = basin_proration_ratio;
 #endif
 

@@ -1,8 +1,11 @@
 /* RLN This may be needed for crop_data_struct
 #include "VCS_Nl_def.h"
 */
-
+#include "VCS_user_def.h"
 #if (VIC_CROPSYST_VERSION>=3)
+#ifdef OUTPUT_FULLIRRIGATION_PATTERN
+#include "VIC_crop_output.h"
+#endif
 #include "VIC_land_unit_C_interface.h"
 #include "global.h"
 #include "irrigation_lib.h"
@@ -40,11 +43,13 @@ This is intended for a C++ compiler that supports mixed mode C/C++.
 #include "corn/OS/file_system_engine.h"
 #include "corn/OS/directory_entry_name_concrete.h"
 #include "corn/data_source/vv_file.h"
-#ifdef CROP_DAILY_OUTPUT_MEMFIRST
+#if defined(CROP_DAILY_OUTPUT_MEMFIRST) || defined (OUTPUT_FULLIRRIGATION_PATTERN)
 #include <list>
 #include "VIC_crop_output.h"
 #endif
 #include "crop/crop_interfaced.h"
+
+
 double VIC_land_unit_get_return=0.0;
 
 extern CORN::date32 global_simdate_raw; //LML 200819
@@ -600,6 +605,23 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
          temp.profile_liq_water = profile_liq_water;
      crop_output_list.push_back(temp);
 #endif
+
+#ifdef OUTPUT_FULLIRRIGATION_PATTERN
+     if (active_crop) {
+         if (temp_vic_crop.irrigation_water >= 0.01) {
+             Out_irrigation_pattern_struct irrip;
+             irrip.cell_id = active_land_unit->ref_VIC_soil_con().gridcel;
+             irrip.lon           = (double)active_land_unit->ref_VIC_soil_con().lng;
+             irrip.lat           = (double)active_land_unit->ref_VIC_soil_con().lat;
+             irrip.Year          = (int)global_simdate.get_year();
+             irrip.DOY           = (int)global_simdate.get_DOY();
+             irrip.rotation_code = (active_land_unit->ref_VIC_veg_con().VCS.veg_class_code);
+             irrip.irrigation_amount = temp_vic_crop.irrigation_water;
+             out_irrigation_pattern_output_list.push_back(irrip);
+         }
+     }
+#endif
+
     }
 #ifndef CROP_DAILY_OUTPUT_MEMFIRST
     debugout.close();

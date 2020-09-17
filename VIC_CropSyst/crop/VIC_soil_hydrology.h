@@ -11,11 +11,17 @@ extern "C" {
 #endif
 
 double cal_soil_evap_from_total_evap(double ET_reference_crop);
+
 bool need_irrigation(double, double, int, double, layer_data_struct *, const soil_con_struct &
+                     ,double &irrigation_demand
+#ifndef FULL_IRRIGATION
+                     ,int rotation_code
+#endif
                      ,bool fill_water_to_fc_exclude_top = false
                      ,double max_capacity = 0                                   //190724LML
                      ,double *real_added_water = 0                              //190724LML
-                     ,double top_layer_to_fc_fraction = 1.0);                   //190805LML control drip irrigations over fruit trees (vine in this case)
+                     ,double top_layer_to_fc_fraction = 1.0
+        );                   //190805LML control drip irrigations over fruit trees (vine in this case)
 double calc_wetted_percentage(const Irrigation_Type irrigation_code,
                               const soil_con_struct &soil_con,
                               const double irrigation_amount,
@@ -23,6 +29,9 @@ double calc_wetted_percentage(const Irrigation_Type irrigation_code,
                               );
 double refill_water_depth_mm(layer_data_struct *layer,
     soil_con_struct *soil_con, size_t frost_index);                              //150701LML added argument
+#ifndef FULL_IRRIGATION
+double amount_of_deficit_irrigation(int, int);
+#endif
 #if (VIC_CROPSYST_VERSION < 3)
 double VIC_soil_hydrology_get_water_content(unsigned char layer);
 double VIC_soil_hydrology_extract_water(double water_uptake_m[] ,unsigned char start_layer );
@@ -35,7 +44,6 @@ double VIC_calc_soil_evaporation_actual_mm(
                                                   double soil_evap_pot_mm
                                                   ,double c);
 double VIC_calc_ET_pot(double ET_reference_crop);                                //121207
-double amount_of_deficit_irrigation(int);
 double LAI_from_CropSyst();
 double crop_coefficient();
 double canopy_fraction();

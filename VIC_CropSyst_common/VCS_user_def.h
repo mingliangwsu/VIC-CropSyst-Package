@@ -14,7 +14,13 @@
 #define MAX_APPLIED_IRRIGATION_AMOUNT 20.0
                                                                                  //**This is the maximum irrigation amount that can be applied. *
 #define MIN_APPLIED_IRRIGATION_AMOUNT 20.0
-#define FULL_IRRIGATION TRUE
+#define FULL_IRRIGATION
+#define OUTPUT_FULLIRRIGATION_PATTERN
+
+#ifndef FULL_IRRIGATION
+#undef OUTPUT_FULLIRRIGATION_PATTERN
+#endif
+
 #define PORTION_OF_IRRIGATION_DEMAND_IN_DEFICIT 0.3
 
 //190823LML for increasing irrigation frequency

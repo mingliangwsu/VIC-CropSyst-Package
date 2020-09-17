@@ -1,6 +1,8 @@
 #ifdef VIC_CROPSYST_VERSION
 #ifndef VIC_land_unit_C_interfaceH
 #define VIC_land_unit_C_interfaceH
+#include <list>
+#include "VIC_crop_output.h"
 /*190201RLN check needed
 #ifdef VCS_V5
 #include "vic_def.h"
@@ -12,6 +14,10 @@
 #include "irrigation_lib.h"
 #include "CropSyst/source/rot_param.h"
 #include "agronomic/VIC_land_unit_simulation.h"
+
+#ifdef OUTPUT_FULLIRRIGATION_PATTERN
+extern std::list<Out_irrigation_pattern_struct> out_irrigation_pattern_output_list;
+#endif
 /** \file
 \author Roger Nelson  Biological System Engineering  Washington State University
 \email rnelson@wsu.edu

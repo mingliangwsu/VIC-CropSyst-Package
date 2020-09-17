@@ -14,9 +14,9 @@ int set_output_for_crop_numbers(out_data_struct *out_data,const int numcrops); /
 int copy_veg_lib_record(const veg_lib_struct &from_veg, veg_lib_struct &to_veg);      //151001LML
 int make_veg_lib_for_crops(veg_con_struct *veg_con,veg_lib_struct *veg_lib);     //151001LML
 */
-#if (FULL_IRRIGATION==FALSE)
-irrigation_pattern_struct *irrig_patt;
-#endif
+//#if (FULL_IRRIGATION==FALSE)
+//irrigation_pattern_struct *girrig_patt;
+//#endif
 #if (VIC_CROPSYST_VERSION>=3)
 #include "corn/OS/file_system_logical.h"
 namespace CORN { namespace OS {

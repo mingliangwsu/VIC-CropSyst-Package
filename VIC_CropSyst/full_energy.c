@@ -1,3 +1,4 @@
+#include <map>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vicNl.h>
@@ -31,8 +32,8 @@ int  full_energy(char                 NEWCELL,
                  #if VIC_CROPSYST_VERSION==2
                  ,crop_data_struct   *crops
                  #endif
-                 #if (FULL_IRRIGATION==FALSE)
-                 ,irrigation_pattern_struct *irrig_patt //keyvan 130604
+                 #ifndef FULL_IRRIGATION
+                 ,std::map<int,std::map<int,irrigation_pattern_struct>> &irrig_patt //keyvan 130604
                  #endif
 #endif
                  )
@@ -568,8 +569,8 @@ int  full_energy(char                 NEWCELL,
 #if (VIC_CROPSYST_VERSION>=3)
                                     ,veg_con
 #endif
-#if (FULL_IRRIGATION==FALSE)
-                                    ,irrig_patt
+#ifndef FULL_IRRIGATION
+                                    ,&irrig_patt[veg_class_code][rec]
 #endif
 #endif
                             );

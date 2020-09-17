@@ -139,6 +139,9 @@ typedef struct {
   int    number_spinups_for_soil;                                                //*150723LML To get equilibium for SOM, residue, and soil inorganic N*
   int    spinup_years;                                                           //*years of climate data to use for each spinup run*
   int    is_spinup_run;                                                          //*150723LML*
+#ifndef FULL_IRRIGATION
+  double basin_wide_proration;
+#endif
 } VCS_global_param_struct;
 
 #define MAX_NUM_CROP_TYPES_FOR_IRRIGATION_DEFINE 50
@@ -344,9 +347,10 @@ typedef struct
 //Keyvan 130530
 //this structure stores irrigation history from previous runs
 //********************************************************************
-#if (FULL_IRRIGATION==FALSE)
+#ifndef FULL_IRRIGATION
 typedef struct {
-    double irrig_amount;
+    double irrig_amount;                                                        //Fully irrigation demand (mm/day)
+    double proration_rate;                                                      //0-1: real ratio; -1: use basin_wide_proration rate
 } irrigation_pattern_struct;
 #endif
 //*******************************************************************

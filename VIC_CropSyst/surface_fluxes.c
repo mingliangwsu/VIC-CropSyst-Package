@@ -79,7 +79,7 @@ int surface_fluxes(char                 overstory,
 #if (VIC_CROPSYST_VERSION>=3)
                    ,veg_con_struct      *veg_con
 #endif
-#if (FULL_IRRIGATION==FALSE)
+#ifndef FULL_IRRIGATION
                    ,irrigation_pattern_struct *irrig_patt                         //keyvan 130604
 #endif
 #endif
@@ -720,7 +720,7 @@ int surface_fluxes(char                 overstory,
                      //150929LML ,current_crop/*150702 crops*/  //Keyvan 11202012
                      ,veg_class_code //Keyvan 130226
                      ,aero_resist
-                     #if (FULL_IRRIGATION==FALSE)
+                     #ifndef FULL_IRRIGATION
                      ,irrig_patt
                      #endif
                      #endif //VIC_CROPSYST_VERSION
@@ -853,15 +853,15 @@ int surface_fluxes(char                 overstory,
 #ifdef __BCPLUSPLUS__
 //190130 RLN compiler not finding irrigation_netdemand
 #else
-        store_irrigation_netdemand[dist]        += cell->VCS.irrigation_netdemand;          //180327LML
+        if (N_steps==0) store_irrigation_netdemand[dist]        += cell->VCS.irrigation_netdemand;          //180327LML
 #endif
-        store_irrigation_evap[dist]             += cell->VCS.evap_from_irrigation_syst;     //150702LML
-        store_irrigation_water[dist]            += cell->VCS.irrigation_water;        //150702LML
-        store_irrigation_actual[dist]           += cell->VCS.actual_irrigation_reach_ground_amount;      //150714LML
-        store_irrigation_runoff[dist]           += cell->VCS.irrigation_runoff;             //150702LML
-        store_irrigation_intercept[dist]        += cell->VCS.intercepted_irrigation;        //150702LML
-        store_irrigation_intercept_evap[dist]   += cell->VCS.evap_from_irrigation_intercept;//150702LML
-        store_pot_tanspiration[dist]            += cell->VCS.potential_transpir;            //150702LML
+        if (N_steps==0) store_irrigation_evap[dist]             += cell->VCS.evap_from_irrigation_syst;     //150702LML
+        if (N_steps==0) store_irrigation_water[dist]            += cell->VCS.irrigation_water;        //150702LML
+        if (N_steps==0) store_irrigation_actual[dist]           += cell->VCS.actual_irrigation_reach_ground_amount;      //150714LML
+        if (N_steps==0) store_irrigation_runoff[dist]           += cell->VCS.irrigation_runoff;             //150702LML
+        if (N_steps==0) store_irrigation_intercept[dist]        += cell->VCS.intercepted_irrigation;        //150702LML
+        if (N_steps==0) store_irrigation_intercept_evap[dist]   += cell->VCS.evap_from_irrigation_intercept;//150702LML
+        if (N_steps==0) store_pot_tanspiration[dist]            += cell->VCS.potential_transpir;            //150702LML
       }
       #endif
       store_ppt[dist] += step_ppt[dist];
@@ -1057,8 +1057,6 @@ int surface_fluxes(char                 overstory,
       current_crop->evap_intercepted_irrig_water  = store_irrigation_intercept_evap[dist];  //150702LML
       current_crop->canopy_interception_fraction  = VIC_CropSyst_get(VIC::CANOPY_COVER_FRACTION_TOTAL); //150702LML
       current_crop->potential_transpir            = store_pot_tanspiration[dist];           //150702LML
-
-
       cell->VCS.potential_transpir                = store_pot_tanspiration[dist];           //160620LML removed the irrigation evaporation
 
       //170925LML cell->VCS.irrigation_water                = current_crop->irrigation_water;             //150713LML

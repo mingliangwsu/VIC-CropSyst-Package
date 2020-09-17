@@ -1215,6 +1215,11 @@ bool store_veg_outputs(const double *AreaFract,
                 //170924LML double fraction_for_gridcell = fraction * veg_con[veg].Cv;
                 fraction *= veg_con[veg].Cv;                                     //170924LML
                 out_data[OUT_CROP_IRRI_WAT].data[crop_counter]   += fraction * current_crop.irrigation_water;
+
+                if (current_crop.irrigation_water > 100) {
+                    std::clog << "current_crop.irrigation_water:" << current_crop.irrigation_water << "\n";
+                }
+
                 for (int index = 0; index < options.Nlayer-1; index++) {
                   out_data[OUT_CROP_TRANSPIR].data[crop_counter] += fraction * current_crop.transpiration[index];
                 }

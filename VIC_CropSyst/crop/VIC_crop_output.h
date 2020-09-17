@@ -1,7 +1,7 @@
 #ifndef VIC_crop_output
 #define VIC_crop_output
 #include "VIC_CropSyst_common/VCS_Nl_def.h"
-
+#include "VCS_user_def.h"
 
 typedef struct {
     int cell_id;
@@ -56,5 +56,16 @@ typedef struct {
     double Crop_Biomass_kg_m2;
     double profile_liq_water;
 } Crop_output_struct;
+#ifdef OUTPUT_FULLIRRIGATION_PATTERN
+typedef struct {
+    int cell_id;
+    double lon;
+    double lat;
+    int Year;
+    int DOY;
+    int rotation_code;
+    double irrigation_amount;
+} Out_irrigation_pattern_struct;
+#endif
 
 #endif

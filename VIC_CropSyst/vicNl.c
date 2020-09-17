@@ -1,3 +1,4 @@
+#include <map>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,6 +41,9 @@ int make_veg_lib_for_crops(veg_con_struct *veg_con,veg_lib_struct *veg_lib);    
 */
 static char vcid[] = "$Id: vicNl.c,v 5.14.2.20 2012/02/05 00:15:44 vicadmin Exp $";
 soil_con_struct   *soil_con_global = 0;   //km 130124
+#ifndef FULL_IRRIGATION
+std::map<int,std::map<int,irrigation_pattern_struct>> girrig_patt;              //[rotation_type][rec]
+#endif
 /*170413LML moved to VCS_Nl.c
 #if (FULL_IRRIGATION==FALSE)
 irrigation_pattern_struct *irrig_patt;
@@ -70,6 +74,9 @@ std::stringstream crop_output_head;
 bool created_head = false;
 char out_file_name[MAXSTRING];
 std::list<Crop_output_struct> crop_output_list;
+#endif
+#ifdef OUTPUT_FULLIRRIGATION_PATTERN
+std::list<Out_irrigation_pattern_struct> out_irrigation_pattern_output_list;
 #endif
 
 
@@ -235,7 +242,7 @@ int main (int argc, char *argv[])
   int                      Ncrop_type; //Similar to Nveg_type but counts the number of crps in the crop library -KJC 02132011
   int                      Ncrop_rotation_type;     //LML 141104
   CO2_conc_struct          *CO2_str; //Keyvan added
-  double *irrigation_data;
+  //double *irrigation_data;
   double *CO2_conc;
 #endif
 
@@ -304,15 +311,6 @@ int main (int argc, char *argv[])
   set_irrigation_efficiency_of_irrigation_library(3);
 #endif
   if (run_CropSyst_crop/*LML 150528 crops*/){
-  /************************************************
-  deficit irrigation calculations Keyvan 130604
-  ************************************************/
-#if (FULL_IRRIGATION==FALSE)
-    alloc_irrig_pattern(global_param.nrecs, &irrig_patt, &filep, &filenames, &soil_con);
-    irrigation_data = read_irrig_pattern(filep.irrigation_pattern, irrig_patt, global_param.nrecs);
-    for(rec=0; rec<global_param.nrecs; rec++)
-      irrig_patt[rec].irrig_amount= irrigation_data[rec]; //keyvan 130604
-#endif
     if(options.VCS.CO2_trans){
       CO2_str= read_CO2_conc(filep.VCS.CO2_PPM);
       //free((double *)irrigation_data); // keyvan 130604
@@ -338,8 +336,19 @@ int main (int argc, char *argv[])
 #ifdef CROP_DAILY_OUTPUT_MEMFIRST
     crop_output_list.clear();
 #endif
+#ifdef OUTPUT_FULLIRRIGATION_PATTERN
+    out_irrigation_pattern_output_list.clear();
+#endif
     fprintf(stderr,"read_soilparam...\n");
     soil_con = read_soilparam(filep.soilparam, filenames.soil_dir, &cell_cnt, &RUN_MODEL, &MODEL_DONE);
+    /************************************************
+    deficit irrigation calculations Keyvan 130604
+    ************************************************/
+#ifndef FULL_IRRIGATION
+    //200916LML
+    alloc_irrig_pattern(global_param.nrecs, &filep, &filenames, &soil_con);
+    int read_irrig = read_irrig_pattern(filep.VCS.irrigation_pattern, girrig_patt, global_param.nrecs);
+#endif
 
     if(RUN_MODEL) {
 
@@ -481,8 +490,8 @@ int main (int argc, char *argv[])
                            #if VIC_CROPSYST_VERSION==2
                            ,crops
                            #endif
-                           #if (FULL_IRRIGATION==FALSE)
-                           ,irrig_patt /**keyvan added this for deficit irrigation**/
+                           #ifndef FULL_IRRIGATION
+                           ,girrig_patt /**keyvan added this for deficit irrigation**/
                            #endif
                            ,0
 #endif
@@ -557,8 +566,8 @@ int main (int argc, char *argv[])
                               #if VIC_CROPSYST_VERSION==2
                               ,crops
                               #endif
-                              #if (FULL_IRRIGATION==FALSE)
-                              ,irrig_patt /**keyvan added this for deficit irrigation**/
+                              #ifndef FULL_IRRIGATION
+                              ,girrig_patt /**keyvan added this for deficit irrigation**/
                               #endif
                               ,global_param.VCS.is_spinup_run                        //150819LML
 #endif
@@ -710,6 +719,26 @@ int main (int argc, char *argv[])
         debugout.close();
         crop_output_list.clear();
         }
+#endif
+#ifdef OUTPUT_FULLIRRIGATION_PATTERN
+    if (sizeof(out_irrigation_pattern_output_list.size() > 0)) {
+        sprintf(out_file_name,"%s_%.5f_%.5f",filenames.VCS.irrig_fpath_pfx,
+            soil_con.lat,
+            soil_con.lng);
+        std::ofstream irrout(out_file_name,std::ofstream::out);
+        for (std::list<Out_irrigation_pattern_struct>::iterator temp=out_irrigation_pattern_output_list.begin()
+             ; temp != out_irrigation_pattern_output_list.end()
+             ; ++temp) {
+            //std::cout << ' ' << *it; 1979	153	1401	20	0.5
+            irrout << temp->Year
+                   << " " << temp->DOY
+                   << " " << temp->rotation_code
+                   << " " << temp->irrigation_amount
+                   << std::endl;
+        }
+        irrout.close();
+        out_irrigation_pattern_output_list.clear();
+    }
 #endif
     }    /* End Run Model Condition */
   }     /* End Grid Loop */

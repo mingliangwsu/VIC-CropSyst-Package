@@ -14,8 +14,8 @@
 #define MAX_APPLIED_IRRIGATION_AMOUNT 20.0
                                                                                  //**This is the maximum irrigation amount that can be applied. *
 #define MIN_APPLIED_IRRIGATION_AMOUNT 20.0
-#define FULL_IRRIGATION
-#define OUTPUT_FULLIRRIGATION_PATTERN
+//#define FULL_IRRIGATION
+//#define OUTPUT_FULLIRRIGATION_PATTERN
 
 #ifndef FULL_IRRIGATION
 #undef OUTPUT_FULLIRRIGATION_PATTERN

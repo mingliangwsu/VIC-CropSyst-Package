@@ -12,7 +12,7 @@ MAKEFILE      = Makefile
 
 CC            = g++
 CXX           = g++
-DEFINES       = -DCS_VERSION=5 -DCROPSYST_VERSION=5 -DWEATHER_PROVIDER_VERSION=5 -DVIC_CROPSYST_VERSION=3 -DCS_VERSION_NUMBERS=5,0,0 -DEVENT_SCHEDULER_VERSION=1 -DCROP_ORCHARD -DCROPSYST_HANDLE_CANOPY_EVAP -DLIU_DEBUG -DCROPSYST_MAX_DESCRIPTION_LENGTH=128 -DCROPSYST_VV_BOOL_FORM=CORN::VV_bool_entry::form_true -DNormal_crop_growth_stage=Normal_crop_event_sequence -DUSE_STD_STRING -DCHECK_WATER_BALANCE -DxUSE_CROPSYST_CROP_IRRIGATION -DxPRINT_VIC_SOIL_LAYERS_FOR_DEBUG -DxMECHANISTIC_IRRIGATION -DxMECHANISTIC_RUNOFF_TRUE -DIRRIGATION_FROM_DEMAND -DUSE_IRRIGATION_PARAM_FILE -DSATURATE_FLOW_TO_LOWER_LAYER_FIRST -DSEPERATE_SOIL_PARAMETER_AND_CROP_OUTPUT -DIRRIGATION_MANAGEMENT_QUALITY=1 -DONE_SNOWBAND_FOR_CROP -DxNOT_PRINT_CROP_DAILY_OUTPUTS -DINPUT_24HR_AVG_SOLAR_RADIATION -DIRRIG_PARAMETERFILE_DECIDE_IRRIGATION -DOLD_PROVIDE_CANOPY -DxDUMP_TO_STREAM_BUFFER_AT_FIRST_FOR_OUTPUT -DxCONST_SOIL_MIDDLE_LAYER_DEPTH -DxPRINT_SOM_FOR_DEBUG -DMAD_FOR_NETIRRIGATION_DEMAND=0.2 -DCROP_DAILY_OUTPUT_MEMFIRST -DPOSTPONE_FIRST_IRRIGATION_PERENNIAL_CROPS -DQT_QML_DEBUG -DQT_CORE_LIB
+DEFINES       = -DCS_VERSION=5 -DCROPSYST_VERSION=5 -DWEATHER_PROVIDER_VERSION=5 -DVIC_CROPSYST_VERSION=3 -DCS_VERSION_NUMBERS=5,0,0 -DEVENT_SCHEDULER_VERSION=1 -DCROP_ORCHARD -DCROPSYST_HANDLE_CANOPY_EVAP -DLIU_DEBUG -DCROPSYST_MAX_DESCRIPTION_LENGTH=128 -DCROPSYST_VV_BOOL_FORM=CORN::VV_bool_entry::form_true -DNormal_crop_growth_stage=Normal_crop_event_sequence -DUSE_STD_STRING -DCHECK_WATER_BALANCE -DxUSE_CROPSYST_CROP_IRRIGATION -DxPRINT_VIC_SOIL_LAYERS_FOR_DEBUG -DxMECHANISTIC_IRRIGATION -DxMECHANISTIC_RUNOFF_TRUE -DIRRIGATION_FROM_DEMAND -DUSE_IRRIGATION_PARAM_FILE -DSATURATE_FLOW_TO_LOWER_LAYER_FIRST -DSEPERATE_SOIL_PARAMETER_AND_CROP_OUTPUT -DIRRIGATION_MANAGEMENT_QUALITY=1 -DONE_SNOWBAND_FOR_CROP -DxNOT_PRINT_CROP_DAILY_OUTPUTS -DINPUT_24HR_AVG_SOLAR_RADIATION -DIRRIG_PARAMETERFILE_DECIDE_IRRIGATION -DOLD_PROVIDE_CANOPY -DxDUMP_TO_STREAM_BUFFER_AT_FIRST_FOR_OUTPUT -DxCONST_SOIL_MIDDLE_LAYER_DEPTH -DxPRINT_SOM_FOR_DEBUG -DMAD_FOR_NETIRRIGATION_DEMAND=0.2 -DCROP_DAILY_OUTPUT_MEMFIRST -DPOSTPONE_FIRST_IRRIGATION_PERENNIAL_CROPS -DxFULL_IRRIGATION -DOUTPUT_FULLIRRIGATION_PATTERN -DQT_QML_DEBUG -DQT_CORE_LIB
 CFLAGS        = -pipe -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-write-strings -Wno-sign-compare -Wno-unused-value -Wno-reorder -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-parameter -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -fpermissive -w -g -O0 -Wno-reorder -Wno-unused-parameter -Wno-unused-but-set-parameter -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I../Linux_gcc -I. -I../../../../VIC_CropSyst_common -I../../../vic_5_emulator/vic/vic_run/include -I../../../vic_5_emulator/vic/drivers/shared_all/include -I../../../../VIC_CropSyst -I../../../build -I../../../crop -I/home/liuming/dev -I../../../../common -I../../../../corn -I../../../../CropSyst -I../../../../CropSyst/source -I../../../../USDA/NRCS -I../../../../corn/build/Qt/Linux_gcc/Debug -I../../../../CS_suite/build/Qt/CS_suite_static/Debug -I../../../../CropSyst/source/build/Qt/Linux_gcc/Debug_VIC_V3 -I../../../../UED/library/build/Qt/UED_static/Debug -I../../../../common/weather/build/Qt/weather_static/bin/debug -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
@@ -1125,6 +1125,7 @@ CalcAerodynamic.o: ../../../CalcAerodynamic.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -1424,6 +1425,7 @@ CalcBlowingSnow.o: ../../../CalcBlowingSnow.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -1724,6 +1726,7 @@ IceEnergyBalance.o: ../../../IceEnergyBalance.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -2023,6 +2026,7 @@ SnowPackEnergyBalance.o: ../../../SnowPackEnergyBalance.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -2322,6 +2326,7 @@ StabilityCorrection.o: ../../../StabilityCorrection.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -2621,6 +2626,7 @@ advected_sensible_heat.o: ../../../advected_sensible_heat.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -2920,6 +2926,7 @@ alloc_atmos.o: ../../../alloc_atmos.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -3219,6 +3226,7 @@ arno_evap.o: ../../../arno_evap.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -3518,6 +3526,7 @@ calc_air_temperature.o: ../../../calc_air_temperature.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -3817,6 +3826,7 @@ calc_atmos_energy_bal.o: ../../../calc_atmos_energy_bal.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -4116,6 +4126,7 @@ calc_cloud_cover_fraction.o: ../../../calc_cloud_cover_fraction.c ../../../vicNl
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -4415,6 +4426,7 @@ calc_forcing_stats.o: ../../../calc_forcing_stats.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -4714,6 +4726,7 @@ calc_longwave.o: ../../../calc_longwave.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -5013,6 +5026,7 @@ calc_rainonly.o: ../../../calc_rainonly.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -5312,6 +5326,7 @@ calc_root_fraction.o: ../../../calc_root_fraction.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -5611,6 +5626,7 @@ calc_snow_coverage.o: ../../../calc_snow_coverage.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -5910,6 +5926,7 @@ calc_surf_energy_bal.o: ../../../calc_surf_energy_bal.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -6209,6 +6226,7 @@ calc_veg_params.o: ../../../calc_veg_params.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -6508,6 +6526,7 @@ calc_water_energy_balance_errors.o: ../../../calc_water_energy_balance_errors.c 
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -6807,6 +6826,7 @@ call_crop_model.o: ../../../call_crop_model.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -7108,6 +7128,7 @@ canopy_evap.o: ../../../canopy_evap.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -7408,6 +7429,7 @@ check_files.o: ../../../check_files.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -7707,6 +7729,7 @@ check_state_file.o: ../../../check_state_file.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -8006,6 +8029,7 @@ close_files.o: ../../../close_files.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -8305,6 +8329,7 @@ cmd_proc.o: ../../../cmd_proc.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -8604,6 +8629,7 @@ compress_files.o: ../../../compress_files.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -8903,6 +8929,7 @@ compute_dz.o: ../../../compute_dz.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -9202,6 +9229,7 @@ compute_pot_evap.o: ../../../compute_pot_evap.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -9501,6 +9529,7 @@ compute_treeline.o: ../../../compute_treeline.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -9800,6 +9829,7 @@ compute_zwt.o: ../../../compute_zwt.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -10099,6 +10129,7 @@ correct_precip.o: ../../../correct_precip.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -10398,6 +10429,7 @@ display_current_settings.o: ../../../display_current_settings.c ../../../vicNl.h
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -10697,6 +10729,7 @@ dist_prec.o: ../../../dist_prec.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -10996,6 +11029,7 @@ estimate_T1.o: ../../../estimate_T1.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -11295,6 +11329,7 @@ free_crop.o: ../../../free_crop.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -11594,6 +11629,7 @@ free_dist_prcp.o: ../../../free_dist_prcp.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -11893,6 +11929,7 @@ free_vegcon.o: ../../../free_vegcon.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -12192,6 +12229,7 @@ frozen_soil.o: ../../../frozen_soil.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -12491,6 +12529,7 @@ full_energy.o: ../../../full_energy.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -12790,6 +12829,7 @@ func_atmos_energy_bal.o: ../../../func_atmos_energy_bal.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -13089,6 +13129,7 @@ func_atmos_moist_bal.o: ../../../func_atmos_moist_bal.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -13388,6 +13429,7 @@ func_canopy_energy_bal.o: ../../../func_canopy_energy_bal.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -13687,6 +13729,7 @@ func_surf_energy_bal.o: ../../../func_surf_energy_bal.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -13989,6 +14032,7 @@ get_force_type.o: ../../../get_force_type.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -14288,6 +14332,7 @@ get_global_param.o: ../../../get_global_param.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -14587,6 +14632,7 @@ ice_melt.o: ../../../ice_melt.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -14886,6 +14932,7 @@ initialize_atmos.o: ../../../initialize_atmos.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -15185,6 +15232,7 @@ initialize_crop.o: ../../../initialize_crop.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -15484,6 +15532,7 @@ initialize_global.o: ../../../initialize_global.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -15783,6 +15832,7 @@ initialize_lake.o: ../../../initialize_lake.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -16082,6 +16132,7 @@ initialize_model_state.o: ../../../initialize_model_state.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -16381,6 +16432,7 @@ initialize_new_storm.o: ../../../initialize_new_storm.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -16680,6 +16732,7 @@ initialize_snow.o: ../../../initialize_snow.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -16979,6 +17032,7 @@ initialize_soil.o: ../../../initialize_soil.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -17278,6 +17332,7 @@ initialize_veg.o: ../../../initialize_veg.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -17577,6 +17632,7 @@ lakes.eb.o: ../../../lakes.eb.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -17876,6 +17932,7 @@ latent_heat_from_snow.o: ../../../latent_heat_from_snow.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -18175,6 +18232,7 @@ make_cell_data.o: ../../../make_cell_data.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -18474,6 +18532,7 @@ make_dist_prcp.o: ../../../make_dist_prcp.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -18773,6 +18832,7 @@ make_dmy.o: ../../../make_dmy.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -19072,6 +19132,7 @@ make_energy_bal.o: ../../../make_energy_bal.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -19371,6 +19432,7 @@ make_in_and_outfiles.o: ../../../make_in_and_outfiles.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -19670,6 +19732,7 @@ make_snow_data.o: ../../../make_snow_data.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -19969,6 +20032,7 @@ make_veg_var.o: ../../../make_veg_var.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -20268,6 +20332,7 @@ massrelease.o: ../../../massrelease.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -20567,6 +20632,7 @@ modify_Ksat.o: ../../../modify_Ksat.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -20866,6 +20932,7 @@ mtclim_vic.o: ../../../mtclim_vic.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -21167,6 +21234,7 @@ mtclim_wrapper.o: ../../../mtclim_wrapper.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -21468,6 +21536,7 @@ newt_raph_func_fast.o: ../../../newt_raph_func_fast.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -21767,6 +21836,7 @@ nrerror.o: ../../../nrerror.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -22066,6 +22136,7 @@ open_debug.o: ../../../open_debug.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -22365,6 +22436,7 @@ open_file.o: ../../../open_file.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -22664,6 +22736,7 @@ open_state_file.o: ../../../open_state_file.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -22963,6 +23036,7 @@ output_list_utils.o: ../../../output_list_utils.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -23262,6 +23336,7 @@ parse_output_info.o: ../../../parse_output_info.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -23561,6 +23636,7 @@ penman.o: ../../../penman.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -23860,6 +23936,7 @@ prepare_full_energy.o: ../../../prepare_full_energy.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -24159,6 +24236,7 @@ put_data.o: ../../../put_data.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -24458,6 +24536,7 @@ read_arcinfo_ascii.o: ../../../read_arcinfo_ascii.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -24757,6 +24836,7 @@ read_atmos_data.o: ../../../read_atmos_data.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -25056,6 +25136,7 @@ read_croplib.o: ../../../read_croplib.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -25355,6 +25436,7 @@ read_cropparam.o: ../../../read_cropparam.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -25654,6 +25736,7 @@ read_forcing_data.o: ../../../read_forcing_data.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -25953,6 +26036,7 @@ read_initial_model_state.o: ../../../read_initial_model_state.c ../../../vicNl.h
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -26252,6 +26336,7 @@ read_lakeparam.o: ../../../read_lakeparam.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -26551,6 +26636,7 @@ read_snowband.o: ../../../read_snowband.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -26850,6 +26936,7 @@ read_soilparam.o: ../../../read_soilparam.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -27149,6 +27236,7 @@ read_soilparam_arc.o: ../../../read_soilparam_arc.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -27448,6 +27536,7 @@ read_veglib.o: ../../../read_veglib.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -27747,6 +27836,7 @@ read_vegparam.o: ../../../read_vegparam.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -28046,6 +28136,7 @@ redistribute_during_storm.o: ../../../redistribute_during_storm.c ../../../vicNl
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -28345,6 +28436,7 @@ root_brent.o: ../../../root_brent.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -28644,6 +28736,7 @@ runoff.o: ../../../runoff.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -28944,6 +29037,7 @@ set_output_defaults.o: ../../../set_output_defaults.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -29243,6 +29337,7 @@ snow_intercept.o: ../../../snow_intercept.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -29542,6 +29637,7 @@ snow_melt.o: ../../../snow_melt.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -29841,6 +29937,7 @@ snow_utility.o: ../../../snow_utility.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -30140,6 +30237,7 @@ soil_conduction.o: ../../../soil_conduction.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -30439,6 +30537,7 @@ soil_thermal_eqn.o: ../../../soil_thermal_eqn.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -30738,6 +30837,7 @@ solve_snow.o: ../../../solve_snow.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -31037,6 +31137,7 @@ store_moisture_for_debug.o: ../../../store_moisture_for_debug.c ../../../vicNl.h
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -31336,6 +31437,7 @@ surface_fluxes.o: ../../../surface_fluxes.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -31636,6 +31738,7 @@ svp.o: ../../../svp.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -31935,6 +32038,7 @@ vicNl.o: ../../../vicNl.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -32073,8 +32177,7 @@ vicNl.o: ../../../vicNl.c ../../../vicNl.h \
 		../../../../corn/application/explaination/explainations.h \
 		../../../../corn/application/explaination/explaination_location.h \
 		../../../../corn/OS/uniform_resource_locator.h \
-		../../../../corn/OS/uniform_resource_identifier.h \
-		../../../crop/VIC_crop_output.h
+		../../../../corn/OS/uniform_resource_identifier.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o vicNl.o ../../../vicNl.c
 
 vicerror.o: ../../../vicerror.c ../../../vicNl.h \
@@ -32239,6 +32342,7 @@ vicerror.o: ../../../vicerror.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -32538,6 +32642,7 @@ water_energy_balance.o: ../../../water_energy_balance.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -32837,6 +32942,7 @@ water_under_ice.o: ../../../water_under_ice.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -33136,6 +33242,7 @@ write_atmosdata.o: ../../../write_atmosdata.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -33435,6 +33542,7 @@ write_data.o: ../../../write_data.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -33734,6 +33842,7 @@ write_debug.o: ../../../write_debug.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -34033,6 +34142,7 @@ write_forcing_file.o: ../../../write_forcing_file.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -34332,6 +34442,7 @@ write_header.o: ../../../write_header.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -34631,6 +34742,7 @@ write_layer.o: ../../../write_layer.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -34930,6 +35042,7 @@ write_model_state.o: ../../../write_model_state.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -35229,6 +35342,7 @@ write_snow_data.o: ../../../write_snow_data.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -35528,6 +35642,7 @@ write_soilparam.o: ../../../write_soilparam.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -35827,6 +35942,7 @@ write_vegparam.o: ../../../write_vegparam.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -36126,6 +36242,7 @@ write_vegvar.o: ../../../write_vegvar.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -36747,6 +36864,7 @@ VIC_land_unit_simulation.o: ../../../agronomic/VIC_land_unit_simulation.cpp ../.
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../corn/data_source/vv_file.h \
 		../../../../common/weather/database/weather_database.h \
 		../../../../common/weather/weather.h \
@@ -36791,7 +36909,11 @@ VIC_land_unit_simulation.o: ../../../agronomic/VIC_land_unit_simulation.cpp ../.
 		../../../LAKE.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VIC_land_unit_simulation.o ../../../agronomic/VIC_land_unit_simulation.cpp
 
-VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ../../../agronomic/VIC_land_unit_C_interface.h \
+VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ../../../../VIC_CropSyst_common/VCS_user_def.h \
+		../../../crop/VIC_crop_output.h \
+		../../../../VIC_CropSyst_common/VCS_Nl_def.h \
+		../../../irrigation_lib.h \
+		../../../agronomic/VIC_land_unit_C_interface.h \
 		../../../../CropSyst/source/cs_scenario.h \
 		../../../../CropSyst/source/options.h \
 		../../../../CropSyst/source/CropSyst_version.h \
@@ -36935,7 +37057,6 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../../UED/library/UED_fname.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
-		../../../irrigation_lib.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -37063,14 +37184,12 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../../corn/OS/FS/recursion.h \
 		../../../../corn/OS/FS/directory_entry.h \
 		../../../vic_5_emulator/vic/vic_run/include/vic_def.h \
-		../../../../VIC_CropSyst_common/VCS_Nl_def.h \
 		../../../vic_5_emulator/vic/vic_run/include/vic_physical_constants.h \
 		../../../vicNl_def.h \
 		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_driver_shared_all.h \
 		../../../vic_5_emulator/vic/vic_run/include/vic_run.h \
 		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_version.h \
 		../../../user_def.h \
-		../../../../VIC_CropSyst_common/VCS_user_def.h \
 		../../../snow.h \
 		../../../agronomic/VIC_soil.h \
 		../../../../CropSyst/source/soil.h \
@@ -37088,6 +37207,7 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../crop/VIC_soil_hydrology.h \
 		../../../crop/VIC_crop_C_interface.h \
 		../../../LAKE.h \
+		../../../../CropSyst/source/crop/phenology_I.h \
 		../../../../CropSyst/source/soil/chemicals_profile.h \
 		../../../../CropSyst/source/soil/nitrogen_common.h \
 		../../../../CropSyst/source/soil/nitrogen_I.h \
@@ -37095,7 +37215,6 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../../CropSyst/source/soil/chemical_profile.h \
 		../../../../CropSyst/source/chemical_types.h \
 		../../../../corn/data_source/vv_file.h \
-		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/crop/crop_interfaced.h \
 		../../../../CropSyst/source/crop/crop_N_interface.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VIC_land_unit_C_interface.o ../../../agronomic/VIC_land_unit_C_interface.cpp
@@ -37347,6 +37466,7 @@ VIC_soil_hydrology.o: ../../../crop/VIC_soil_hydrology.c ../../../crop/VIC_soil_
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -37797,6 +37917,7 @@ read_irrigparam.o: ../../../read_irrigparam.c ../../../vicNl.h \
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -38489,6 +38610,7 @@ VCS_Nl.o: ../../../../VIC_CropSyst_common/VCS_Nl.c ../../../vic_5_emulator/vic/v
 		../../../../common/weather/GEN_DAT_filename.h \
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -38693,7 +38815,8 @@ interpolator_temporal.o: ../../../../corn/math/numerical/interpolation/interpola
 
 VIC_crop_output.o: ../../../crop/VIC_crop_output.cpp ../../../crop/VIC_crop_output.h \
 		../../../../VIC_CropSyst_common/VCS_Nl_def.h \
-		../../../irrigation_lib.h
+		../../../irrigation_lib.h \
+		../../../../VIC_CropSyst_common/VCS_user_def.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VIC_crop_output.o ../../../crop/VIC_crop_output.cpp
 
 CS_optation.o: ../../../../CS_suite/observation/CS_optation.cpp ../../../../CS_suite/observation/CS_optation.h \

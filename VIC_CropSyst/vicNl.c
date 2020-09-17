@@ -775,6 +775,9 @@ int main (int argc, char *argv[])
   fclose(filep.VCS.cropcodelib);
   free_cropcodelib(&cropcode_lib);
   provide_explainations_global().delete_all();
+#if !defined(FULL_IRRIGATION) || defined(OUTPUT_FULLIRRIGATION_PATTERN)
+  fclose(filep.VCS.irrigation_pattern);
+#endif
   #endif
   return EXIT_SUCCESS;
 }    /* End Main Program */

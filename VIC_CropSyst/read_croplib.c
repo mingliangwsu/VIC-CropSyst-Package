@@ -155,6 +155,19 @@ int alloc_irrig_pattern(
 /********************************************************************
 read irrigation pattern
 ********************************************************************/
+int words(const char *s)
+{
+    const char *sep = " \t\n\r\v\f";
+    int word = 0;
+    size_t len;
+    s += strspn(s, sep);
+    while ((len = strcspn(s, sep)) > 0) {
+        ++word;
+        s += len;
+        s += strspn(s, sep);
+    }
+    return word;
+}
 #ifndef FULL_IRRIGATION
 int read_irrig_pattern(FILE *infile,
                            std::map<int,std::map<int,irrigation_pattern_struct>> &irrig_patt,
@@ -171,26 +184,30 @@ int read_irrig_pattern(FILE *infile,
     //doy is from 1
     CORN::Date_clad_32 first_sim_day;
     first_sim_day.set_YMD(global_param.startyear,global_param.startmonth,global_param.startday);
-    while ((temp = fscanf(infile,"%i %i %i %lf %lf\n",
-                   &year, &doy, &rotation, &irrig_amount, &proration)) != EOF) {
-        if (temp == 5) {
-            irrigation_pattern_struct irr;
-            irr.irrig_amount = irrig_amount;
-            irr.proration_rate = proration;
-            //int rec;
-            CORN::Date_clad_32 recday;
-            recday.set_YD(year,doy);
-            int rec = recday.days_between(first_sim_day,false);
-            //std::map<int,irrigation_pattern_struct> trec;
-            //trec.insert(std::pair<int,irrigation_pattern_struct>(rec,irr));
-            //irrig_patt.insert(std::pair<int,std::map<int,irrigation_pattern_struct>());
-            //irrig_patt[rotation].insert(std::pair<int,irrigation_pattern_struct>(rec,irr));
-            irrig_patt[rotation][rec] = irr;
-        }
-        else {
+    char *line = NULL;
+    size_t charactors,len;
+    int columns;
+    while ((charactors = getline(&line,&len, infile)) != -1) {
+        columns = words(line);
+        if (columns == 5) {
+            sscanf(line, "%i %i %i %lf %lf\n",
+                         &year, &doy, &rotation, &irrig_amount, &proration);
+        } else if (columns == 4) {
+            sscanf(line, "%i %i %i %lf\n",
+                         &year, &doy, &rotation, &irrig_amount);
+            proration = -1;
+        } else if (columns != 0) {
             std::cerr << "Wrong irrigation pattern file format!\n";
             return 1;
         }
+
+        irrigation_pattern_struct irr;
+        irr.irrig_amount = irrig_amount;
+        irr.proration_rate = proration;
+        CORN::Date_clad_32 recday;
+        recday.set_YD(year,doy);
+        int rec = recday.days_between(first_sim_day,false);
+        irrig_patt[rotation][rec] = irr;
     }
     //return(irrigation_data);
     return 0;

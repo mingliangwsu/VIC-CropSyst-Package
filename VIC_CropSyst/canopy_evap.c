@@ -316,27 +316,32 @@ double canopy_evap(const soil_con_struct   &soil_con,
            #else
            const CropSyst::Irrigation_operation_struct *irrigation_param         //190128RLN
                = VIC_land_unit_get_irrigation_parameters();                      //150413RLN
+           double CropSyst_target_irrigation_m = 0.0;                            //201028LML irrigation need from manual irrigation events
+           CropSyst_target_irrigation_m = VIC_land_unit_get_irrigation_target();
            bool isInCropIrrigationSeason = irrigation_param == 0 ? false : true; //150413RLN
+           if (CropSyst_target_irrigation_m > 1.e-6) isInCropIrrigationSeason = true; //201028LML
            if ((dmy->month < 3) || (dmy->month > 10)) isInCropIrrigationSeason = false; //180807LML hard codded!!!
            double table_irrigation_runoff_loss = 0.0;                            //180511LML
            double table_deep_percolation_loss = 0;                               //180531LML
            if (isInCropIrrigationSeason && options.VCS.do_irrigate_crop) {
-              maximum_allowable_depletion =
-                irrigation_param->max_allowable_depletion;                       //150413RLN
-              switch (irrigation_param->depletion_observation_depth_mode) {
-              case constant_fixed_depth_mode:
-                  depletion_observe_depth_mm = m_to_mm(irrigation_param->depletion_observe_depth_m);            //180502LML
-                  break;
-              case fraction_of_root_depth_mode:
-                  depletion_observe_depth_mm = VIC_CropSyst_get(VIC::VC_root_depth_mm) * irrigation_param->depletion_observe_root_zone_fract;  //190919LML added fraction part, seems not right and should be fixed!!!
-                  break;
-              case soil_profile_depth_mode:
-                  depletion_observe_depth_mm = get_total_soil_thickness_mm(&soil_con);
-                  break;
-              default:
-                  depletion_observe_depth_mm = m_to_mm(irrigation_param->depletion_observe_depth_m);
-                  break;
-              }
+              if (irrigation_param) {
+                maximum_allowable_depletion =
+                  irrigation_param->max_allowable_depletion;                       //150413RLN
+                switch (irrigation_param->depletion_observation_depth_mode) {
+                case constant_fixed_depth_mode:
+                    depletion_observe_depth_mm = m_to_mm(irrigation_param->depletion_observe_depth_m);            //180502LML
+                    break;
+                case fraction_of_root_depth_mode:
+                    depletion_observe_depth_mm = VIC_CropSyst_get(VIC::VC_root_depth_mm) * irrigation_param->depletion_observe_root_zone_fract;  //190919LML added fraction part, seems not right and should be fixed!!!
+                    break;
+                case soil_profile_depth_mode:
+                    depletion_observe_depth_mm = get_total_soil_thickness_mm(&soil_con);
+                    break;
+                default:
+                    depletion_observe_depth_mm = m_to_mm(irrigation_param->depletion_observe_depth_m);
+                    break;
+                }
+              } //irrigation_param
               //depletion_observe_depth_mm =
               //  m_to_mm(irrigation_param->depletion_observe_depth_m);            //180502LML
               #ifdef USE_IRRIGATION_PARAM_FILE
@@ -363,8 +368,10 @@ double canopy_evap(const soil_con_struct   &soil_con,
               }
               girrig_type = identify_general_irrigation_type(irrigation_mode);
               #else
-              irrigation_mode = static_cast<Irrigation_Type>(
-                  irrigation_param->irrigation_type);
+              if(irrigation_param) {
+                irrigation_mode = static_cast<Irrigation_Type>(
+                    irrigation_param->irrigation_type);
+              }
               #endif
            }
            #endif
@@ -425,7 +432,7 @@ double canopy_evap(const soil_con_struct   &soil_con,
              double top_layer_to_fc_fraction = (irrigation_mode == IrrigTP_Sub_surf_drip_perfect_eliminate_top) ? 0.2 : 1.0;   //190805LML
 
              //std::clog << "maximum_allowable_depletion = " << maximum_allowable_depletion << std::endl;
-             
+             if (irrigation_param) {
              require_irrigation = need_irrigation(maximum_allowable_depletion
                                                  ,depletion_observe_depth_mm
                                                  ,rec
@@ -441,6 +448,11 @@ double canopy_evap(const soil_con_struct   &soil_con,
                                                  ,&real_filled_water
                                                  ,top_layer_to_fc_fraction
                                                  );
+             } else {                                                            //201028LML irrigation is trigered by manual irrigation events
+                 require_irrigation = true;
+                 soil_water_demand_mm = m_to_mm(CropSyst_target_irrigation_m);
+                 real_filled_water = soil_water_demand_mm;
+             }
              //if (require_irrigation) {
              //    std::clog << "hidx:" << hidx << "\treal_filled_water:" << real_filled_water << std::endl;
              //}

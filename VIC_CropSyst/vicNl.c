@@ -686,6 +686,7 @@ int main (int argc, char *argv[])
                     << "," << temp->Root_depth_mm
                     << "," << temp->VIC_PET_shortgrass_mm
                     << "," << temp->CropSyst_refET_mm
+                    << "," << temp->crop_evapotransp_max_mm
                     << "," << temp->Act_Transp_mm
                     << "," << temp->VIC_final_transp_mm
                     << "," << temp->irrig_netdemand_mm

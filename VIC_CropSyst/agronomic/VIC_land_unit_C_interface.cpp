@@ -300,6 +300,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #endif
              //<<"CropSyst_Pot_Transp_mm,"
              <<"CropSyst_refET_mm,"
+             <<"crop_evapotransp_max_mm,"
              <<"Act_Transp_mm,"                                              //180523LML include canopy evap ifdef CROPSYST_HANDLE_CANOPY_EVAP
              <<"VIC_final_transp_mm,"
              <<"irrig_netdemand_mm,"
@@ -354,6 +355,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
           VIC_transpiration_mm += active_land_unit->ref_VIC_cell().layer[index].evap;
         
         double CropSyst_ref_et_m = active_land_unit->meteorology.ref_ET_reference().get_m(); //190721LML (m)
+        double crop_evapotransp_max_m = active_land_unit->output_crop_evapotransp_max_m;     //20201021LML
         //190507 double canopy_evap_mm = temp_vic_crop.canopy_evap;
         double canopy_evap_mm = active_land_unit->ref_VIC_veg_var().canopyevap;     //190507
         double soil_evap_mm = active_land_unit->ref_VIC_cell().layer[0].VCS.evap_bare_soil;
@@ -575,6 +577,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
          temp.Root_depth_mm = m_to_mm(active_crop ? active_crop->get_recorded_root_depth_m()   : 0);
          temp.VIC_PET_shortgrass_mm = active_land_unit->ref_VIC_cell().VCS.pot_evap_daily[PET_SHORT];
          temp.CropSyst_refET_mm = m_to_mm(CropSyst_ref_et_m);
+         temp.crop_evapotransp_max_mm = m_to_mm(crop_evapotransp_max_m);
          temp.Act_Transp_mm = m_to_mm(active_crop ? active_crop->get_act_transpiration_m()     : 0);
          temp.VIC_final_transp_mm = VIC_transpiration_mm;
          temp.irrig_netdemand_mm = temp_vic_crop.irrigation_netdemand;
@@ -635,6 +638,11 @@ int VIC_land_unit_process_day()                                                 
 /*______________________________________________________VIC_land_unit_process_*/
 const CropSyst::Irrigation_operation_struct *VIC_land_unit_get_irrigation_parameters() //190128RLN
 {  return (active_land_unit) ? active_land_unit->get_irrigation_parameters() : 0;
+}
+/*____________________________________________________________________________*/
+double VIC_land_unit_get_irrigation_target()                                     //201028LML
+{
+   return (active_land_unit) ? active_land_unit->irrig_appl_target : 0;          //(m)
 }
 /*____________________________________________________________________________*/
 int VIC_land_unit_chemical_transport_and_exchange

@@ -137,6 +137,9 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 int VIC_land_unit_process_day();                                                 //150611RLN
 /*_2014-12-08_________________________________________________________________*/
 const CropSyst::Irrigation_operation_struct *VIC_land_unit_get_irrigation_parameters(); //190128RLN
+/*_2020-10-28_________________________________________________________________*/
+double VIC_land_unit_get_irrigation_target();
+/*_2020-10-28_________________________________________________________________*/
 /*_VIC_land_unit_get_irrigation_parameters_____________________2014-04-13_RLN_*/
 int VIC_land_unit_chemical_transport_and_exchange
    (unsigned long int at_time

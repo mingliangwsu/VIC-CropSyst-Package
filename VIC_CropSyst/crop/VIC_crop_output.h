@@ -27,6 +27,7 @@ typedef struct {
     double Root_depth_mm;
     double VIC_PET_shortgrass_mm;
     double CropSyst_refET_mm;
+    double crop_evapotransp_max_mm;                                             //20201021LML
     double Act_Transp_mm;
     double VIC_final_transp_mm;
     double irrig_netdemand_mm;

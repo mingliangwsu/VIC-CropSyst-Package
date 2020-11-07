@@ -2,6 +2,8 @@
 #define VIC_crop_output
 #include "VIC_CropSyst_common/VCS_Nl_def.h"
 #include "VCS_user_def.h"
+#include "global.h"
+#include <vector>
 
 typedef struct {
     int cell_id;
@@ -56,6 +58,7 @@ typedef struct {
     double Snow_dep_mm;
     double Crop_Biomass_kg_m2;
     double profile_liq_water;
+    std::vector<double> soil_liq_vwc;                                           //(fraction)
 } Crop_output_struct;
 #ifdef OUTPUT_FULLIRRIGATION_PATTERN
 typedef struct {

@@ -714,8 +714,10 @@ int main (int argc, char *argv[])
                     << "," << temp->RHUM_min_per
                     << "," << temp->Snow_dep_mm
                     << "," << temp->Biomass_kg_m2
-                    << "," << temp->profile_liq_water
-                    << std::endl;
+                    << "," << temp->profile_liq_water;
+            for (int layer = 0; layer < options.Nlayer; layer++)
+                 debugout << "," << temp->soil_liq_vwc[layer];
+            debugout << std::endl;
         }
         debugout.close();
         crop_output_list.clear();

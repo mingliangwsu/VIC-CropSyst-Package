@@ -299,7 +299,8 @@ int  runoff(cell_data_struct  *cell_wet,
     cell->asat = 0;
 #ifdef VIC_CROPSYST_VERSION
     for(i = 0; i < options.Nlayer; i++) {
-      min_liq[i] = soil_con->Wpwp[i];
+        if (i==0) min_liq[i] = soil_con->resid_moist[i] * soil_con->depth[i] * 1000.;   //201106LML top soil layer can has lower moisture for evaporation
+        else min_liq[i] = soil_con->Wpwp[i];
       //if (i == (options.Nlayer - 1)) 
       //    fprintf(stderr,"i:%d min_liq[i]:%f max_moist:%f resid_moist[i]:%f depth:%f moist:%f\n",
       //            i,min_liq[i],soil_con->max_moist[i], resid_moist[i],soil_con->depth[i],layer[i].moist);
@@ -373,7 +374,7 @@ int  runoff(cell_data_struct  *cell_wet,
           }
           else 
             evap[lindex][0] = layer[lindex].evap / (double)dt;
-        
+
           //if (lindex == (options.Nlayer - 1)) fprintf(stderr,"check neg ET layer:%d evap:%f\n",lindex,evap[lindex][0]);
         }
         frost_area = 0;
@@ -576,11 +577,16 @@ int  runoff(cell_data_struct  *cell_wet,
                 
                 max_Q12 = (tmp_liq-/*190806LML soil_con->Wcr[lindex]*/ soil_con->VCS.Field_Capacity[lindex]); ///dt=24
                 if(Q12[lindex] > max_Q12 && max_Q12 > 0.0){ ///Keyvan defined this variable to prevent full depletion of soil moisture above the field capacity
-                  Q12[lindex] = max_Q12 + 0.1;
+                  Q12[lindex] = max_Q12;//201106LML + 0.1;
                 }
-                if(tmp_liq < /*190806LML soil_con->Wcr[lindex]*/ soil_con->VCS.Field_Capacity[lindex] && Q12[lindex] > 0.001){ ///to make sure that soil water transfer is not significant after the field capacity
-                  Q12[lindex] = 0.001;
+                //if(tmp_liq < /*190806LML soil_con->Wcr[lindex]*/ soil_con->VCS.Field_Capacity[lindex] && Q12[lindex] > 0.001){ ///to make sure that soil water transfer is not significant after the field capacity
+                //  Q12[lindex] = 0.001;
+                //}
+                //201106LML
+                if(tmp_liq < soil_con->VCS.Field_Capacity[lindex]){
+                  Q12[lindex] = 0.0;
                 }
+
 #endif
               }
               else Q12[lindex] = 0.0;

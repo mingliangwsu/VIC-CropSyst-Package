@@ -329,8 +329,10 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
              <<"RHUM_min_%,"
              <<"Snow_dep_mm,"
              <<"Crop_Biomass_kg_m2,"
-             <<"SoilProfileMoisture_mm"
-             <<std::endl;
+             <<"SoilProfileMoisture_mm,";
+        for (int layer = 0; layer < options.Nlayer; layer++)
+             crop_output_head <<"soil_liq_vwc[" << layer << "].liq,";
+        crop_output_head << std::endl;
         created_head = true;
     }
 #endif
@@ -606,6 +608,12 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
          temp.Snow_dep_mm = m_to_mm(snow.depth);
          temp.Biomass_kg_m2 = (active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0);
          temp.profile_liq_water = profile_liq_water;
+         temp.soil_liq_vwc.resize(options.Nlayer);
+         for (int layer = 0; layer < options.Nlayer; layer++) {
+             temp.soil_liq_vwc[layer] = active_land_unit->ref_VIC_cell().layer[layer].moist
+                                        / m_to_mm(active_land_unit->ref_VIC_soil_con().depth[layer]);
+         }
+
      crop_output_list.push_back(temp);
 #endif
 

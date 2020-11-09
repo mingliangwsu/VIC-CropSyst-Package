@@ -669,41 +669,56 @@ int main (int argc, char *argv[])
                     << "," << temp->Month
                     << "," << temp->Day
                     << "," << temp->DOY
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->Dist
                     << "," << temp->Band
+#endif
                     << std::setprecision(8)
                     << "," << temp->Cell_fract
                     << "," << temp->CroppingSyst_code
                     << "," << temp->Crop_code
                     << "," << temp->Crop_name
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->Accum_DD
                     << "," << temp->Accum_DD_clip
                     << "," << temp->Grow_Stage
                     << "," << temp->GAI
+#endif
                     << "," << temp->Green_Canopy_Cover
                     << "," << temp->Biomass_kg_m2
                     << "," << temp->Yield_kg_m2
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->Root_depth_mm
                     << "," << temp->VIC_PET_shortgrass_mm
+#endif
                     << "," << temp->CropSyst_refET_mm
                     << "," << temp->crop_evapotransp_max_mm
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->Act_Transp_mm
+#endif
                     << "," << temp->VIC_final_transp_mm
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->irrig_netdemand_mm
+#endif
                     << "," << temp->irrig_total_mm
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->irrig_evap_mm
                     << "," << temp->irrig_runoff_mm
                     << "," << temp->irrig_intcpt_mm
+#endif
                     << "," << temp->Soil_E_mm
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->Crop_Canopy_E_mm
                     << "," << temp->snow_sublimation
                     << "," << temp->ET_mm
+#endif
                     << "," << temp->VIC_ET_mm
                     << "," << temp->water_stress_index
                     << "," << temp->Runoff
                     << "," << temp->Baseflow
                     << "," << temp->PPT
                     << "," << temp->Tair_avg
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->Tmax
                     << "," << temp->Tmin
                     << "," << temp->SWRAD_w_m2
@@ -714,9 +729,12 @@ int main (int argc, char *argv[])
                     << "," << temp->RHUM_min_per
                     << "," << temp->Snow_dep_mm
                     << "," << temp->Biomass_kg_m2
+#endif
                     << "," << temp->profile_liq_water;
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
             for (int layer = 0; layer < options.Nlayer; layer++)
                  debugout << "," << temp->soil_liq_vwc[layer];
+#endif
             debugout << std::endl;
         }
         debugout.close();

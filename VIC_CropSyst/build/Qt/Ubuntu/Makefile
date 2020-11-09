@@ -12,7 +12,7 @@ MAKEFILE      = Makefile
 
 CC            = g++
 CXX           = g++
-DEFINES       = -DCS_VERSION=5 -DCROPSYST_VERSION=5 -DWEATHER_PROVIDER_VERSION=5 -DVIC_CROPSYST_VERSION=3 -DCS_VERSION_NUMBERS=5,0,0 -DEVENT_SCHEDULER_VERSION=1 -DCROP_ORCHARD -DCROPSYST_HANDLE_CANOPY_EVAP -DLIU_DEBUG -DCROPSYST_MAX_DESCRIPTION_LENGTH=128 -DCROPSYST_VV_BOOL_FORM=CORN::VV_bool_entry::form_true -DNormal_crop_growth_stage=Normal_crop_event_sequence -DUSE_STD_STRING -DCHECK_WATER_BALANCE -DxUSE_CROPSYST_CROP_IRRIGATION -DxPRINT_VIC_SOIL_LAYERS_FOR_DEBUG -DxMECHANISTIC_IRRIGATION -DxMECHANISTIC_RUNOFF_TRUE -DIRRIGATION_FROM_DEMAND -DUSE_IRRIGATION_PARAM_FILE -DSATURATE_FLOW_TO_LOWER_LAYER_FIRST -DSEPERATE_SOIL_PARAMETER_AND_CROP_OUTPUT -DIRRIGATION_MANAGEMENT_QUALITY=1 -DONE_SNOWBAND_FOR_CROP -DxNOT_PRINT_CROP_DAILY_OUTPUTS -DINPUT_24HR_AVG_SOLAR_RADIATION -DIRRIG_PARAMETERFILE_DECIDE_IRRIGATION -DOLD_PROVIDE_CANOPY -DxDUMP_TO_STREAM_BUFFER_AT_FIRST_FOR_OUTPUT -DxCONST_SOIL_MIDDLE_LAYER_DEPTH -DxPRINT_SOM_FOR_DEBUG -DMAD_FOR_NETIRRIGATION_DEMAND=0.2 -DCROP_DAILY_OUTPUT_MEMFIRST -DPOSTPONE_FIRST_IRRIGATION_PERENNIAL_CROPS -DFULL_IRRIGATION -DOUTPUT_FULLIRRIGATION_PATTERN -DQT_QML_DEBUG -DQT_CORE_LIB
+DEFINES       = -DCS_VERSION=5 -DCROPSYST_VERSION=5 -DWEATHER_PROVIDER_VERSION=5 -DVIC_CROPSYST_VERSION=3 -DCS_VERSION_NUMBERS=5,0,0 -DEVENT_SCHEDULER_VERSION=1 -DCROP_ORCHARD -DCROPSYST_HANDLE_CANOPY_EVAP -DLIU_DEBUG -DCROPSYST_MAX_DESCRIPTION_LENGTH=128 -DCROPSYST_VV_BOOL_FORM=CORN::VV_bool_entry::form_true -DNormal_crop_growth_stage=Normal_crop_event_sequence -DUSE_STD_STRING -DCHECK_WATER_BALANCE -DxUSE_CROPSYST_CROP_IRRIGATION -DxPRINT_VIC_SOIL_LAYERS_FOR_DEBUG -DxMECHANISTIC_IRRIGATION -DxMECHANISTIC_RUNOFF_TRUE -DIRRIGATION_FROM_DEMAND -DUSE_IRRIGATION_PARAM_FILE -DSATURATE_FLOW_TO_LOWER_LAYER_FIRST -DSEPERATE_SOIL_PARAMETER_AND_CROP_OUTPUT -DIRRIGATION_MANAGEMENT_QUALITY=1 -DONE_SNOWBAND_FOR_CROP -DxNOT_PRINT_CROP_DAILY_OUTPUTS -DINPUT_24HR_AVG_SOLAR_RADIATION -DIRRIG_PARAMETERFILE_DECIDE_IRRIGATION -DOLD_PROVIDE_CANOPY -DxDUMP_TO_STREAM_BUFFER_AT_FIRST_FOR_OUTPUT -DxCONST_SOIL_MIDDLE_LAYER_DEPTH -DxPRINT_SOM_FOR_DEBUG -DMAD_FOR_NETIRRIGATION_DEMAND=0.2 -DCROP_DAILY_OUTPUT_MEMFIRST -DPOSTPONE_FIRST_IRRIGATION_PERENNIAL_CROPS -DFULL_IRRIGATION -DOUTPUT_FULLIRRIGATION_PATTERN -DxOUTPUT_SIMPLE_FOR_FORECAST -DQT_QML_DEBUG -DQT_CORE_LIB
 CFLAGS        = -pipe -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-write-strings -Wno-sign-compare -Wno-unused-value -Wno-reorder -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-parameter -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -fpermissive -w -g -O0 -Wno-reorder -Wno-unused-parameter -Wno-unused-but-set-parameter -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I../Linux_gcc -I. -I../../../../VIC_CropSyst_common -I../../../vic_5_emulator/vic/vic_run/include -I../../../vic_5_emulator/vic/drivers/shared_all/include -I../../../../VIC_CropSyst -I../../../build -I../../../crop -I/home/liuming/dev -I../../../../common -I../../../../corn -I../../../../CropSyst -I../../../../CropSyst/source -I../../../../USDA/NRCS -I../../../../corn/build/Qt/Linux_gcc/Debug -I../../../../CS_suite/build/Qt/CS_suite_static/Debug -I../../../../CropSyst/source/build/Qt/Linux_gcc/Debug_VIC_V3 -I../../../../UED/library/build/Qt/UED_static/Debug -I../../../../common/weather/build/Qt/weather_static/bin/debug -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
@@ -36865,6 +36865,8 @@ VIC_land_unit_simulation.o: ../../../agronomic/VIC_land_unit_simulation.cpp ../.
 		../../../../common/weather/weather_interface.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
 		../../../crop/VIC_crop_output.h \
+		../../../global.h \
+		../../../../VIC_CropSyst_common/VCS_global.h \
 		../../../../corn/data_source/vv_file.h \
 		../../../../common/weather/database/weather_database.h \
 		../../../../common/weather/weather.h \
@@ -36896,8 +36898,6 @@ VIC_land_unit_simulation.o: ../../../agronomic/VIC_land_unit_simulation.cpp ../.
 		../../../../CropSyst/source/soil/nitrogen_profile.h \
 		../../../../CropSyst/source/soil/chemical_profile.h \
 		../../../../CropSyst/source/chemical_types.h \
-		../../../global.h \
-		../../../../VIC_CropSyst_common/VCS_global.h \
 		../../../../UED/library/std_codes.h \
 		../../../../common/weather/hour/weather_hours.h \
 		../../../../common/weather/hour/solar_irrad_hour.h \
@@ -36913,6 +36913,29 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../crop/VIC_crop_output.h \
 		../../../../VIC_CropSyst_common/VCS_Nl_def.h \
 		../../../irrigation_lib.h \
+		../../../global.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_def.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_physical_constants.h \
+		../../../vicNl_def.h \
+		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_driver_shared_all.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_run.h \
+		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_version.h \
+		../../../../corn/primitive.h \
+		../../../user_def.h \
+		../../../snow.h \
+		../../../../VIC_CropSyst_common/VCS_global.h \
+		../../../../corn/chronometry/date_32.h \
+		../../../../corn/chronometry/date_T.h \
+		../../../../corn/chronometry/date_A.h \
+		../../../../corn/chronometry/date_I.h \
+		../../../../corn/chronometry/temporal.h \
+		../../../../corn/chronometry/date_types.hpp \
+		../../../../corn/chronometry/date_types.hh \
+		../../../../corn/chronometry/time_types.hpp \
+		../../../../corn/chronometry/time_types.hh \
+		../../../../corn/const.h \
+		../../../../corn/string \
+		../../../../corn/chronometry/date_format.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
 		../../../../CropSyst/source/cs_scenario.h \
 		../../../../CropSyst/source/options.h \
@@ -36921,9 +36944,6 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../../corn/condcomp.h \
 		../../../../CropSyst/source/organic_matter/OM_types.h \
 		../../../../corn/enum.h \
-		../../../../corn/primitive.h \
-		../../../../corn/const.h \
-		../../../../corn/string \
 		../../../../CropSyst/source/organic_matter/OM_params.h \
 		../../../../corn/parameters/parameter.h \
 		../../../../corn/measure/units.h \
@@ -36943,7 +36963,6 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../../corn/parameters/number_keyed.h \
 		../../../../corn/data_type_enum.h \
 		../../../../corn/format/field.h \
-		../../../../corn/chronometry/date_format.h \
 		../../../../corn/chronometry/time_format.h \
 		../../../../common/soil/layering.h \
 		../../../../CS_suite/simulation/CS_simulation_unit.h \
@@ -36951,15 +36970,6 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../../corn/container/unilist.h \
 		../../../../corn/container/container.h \
 		../../../../corn/container/bilist.h \
-		../../../../corn/chronometry/date_types.hpp \
-		../../../../corn/chronometry/date_types.hh \
-		../../../../corn/chronometry/date_32.h \
-		../../../../corn/chronometry/date_T.h \
-		../../../../corn/chronometry/date_A.h \
-		../../../../corn/chronometry/date_I.h \
-		../../../../corn/chronometry/temporal.h \
-		../../../../corn/chronometry/time_types.hpp \
-		../../../../corn/chronometry/time_types.hh \
 		../../../../CS_suite/observation/CS_observation.h \
 		../../../../corn/math/statistical/statistics_types.hpp \
 		../../../../corn/math/statistical/statistics_types.h \
@@ -37183,14 +37193,6 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../../corn/OS/FS/path_discovery.h \
 		../../../../corn/OS/FS/recursion.h \
 		../../../../corn/OS/FS/directory_entry.h \
-		../../../vic_5_emulator/vic/vic_run/include/vic_def.h \
-		../../../vic_5_emulator/vic/vic_run/include/vic_physical_constants.h \
-		../../../vicNl_def.h \
-		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_driver_shared_all.h \
-		../../../vic_5_emulator/vic/vic_run/include/vic_run.h \
-		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_version.h \
-		../../../user_def.h \
-		../../../snow.h \
 		../../../agronomic/VIC_soil.h \
 		../../../../CropSyst/source/soil.h \
 		../../../../CropSyst/source/soil/temperature_profile.h \
@@ -37199,8 +37201,6 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
-		../../../global.h \
-		../../../../VIC_CropSyst_common/VCS_global.h \
 		../../../vicNl.h \
 		../../../pubtools.h \
 		../../../../VIC_CropSyst_common/VCS_Nl.h \
@@ -37467,6 +37467,8 @@ VIC_soil_hydrology.o: ../../../crop/VIC_soil_hydrology.c ../../../crop/VIC_soil_
 		../../../../CropSyst/source/soil/soil_N_param.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
 		../../../crop/VIC_crop_output.h \
+		../../../global.h \
+		../../../../VIC_CropSyst_common/VCS_global.h \
 		../../../../CropSyst/source/rot_param.h \
 		../../../../CropSyst/source/cs_operation.h \
 		../../../../common/simulation/operation.h \
@@ -38816,7 +38818,30 @@ interpolator_temporal.o: ../../../../corn/math/numerical/interpolation/interpola
 VIC_crop_output.o: ../../../crop/VIC_crop_output.cpp ../../../crop/VIC_crop_output.h \
 		../../../../VIC_CropSyst_common/VCS_Nl_def.h \
 		../../../irrigation_lib.h \
-		../../../../VIC_CropSyst_common/VCS_user_def.h
+		../../../../VIC_CropSyst_common/VCS_user_def.h \
+		../../../global.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_def.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_physical_constants.h \
+		../../../vicNl_def.h \
+		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_driver_shared_all.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_run.h \
+		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_version.h \
+		../../../../corn/primitive.h \
+		../../../user_def.h \
+		../../../snow.h \
+		../../../../VIC_CropSyst_common/VCS_global.h \
+		../../../../corn/chronometry/date_32.h \
+		../../../../corn/chronometry/date_T.h \
+		../../../../corn/chronometry/date_A.h \
+		../../../../corn/chronometry/date_I.h \
+		../../../../corn/chronometry/temporal.h \
+		../../../../corn/chronometry/date_types.hpp \
+		../../../../corn/chronometry/date_types.hh \
+		../../../../corn/chronometry/time_types.hpp \
+		../../../../corn/chronometry/time_types.hh \
+		../../../../corn/const.h \
+		../../../../corn/string \
+		../../../../corn/chronometry/date_format.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VIC_crop_output.o ../../../crop/VIC_crop_output.cpp
 
 CS_optation.o: ../../../../CS_suite/observation/CS_optation.cpp ../../../../CS_suite/observation/CS_optation.h \

@@ -32,6 +32,8 @@ typedef struct Irrigation_Efficiency
                                                                                  //not the loss afterthen.
     double table_irrigation_deep_percolation_loss;                               //(fraction)
     double maximum_capacity;                                                     //(mm H2O/day)
+    //double depletion_observe_depth_m;                                            //(m) 201110LML
+    double max_allowable_depletion;                                              //(fraction) 201110LML
     //170830 #else
     /*//170830
     double Runoff;

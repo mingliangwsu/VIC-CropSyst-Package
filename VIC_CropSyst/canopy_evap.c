@@ -325,8 +325,9 @@ double canopy_evap(const soil_con_struct   &soil_con,
            double table_deep_percolation_loss = 0;                               //180531LML
            if (isInCropIrrigationSeason && options.VCS.do_irrigate_crop) {
               if (irrigation_param) {
-                maximum_allowable_depletion =
-                  irrigation_param->max_allowable_depletion;                       //150413RLN
+                //201111LML&COS MAD depends on irrigation technology
+                //maximum_allowable_depletion =
+                //  irrigation_param->max_allowable_depletion;                       //150413RLN
                 switch (irrigation_param->depletion_observation_depth_mode) {
                 case constant_fixed_depth_mode:
                     depletion_observe_depth_mm = m_to_mm(irrigation_param->depletion_observe_depth_m);            //180502LML
@@ -341,6 +342,8 @@ double canopy_evap(const soil_con_struct   &soil_con,
                     depletion_observe_depth_mm = m_to_mm(irrigation_param->depletion_observe_depth_m);
                     break;
                 }
+                depletion_observe_depth_mm = depletion_observe_depth_mm < 0.3
+                                                ? 0.3 : depletion_observe_depth_mm;
               } //irrigation_param
               //depletion_observe_depth_mm =
               //  m_to_mm(irrigation_param->depletion_observe_depth_m);            //180502LML
@@ -421,6 +424,10 @@ double canopy_evap(const soil_con_struct   &soil_con,
                  fill_soil_deficit = true;  //190724LML directly fill soil moisture to field capacity (exclude top soil layer)
                  maximum_allowable_depletion = MAD_FOR_NETIRRIGATION_DEMAND; //190807LML 0.3;                             //190725LML&COS
              }
+             //201111LML&Claudio the MAD depends on irrigation technology
+             maximum_allowable_depletion = irreff.max_allowable_depletion;
+
+
              //if (veg_con[iveg].VCS.this_year_start_irrigated == false && (veg_con[iveg].VCS.veg_class_code == 7701 || veg_con[iveg].VCS.veg_class_code == 8205))
 #ifdef POSTPONE_FIRST_IRRIGATION_PERENNIAL_CROPS
              if (veg_con[iveg].VCS.this_year_start_irrigated == false &&

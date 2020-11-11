@@ -197,6 +197,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.35;
             irrig_eff.table_irrigation_evap_loss                = 0.0;
             irrig_eff.table_irrigation_runoff_loss              = 0.15;
+            irrig_eff.max_allowable_depletion                   = 0.5;           //201111LML
         } else if ((gtype == DRIP)
                    && (Irrigation_library[i].IrrigationType_code != IrrigTP_Sub_surf_drip_perfect)
                    && (Irrigation_library[i].IrrigationType_code != IrrigTP_Sub_surf_drip_perfect_eliminate_top)) {
@@ -210,6 +211,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.03;
             irrig_eff.table_irrigation_runoff_loss              = 0.0;
+            irrig_eff.max_allowable_depletion                   = 0.2;           //201111LML
         } else if ((Irrigation_library[i].IrrigationType_code == IrrigTP_Sub_surf_drip_perfect)
                    || Irrigation_library[i].IrrigationType_code == IrrigTP_Sub_surf_drip_perfect_eliminate_top){   //190724LML
             irrig_eff.time_irrig = 20;
@@ -220,6 +222,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.0;
             irrig_eff.table_irrigation_runoff_loss              = 0.0;
+            irrig_eff.max_allowable_depletion                   = 0.2;           //201111LML
         } else if (gtype == WHEEL_LINE) {
             irrig_eff.uniformity = 0.95;
             irrig_eff.maximum_capacity = 30.0;
@@ -230,6 +233,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.3;
             irrig_eff.table_irrigation_runoff_loss              = 0.0;
+            irrig_eff.max_allowable_depletion                   = 0.5;           //201111LML
         } else if (gtype == SOLID_SET) {
             irrig_eff.uniformity = 0.95;
             irrig_eff.maximum_capacity = 30.0;
@@ -240,6 +244,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.2;
             irrig_eff.table_irrigation_runoff_loss              = 0.0;
+            irrig_eff.max_allowable_depletion                   = 0.5;           //201111LML
         } else if (gtype == BIG_GUN) {
             irrig_eff.uniformity = 0.95;
             irrig_eff.maximum_capacity = 30.0;
@@ -250,6 +255,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.4;
             irrig_eff.table_irrigation_runoff_loss              = 0.05;
+            irrig_eff.max_allowable_depletion                   = 0.5;           //201111LML
         } else if (gtype == CENTER_PIVOT) {
             irrig_eff.uniformity = 0.92;
             irrig_eff.maximum_capacity = 20.0;
@@ -260,6 +266,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.12;
             irrig_eff.table_irrigation_runoff_loss              = 0.03;
+            irrig_eff.max_allowable_depletion                   = 0.2;           //201111LML
         }
     } //i
 }

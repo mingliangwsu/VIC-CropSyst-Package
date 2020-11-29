@@ -441,6 +441,7 @@ int  put_data(  dist_prcp_struct  *prcp,
   }
   storage += out_data[OUT_SWE].data[0] + out_data[OUT_SNOW_CANOPY].data[0] + out_data[OUT_WDEW].data[0] + out_data[OUT_SURFSTOR].data[0];
   out_data[OUT_WATER_ERROR].data[0] = calc_water_balance_error(rec,inflow,outflow,storage);
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
   if (fabs(out_data[OUT_WATER_ERROR].data[0]) > 1e-5) {
       std::clog<<"##error:"     <<out_data[OUT_WATER_ERROR].data[0]
                <<"\nrec:"       <<rec
@@ -475,6 +476,7 @@ int  put_data(  dist_prcp_struct  *prcp,
                                            - (inflow-outflow))
                <<std::endl;
   }
+#endif
   last_storage = storage;                                                        //150930LML
   /********************
     Check Energy Balance

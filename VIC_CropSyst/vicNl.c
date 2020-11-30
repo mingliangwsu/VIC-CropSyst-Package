@@ -41,6 +41,9 @@ int make_veg_lib_for_crops(veg_con_struct *veg_con,veg_lib_struct *veg_lib);    
 */
 static char vcid[] = "$Id: vicNl.c,v 5.14.2.20 2012/02/05 00:15:44 vicadmin Exp $";
 soil_con_struct   *soil_con_global = 0;   //km 130124
+#ifndef CROP_DAILY_OUTPUT_MEMFIRST
+    std::ofstream debugout;
+#endif
 #ifndef FULL_IRRIGATION
 std::map<int,std::map<int,irrigation_pattern_struct>> girrig_patt;              //[rotation_type][rec]
 #endif
@@ -68,11 +71,11 @@ File_system &file_system() { return CORN::OS::file_system_logical; }
 #ifdef VIC_CROPSYST_VERSION
 int run_CropSyst_crop = 0;                                                       //LML 150521
 #endif
-
+char out_file_name[MAXSTRING];
 #ifdef CROP_DAILY_OUTPUT_MEMFIRST
 std::stringstream crop_output_head;
 bool created_head = false;
-char out_file_name[MAXSTRING];
+//char out_file_name[MAXSTRING];
 std::list<Crop_output_struct> crop_output_list;
 #endif
 #ifdef OUTPUT_FULLIRRIGATION_PATTERN
@@ -800,6 +803,10 @@ int main (int argc, char *argv[])
   if (filep.VCS.irrigation_pattern) fclose(filep.VCS.irrigation_pattern);
 #endif
   #endif
+
+#ifndef CROP_DAILY_OUTPUT_MEMFIRST
+    debugout.close();
+#endif
   return EXIT_SUCCESS;
 }    /* End Main Program */
 

@@ -136,7 +136,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
     bool doprint      = false;
     int lys = options.Nlayer;
 #ifndef CROP_DAILY_OUTPUT_MEMFIRST
-    std::ofstream debugout;
+    extern std::ofstream debugout;
 #endif
     //180404LML static bool newed(false);
     int runtime_veg_code =
@@ -169,21 +169,26 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<"Month,"
                  <<"Day,"
                  <<"DOY,"
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"Dist,"
                  <<"Band,"
+#endif
                  <<"Cell_fract,"
                  <<"CroppingSyst_code,"
                  <<"Crop_code,"
                  <<"Crop_name,"
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"Accum_DD,"
                  <<"Accum_DD_clip,"
                  <<"Grow_Stage,"
                  //<<"VIC_LAI,"
                  //<<"LAI,"
                  <<"GAI,"
+#endif
                  <<"Green_Canopy_Cover,"
                  <<"Biomass_kg_m2,"
                  <<"Yield_kg_m2,"
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"Root_depth_mm,"
 #ifdef VCS_V5
                  <<"VIC_PET_mm,"
@@ -191,25 +196,35 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<"VIC_PET_shortgrass_mm,"
 #endif
                  //<<"CropSyst_Pot_Transp_mm,"
+#endif
                  <<"CropSyst_refET_mm,"
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"Act_Transp_mm,"                                              //180523LML include canopy evap ifdef CROPSYST_HANDLE_CANOPY_EVAP
+#endif
                  <<"VIC_final_transp_mm,"
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"irrig_netdemand_mm,"
+#endif
                  <<"irrig_total_mm,"
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"irrig_evap_mm,"
                  <<"irrig_runoff_mm,"
                  <<"irrig_intcpt_mm,"                                            //intercepted by canopy (before & after canopy evap processes)
                  //<<"irrig_intcpt_evap_mm,"                                       //to meet evap demand
+#endif
                  <<"Soil_E_mm,"
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"Crop_Canopy_E_mm,"
                  <<"snow_sublimation,"
                  <<"ET_mm,"
+#endif
                  <<"VIC_ET_mm,"
                  <<"water_stress_index,"
                  <<"Runoff,"
                  <<"Baseflow,"
                  <<"PPT,"
                  <<"Tair_avg,"
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"Tmax,"
                  <<"Tmin,"
                  <<"SWRAD_w_m2,"
@@ -220,6 +235,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<"RHUM_min_%,"
                  <<"Snow_dep_mm,"
                  <<"Crop_Biomass_kg_m2,"
+#endif
 #ifdef PRINT_SOM_FOR_DEBUG
                  <<"Surface_Residue_C_kg_m2,"
                  <<"Soil_Residue_C_kg_m2,"
@@ -259,13 +275,13 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
         }
         #endif
         debugout << std::endl;
-        debugout.close();
+        //debugout.close();
         //180404LML newed = true;
 #else
 #endif
     }
 #ifndef CROP_DAILY_OUTPUT_MEMFIRST
-    debugout.open(out_file_name,std::ofstream::out | std::ofstream::app);
+    //debugout.open(out_file_name,std::ofstream::out | std::ofstream::app);
 #else
     extern bool created_head;
     if(global_rec == 0 && created_head == false) {
@@ -308,7 +324,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
              <<"CropSyst_refET_mm,"
              <<"crop_evapotransp_max_mm,"
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
-             <<"Act_Transp_mm,"                                              //180523LML include canopy evap ifdef CROPSYST_HANDLE_CANOPY_EVAP
+             <<"Act_Transp_mm,"                                                  //180523LML include canopy evap ifdef CROPSYST_HANDLE_CANOPY_EVAP
 #endif
              <<"VIC_final_transp_mm,"
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
@@ -405,16 +421,19 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
         debugout <<active_land_unit->ref_VIC_soil_con().gridcel
                  <<","<<std::setprecision(8)<<(double)active_land_unit->ref_VIC_soil_con().lng
                  <<","<<std::setprecision(7)<<(double)active_land_unit->ref_VIC_soil_con().lat
-                 <<","<<(int)global_today.get_year()
-                 <<","<<(int)global_today.get_month()
-                 <<","<<(int)global_today.get_DOM()
-                 <<","<<(int)global_today.get_DOY()
+                 <<","<<(int)global_simdate.get_year()
+                 <<","<<(int)global_simdate.get_month()
+                 <<","<<(int)global_simdate.get_DOM()
+                 <<","<<(int)global_simdate.get_DOY()
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<dist
                  <<","<<band
+#endif
                  <<","<<cell_fraction
                  <<","<<(active_land_unit->ref_VIC_veg_con().VCS.veg_class_code)
                  <<","<<VIC_land_unit_get_current_crop_code()
                  <<","<<active_crop_name.c_str()
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<(active_crop ? active_crop->get_accum_degree_days(/*200323RLN false*/) : 0)
                  <<","<<(active_crop ? active_crop->get_accum_degree_days(/*200323RLN true*/) : 0)
                  //<<","<<(active_crop ? active_crop->get_d (true) : 0)
@@ -425,10 +444,12 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  //<<","<<VIC_land_unit_get(VIC::LAI)
                  //<<","<<(active_crop ? active_crop->get_LAI(true)                : 0)
                  <<","<<(active_crop ? active_crop->get_GAI(true)                : 0)
+#endif
                  <<","<<(active_crop ? active_crop->get_canopy_interception_global_green() : 0)
                     //200323RLN get_fract_canopy_cover_green()     : 0)
                  <<","<<(active_crop ? active_crop->get_canopy_biomass_kg_m2()   : 0)
                  <<","<<(active_crop ? active_crop->get_latest_yield_kg_m2()     : 0)
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<m_to_mm(active_crop ? active_crop->get_recorded_root_depth_m()   : 0)
 #ifdef VCS_V5
                  <<","<<(active_land_unit->ref_VIC_cell().VCS.pot_evap_total_daily)
@@ -436,19 +457,28 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<","<<active_land_unit->ref_VIC_cell().VCS.pot_evap_daily[PET_SHORT]
 #endif
                  //<<","<<m_to_mm(active_crop ? active_crop->get_pot_transpiration_m(false) : 0)
+#endif
                  <<","<<m_to_mm(CropSyst_ref_et_m)
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<m_to_mm(active_crop ? active_crop->get_act_transpiration_m()     : 0)
+#endif
                  <<","<<VIC_transpiration_mm
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<temp_vic_crop.irrigation_netdemand
+#endif
                  <<","<<temp_vic_crop.irrigation_water
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<temp_vic_crop.irrigation_evap
                  <<","<<temp_vic_crop.irrigation_runoff
                  <<","<<temp_vic_crop.intercepted_irrigation
                  //<<","<<temp_vic_crop.evap_intercepted_irrig_water
+#endif
                  <<","<<soil_evap_mm
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<canopy_evap_mm
                  <<","<<((snow.vapor_flux + snow.canopy_vapor_flux) * 1000.0)        //190507
                  <<","<<total_et
+#endif
                  <<","<<total_VIC_et
                  <<","<<(active_crop ? active_crop->get_water_stress_index() : 0)
                  <<","<<active_land_unit->ref_VIC_cell().runoff
@@ -459,6 +489,8 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #else
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].prec[options.VCS.NR]
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].air_temp[options.VCS.NR]
+#endif
+#ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].VCS.tmax
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].VCS.tmin
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].shortwave[options.VCS.NR]
@@ -471,9 +503,9 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].VCS.relative_humidity[options.VCS.NR]
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].VCS.relative_humidity_max
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].VCS.relative_humidity_min
-#endif
                  <<","<<m_to_mm(snow.depth)
                  <<","<<(active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0)
+#endif
 #ifdef PRINT_SOM_FOR_DEBUG
                  <<","<<VIC_land_unit_get(VIC::SURFACE_RESIDUE_C_MASS)
                  <<","<<VIC_land_unit_get(VIC::SUBSURFACE_RESIDUE_C_MASS)
@@ -528,6 +560,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
         }
         #endif
         debugout<<std::endl;
+        //debugout.close();
 #else
          extern std::list<Crop_output_struct> crop_output_list;
          Crop_output_struct temp;
@@ -666,9 +699,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #endif
 
     }
-#ifndef CROP_DAILY_OUTPUT_MEMFIRST
-    debugout.close();
-#endif
+
     return print_status;
 }
 /*_2010-10-10___________________________________________VIC_land_unit_end_day_*/

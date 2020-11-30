@@ -2,7 +2,7 @@
  *LML 141105 created for define global variables
  **************************************************/
 
- #include "global.h"
+#include "global.h"
 
  /*190201RLN check needed
 #ifdef VCS_V5

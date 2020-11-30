@@ -23,6 +23,11 @@
 **********************************************************************/
 #ifndef GLOBAL_H
 #define GLOBAL_H
+#include <iostream>
+
+#ifndef CROP_DAILY_OUTPUT_MEMFIRST
+    extern std::ofstream debugout;
+#endif
 
 /*LML 141105 moved all global variable definations into global.c
 *Include:

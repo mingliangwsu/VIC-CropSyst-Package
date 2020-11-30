@@ -339,6 +339,10 @@ int main (int argc, char *argv[])
 #ifdef CROP_DAILY_OUTPUT_MEMFIRST
     crop_output_list.clear();
 #endif
+#ifndef CROP_DAILY_OUTPUT_MEMFIRST
+    created_head = false;
+#endif
+
 #ifdef OUTPUT_FULLIRRIGATION_PATTERN
     out_irrigation_pattern_output_list.clear();
 #endif
@@ -765,12 +769,15 @@ int main (int argc, char *argv[])
     }
 #endif
     }    /* End Run Model Condition */
-  }     /* End Grid Loop */
 
-  /** cleanup **/
 #ifndef CROP_DAILY_OUTPUT_MEMFIRST
     debugout.close();
 #endif
+
+  }     /* End Grid Loop */
+
+  /** cleanup **/
+
 
   free_atmos(global_param.nrecs, atmos);
   free_dmy(&dmy);

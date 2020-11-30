@@ -410,6 +410,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
             profile_liq_water += active_land_unit->ref_VIC_cell().layer[i].moist;
         std::string active_crop_name(wactive_crop_name.begin(),wactive_crop_name.end());
         Soil::Chemicals_profile *temp_chemical = active_land_unit->get_soil_chemicals(); //200208RLN
+        int16 day_since_start_of_harvest = (active_crop? active_crop->ref_phenology().get_days_since_start_of(NGS_HARVEST) : 0);
  
         //std::clog << "VIC_shortgrass_ET:" << (active_land_unit->ref_VIC_cell().VCS.pot_evap_daily[PET_SHORT]) << std::endl;
 #ifndef CROP_DAILY_OUTPUT_MEMFIRST
@@ -456,8 +457,10 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #endif
                  <<","<<(active_crop ? active_crop->get_canopy_interception_global_green() : 0)
                     //200323RLN get_fract_canopy_cover_green()     : 0)
-                 <<","<<(active_crop ? active_crop->get_canopy_biomass_kg_m2()   : 0)
-                 <<","<<(active_crop ? active_crop->get_latest_yield_kg_m2()     : 0)
+                 //<<","<<(active_crop ? active_crop->get_canopy_biomass_kg_m2()   : 0)
+                 <<","<<(active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0)
+                 //<<","<<(active_crop ? active_crop->get_latest_yield_kg_m2()     : 0)
+                 <<","<<(active_crop? ((day_since_start_of_harvest==0) ? active_crop->get_latest_yield_kg_m2() : 0.0) : 0.0)
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<m_to_mm(active_crop ? active_crop->get_recorded_root_depth_m()   : 0)
 #ifdef VCS_V5
@@ -627,7 +630,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
          //}
          //std::cerr << "TBD LML 200518!!!\n";
 
-         int16 day_since_start_of_harvest = (active_crop? active_crop->ref_phenology().get_days_since_start_of(NGS_HARVEST) : 0);
+         //int16 day_since_start_of_harvest = (active_crop? active_crop->ref_phenology().get_days_since_start_of(NGS_HARVEST) : 0);
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
          temp.GAI = (active_crop ? active_crop->get_GAI(true)                : 0);
 #endif

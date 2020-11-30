@@ -418,6 +418,13 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
             period_descriptions.string_items(growth_stage_description,' ');                                //200420
 
         */
+
+        if ( (debugout.rdstate() & std::ofstream::failbit ) != 0 ) {
+              std::cerr << "Error write file:" << out_file_name << "\n";
+              return 1;
+        }
+
+
         debugout <<active_land_unit->ref_VIC_soil_con().gridcel
                  <<","<<std::setprecision(8)<<(double)active_land_unit->ref_VIC_soil_con().lng
                  <<","<<std::setprecision(7)<<(double)active_land_unit->ref_VIC_soil_con().lat

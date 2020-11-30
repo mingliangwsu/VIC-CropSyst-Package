@@ -768,6 +768,10 @@ int main (int argc, char *argv[])
   }     /* End Grid Loop */
 
   /** cleanup **/
+#ifndef CROP_DAILY_OUTPUT_MEMFIRST
+    debugout.close();
+#endif
+
   free_atmos(global_param.nrecs, atmos);
   free_dmy(&dmy);
   free_out_data_files(&out_data_files);
@@ -804,9 +808,7 @@ int main (int argc, char *argv[])
 #endif
   #endif
 
-#ifndef CROP_DAILY_OUTPUT_MEMFIRST
-    debugout.close();
-#endif
+
   return EXIT_SUCCESS;
 }    /* End Main Program */
 

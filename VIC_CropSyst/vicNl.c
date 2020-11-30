@@ -72,9 +72,9 @@ File_system &file_system() { return CORN::OS::file_system_logical; }
 int run_CropSyst_crop = 0;                                                       //LML 150521
 #endif
 char out_file_name[MAXSTRING];
+bool created_head = false;
 #ifdef CROP_DAILY_OUTPUT_MEMFIRST
 std::stringstream crop_output_head;
-bool created_head = false;
 //char out_file_name[MAXSTRING];
 std::list<Crop_output_struct> crop_output_list;
 #endif

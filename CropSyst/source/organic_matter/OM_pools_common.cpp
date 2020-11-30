@@ -97,7 +97,7 @@ Organic_matter_pools_common::Organic_matter_pools_common
 Organic_matter_pools_common::~Organic_matter_pools_common()
 {
    #if (CROPSYST_VERSION==5)
-   if (emanator_known) emanator_known->set_status(CS::Emanator::deleted_status); //160614
+   //201130LML some errors if (emanator_known) emanator_known->set_status(CS::Emanator::deleted_status); //160614
    #endif
    if (pools_totals) delete pools_totals;                                        //201129LML
 }

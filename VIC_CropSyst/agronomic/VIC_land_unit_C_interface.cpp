@@ -132,12 +132,14 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                                         const double cell_fraction,
                                         int dist, int band)
 {
+    extern bool created_head;
+
     bool print_status = true;
     bool doprint      = false;
     int lys = options.Nlayer;
-#ifndef CROP_DAILY_OUTPUT_MEMFIRST
-    extern std::ofstream debugout;
-#endif
+//#ifndef CROP_DAILY_OUTPUT_MEMFIRST
+//    extern std::ofstream debugout;
+//#endif
     //180404LML static bool newed(false);
     int runtime_veg_code =
         active_land_unit->ref_VIC_veg_con().VCS.veg_class_code;
@@ -159,8 +161,9 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
     #endif
 #endif
     //if (!newed) {
-    if(global_rec == 0) {                                                        //180404LML
+    if(global_rec == 0 && !created_head) {                                                        //180404LML
 #ifndef CROP_DAILY_OUTPUT_MEMFIRST
+        created_head = true;
         debugout.open(out_file_name,std::ofstream::out);
         debugout <<"cell_id,"
                  <<"lon,"
@@ -283,7 +286,6 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #ifndef CROP_DAILY_OUTPUT_MEMFIRST
     //debugout.open(out_file_name,std::ofstream::out | std::ofstream::app);
 #else
-    extern bool created_head;
     if(global_rec == 0 && created_head == false) {
         extern std::stringstream crop_output_head;
         crop_output_head <<"cell_id,"

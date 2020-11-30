@@ -78,6 +78,8 @@ bool Phenology_abstract::reset
 //_Phenology_common::reset__________________________________________2013-09-02_/
 bool Phenology_abstract::activate_accrescence()
 {  // currently no generalization
+   if (culminescence) delete culminescence;                                      //201129LML
+   if (senescence) delete senescence;                                            //201129LML
    culminescence = 0;                                                            //200504
    senescence = 0;                                                               //200504
 
@@ -93,6 +95,7 @@ bool Phenology_abstract::activate_accrescence()
 //_activate_accrescence_____________________________________________2019-07-01_/
 bool Phenology_abstract::activate_culminescence()
 {
+   if (accrescence) delete accrescence;                                          //201129LML
    accrescence = 0;
    // Warning currently I am keeping these periods until
    // the crop it terminated.
@@ -105,7 +108,10 @@ bool Phenology_abstract::activate_culminescence()
 }
 //_activate_culminescence___________________________________________2019-07-01_/
 bool Phenology_abstract::activate_senescence()
-{  accrescence = 0;
+{
+   if (accrescence) delete accrescence;                                          //201129LML
+   if (culminescence) delete culminescence;                                      //201129LML
+   accrescence = 0;
    culminescence = 0;
    // Warning currently I am keeping these periods until
    // the crop it terminated.
@@ -126,6 +132,10 @@ Phenology::Period *Phenology_abstract::activate_root_elongation()
 
 bool Phenology_abstract::culminate_senescence()
 {
+   if (accrescence) delete accrescence;                                          //201129LML
+   if (culminescence) delete culminescence;                                      //201129LML
+   if (senescence) delete senescence;                                            //201129LML
+
    accrescence = 0;
    culminescence = 0;
    senescence = 0;
@@ -259,6 +269,7 @@ Phenology_abstract::Period::Period
 Phenology_abstract::Period_thermal::~Period_thermal()
 {
    if (parameters_owned) delete parameters;
+   if (thermal_time) delete thermal_time;                                        //201128LML
    thermal_time = 0;
 }
 //_Period::destructor______________________________________________2019-06-30_/

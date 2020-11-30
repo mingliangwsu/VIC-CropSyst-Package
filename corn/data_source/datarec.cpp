@@ -184,7 +184,7 @@ bool Data_record::expect_switch
    return expected;
 }
 //_expect_switch____________________________________________________2019-11-01_/
-
+
 
 // These following dates can probably take interfaces
 VV_date_entry *Data_record::expect_date
@@ -380,7 +380,9 @@ void Data_record::expect_float32_array_with_units_code_fixed
 ,  Units_code units_code_fixed,  float32 *array, bool one_based ,nat16 max_index,bool enumerate_variable)
 {  if (!enumerate_variable)
        set_current_section(variable_or_section_label_);
-    Units_code_item *units_code_item = new Units_code_item(units_code_fixed);
+    //Units_code_item *units_code_item = new Units_code_item(units_code_fixed);
+    Units_code_item units_code_item(units_code_fixed);                           //201128LML
+
 //070418 there are problems in some cases with ths units_codes is deallocated
 //       I am not sure why,  Not adding units_code_item to the units_codes list is a memory leak
 //       but this doesn't add much so it shouldn't hurt anything for now.
@@ -390,7 +392,8 @@ void Data_record::expect_float32_array_with_units_code_fixed
       strcat(units_variable,"_");
    }
    strcat(units_variable,"units");
-   expect_units(units_variable,units_code_item->units_code);
+   //expect_units(units_variable,units_code_item->units_code);
+   expect_units(units_variable,units_code_item.units_code);                      //201128LML
    expect_float32_array(variable_or_section_label_, array,  one_based , max_index,enumerate_variable);
 }
 //_expect_float32_array_with_units_code_fixed_______________________2007-04-03_/

@@ -465,6 +465,7 @@ Crop_complete::Crop_complete
             ,ref_phenology());
       break;
    } // switch harvested_part
+   if (event_scheduler) delete event_scheduler; event_scheduler = 0;             //201129LML
    event_scheduler = as_event_scheduler_crop = new Event_scheduler_crop_complete
       (*this,simdate,performable_operations_);
 }
@@ -483,6 +484,7 @@ Crop_complete::~Crop_complete()
    delete canopy_leaf_growth;                                                    //070626
    delete roots_current;                                                         //141103
    delete CO2_response;
+   delete yield;                                                                 //201128LML
    #if (!PHENOLOGY_VERSION || (PHENOLOGY_VERSION==2013))
    delete thermal_time;                                                          //180522
    #endif

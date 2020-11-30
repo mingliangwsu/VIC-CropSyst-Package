@@ -18,6 +18,7 @@ public:
       (float32             _elevation                                            //150617
       ,const float64 &_day_length_hours_today                                    //150627
       ,Weather_provider   &_weather);
+   inline virtual ~ET_Reference_calculator() {delete ET_reference_models;}       //201129LML
    virtual const CORN::Quality &update()                         rectification_;
    virtual const Slope_saturated_vapor_pressure_plus_psychrometric_resistance            //160731
       &ref_slope_saturated_vapor_pressure_plus_psychrometric_resistance_reference() const;

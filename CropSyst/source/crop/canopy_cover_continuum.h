@@ -99,6 +99,7 @@ class Canopy_cover_reference
       ,const Crop_parameters_struct::Morphology &canopy_growth_common_parameter_
       ,const Phenology                          &phenology_                      //110824
       ,bool                                      is_fruit_tree_);                //120510_101030
+   inline virtual ~Canopy_cover_reference() { delete canopy_cover_curve; }       //201128LML
    virtual bool update_cover
       (float64 leaf_water_potential_yesterday_NA_this_version =0) modification_;
  private:

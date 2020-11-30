@@ -2,6 +2,7 @@
 #define OM_residues_profile_commonH
 #include "organic_matter/OM_residues_profile_abstract.h"
 #include "common/residue/residues_cycling.h"
+#include "CropSyst/source/organic_matter/OM_pools_common.h"                               //201129LML
 
 //______________________________________________________________________________
 namespace Soil { class Abiotic_environment_profile; }                            //181206
@@ -32,6 +33,10 @@ class Organic_matter_residues_profile_common    // rename because this is a conc
       ,const Organic_matter_initialization_parameters &organic_matter_initialization_parameters  //111004_060215
       ,const Organic_matter_decomposition_parameters  &organic_matter_decomposition_parameters  //111004_060215
       ,const CORN::date32                 &today);                               //140507
+   inline virtual ~Organic_matter_residues_profile_common() {
+       organic_matter_pools_profile_owned->delete_all();
+       delete organic_matter_pools_profile_owned;                                //201128LML
+   }
  public: // process
    virtual bool process_day();                                                   //150611_140507_060116
    virtual bool start_day()                                       modification_; //060817

@@ -58,6 +58,7 @@ Crop_common::~Crop_common()
 {
 // this is crashing   delete transpiration; transpiration = 0;                   //141103
    parameters = 0;
+   delete transpiration;                                                         //201129LML
 }
 //_~Crop_common__________________________________________2004-01-21_2003-07-10_/
 bool Crop_common::initialize()                                   initialization_

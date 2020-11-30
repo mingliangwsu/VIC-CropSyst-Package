@@ -115,7 +115,10 @@ protected: // Classes
             #endif
             ,_from_previous_season,_linger_time)
          , accum_today(0)
-         {}
+         {};
+      inline ~Canopy_accumulation(){
+          if (accum_today) delete accum_today;                                      //201128LML
+      }
    public: // Canopy_accumulation members
       float64 reduce_green_fraction_canopy_cover(float64 canopy_cover_to_reduce_fraction);
          // returns the remainder of canopy_cover_to_reduce_fraction

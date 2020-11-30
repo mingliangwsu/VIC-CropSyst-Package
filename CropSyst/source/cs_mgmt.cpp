@@ -63,7 +63,7 @@ void Management::transfer_all                  // rename to transfer_all_to
          if ((N_application_soil_observation_event->begin_sync.get_sync_mode()   //160326
                == relevant_sync) || (relevant_sync == ANY_SYNC_MODE))            //160326
          {  to_event_list.append(N_application_soil_observation_event);          //060804
-            N_application_soil_observation_event = 0;
+             N_application_soil_observation_event = 0;
       }  }
       to_event_list.transfer_from(auto_N_applications,relevant_sync);            //151004_020314
    }

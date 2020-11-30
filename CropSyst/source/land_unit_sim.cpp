@@ -792,6 +792,7 @@ bool Land_unit_simulation_VX::instanciate_organic_matter_and_residues()
             ,*soil->ref_structure()                                              //160412
             , soil->mod_nitrogen()                                               //160412
             ,*soil->ref_texture());                                              //160412
+
          organic_matter_residues_profile_kg_m2
             = new Organic_matter_residues_profile_common
             (soil

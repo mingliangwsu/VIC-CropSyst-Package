@@ -416,6 +416,7 @@ class Management_parameters_class
           int16 total_automatic_N_applications()                          const; //020403
  public:
    Management_parameters_class();  // default management file
+   inline virtual ~Management_parameters_class() { delete N_application_soil_observation_event;} //201128LML
    virtual bool expect_structure(bool for_write = false);                        //161025_981007
    inline virtual const char *get_primary_section_name()                  const
                                                       {return LABEL_management;} //020911

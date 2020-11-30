@@ -135,6 +135,7 @@ Location_parameters::~Location_parameters()
    delete geolocation;
 #endif
 */
+    delete geolocation;                                                          //201129LML
 }
 //_Location_parameters:destructor___________________________________2005-06-07_/
 bool Location_parameters::expect_structure(bool for_write)

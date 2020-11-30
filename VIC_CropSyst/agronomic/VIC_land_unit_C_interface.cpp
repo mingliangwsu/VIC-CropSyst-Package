@@ -776,9 +776,13 @@ unsigned long int VIC_land_unit_create
 , snow_data_struct  &VIC_snow_
 , veg_var_struct    &VIC_veg_var_)
 {   //rotation_number = _VIC_veg_con->veg_class_code
-    CS::Identification *cellid = new CS::Identification((int32)cell_ID);
+    //CS::Identification *cellid = new CS::Identification((int32)cell_ID);
+    CS::Identification cellid((int32)cell_ID);
     wchar_t test;  //20200821LML
-    CS::Arguments *arguments_relinquished = new CS::Arguments(*cellid,&test);          //200817
+    //CS::Arguments *arguments_relinquished = new CS::Arguments(cellid,&test);          //200817
+
+    CS::Arguments arguments_relinquished(cellid,&test);          //200817
+
     /*200817
     CropSyst::Arguments *arguments_relinquished = new CropSyst::Arguments
        (*cellid,cell_ID,rotation_cycle_index);
@@ -815,7 +819,7 @@ unsigned long int VIC_land_unit_create
 */
    active_land_unit = new VIC::Land_unit_simulation
       (
-      arguments_relinquished
+      &arguments_relinquished
        ,(nat32)rotation_or_crop_veg_class_code                                   //150521
        ,(nat8) rotation_cycle_index                                              //150521
        ,global_simdate.ref_date32() //200828RLN global_simdate_raw //190130 global_today.get_date32()

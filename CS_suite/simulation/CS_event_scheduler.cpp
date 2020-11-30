@@ -47,7 +47,11 @@ Event_scheduler_simulation_unit::Event_scheduler_simulation_unit
 {}
 //_Event_scheduler_simulation_unit_____________________________________________/
 Event_scheduler_common::~Event_scheduler_common()
-{}
+{
+    queueA.delete_all();                                                         //201129LML
+    queueB.delete_all();                                                         //201129LML
+    completed_events.delete_all();                                               //201129LML
+}
 //______________________________________________________________________________
 Event_scheduler_simulation_unit::~Event_scheduler_simulation_unit()
 {}

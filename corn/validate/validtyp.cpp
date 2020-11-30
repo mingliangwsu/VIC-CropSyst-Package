@@ -37,7 +37,8 @@ Valid_type::~Valid_type()
 //_~Valid_type______________________________________________________1998-05-08_/
 void Valid_type::set_key(const char *i_key)
 {  int key_length = i_key ? strlen(i_key)+1 : 1;
-   if (key) delete key;
+   //201129LML if (key) delete key;
+   if (key) delete [] key; key = 0;
    key = new char[key_length];
    key[0] = 0;
    if (i_key) strcpy(key,i_key);

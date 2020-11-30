@@ -38,6 +38,7 @@ bool Simulation_unit::initialize()                               initialization_
 //_initialize_______________________________________________________2015-10-01_/
 Simulation_unit::~Simulation_unit()
 {
+   delete event_scheduler;                                                       //201129LML
    balancers.delete_all();
    delete balance_file_daily;
    delete balance_file_annual;

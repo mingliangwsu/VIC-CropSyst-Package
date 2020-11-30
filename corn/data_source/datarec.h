@@ -220,7 +220,7 @@ class Data_record
       ,const char *caption1=0
       ,const char *caption2=0);
 
-   // These following dates can probably take interfaces
+   // These following dates can probably take interfaces
    VV_date_entry       *expect_date      (const char *key, modifiable_ Date_clad_32      &value,bool formatted=false,Phrase_label annotation1_=OPTIONAL_PHRASE,Phrase_label annotation2_=OPTIONAL_PHRASE); //050412
    VV_datetime64_entry *expect_datetime64(const char *key, modifiable_ Date_time_clad_64 &value,bool formatted=false,Phrase_label annotation1_=OPTIONAL_PHRASE,Phrase_label annotation2_=OPTIONAL_PHRASE); //050412
    VV_datetime64_entry *expect_datetime64_formatted(const char *key, modifiable_ Date_time_clad_64 &value,const char *format,Phrase_label annotation1_=OPTIONAL_PHRASE,Phrase_label annotation2_=OPTIONAL_PHRASE); //050412

@@ -35,7 +35,8 @@ bool Canopy_cover_abstract::know_accrescence
 //_know_accrescence_________________________________________________2018-11-18_/
 bool Canopy_cover_abstract::know_culminescence
 (const Phenology::Period_thermal *culminescence_)
-{  accrescence   = 0;
+{
+   accrescence   = 0;
    culminescence = culminescence_;
    senescence    = 0;
    return true; //200409 culminescence;
@@ -43,7 +44,8 @@ bool Canopy_cover_abstract::know_culminescence
 //_know_culminescence_______________________________________________2018-11-18_/
 bool Canopy_cover_abstract::know_senescence
 (const Phenology::Period_thermal *senescence_)
-{  accrescence    = 0;
+{
+   accrescence    = 0;
    culminescence  = 0;
    senescence     = senescence_;
    return true; //200409 senescence;
@@ -448,6 +450,7 @@ bool Canopy_cover_abstract::start_dormancy()                       modification_
    interception_global_green = 0;
    interception_global_green_yesterday = 0;                                      //110512
    interception_PAR_green = 0;                                                   //110512
+
    accrescence    = 0;                                                           //181109
    culminescence  = 0;                                                           //181109
    senescence     = 0;                                                           //181109

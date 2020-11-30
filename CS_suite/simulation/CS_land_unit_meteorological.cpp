@@ -60,6 +60,7 @@ Land_unit_meteorological::~Land_unit_meteorological()
    if (weather_provider_owned)   delete weather_provider;                        //151215
    if (solar_radiation_extraterrestrial_owned)                                   //151215
       delete solar_radiation_extraterrestrial;
+   if (ET_ref)                   delete ET_ref;                                  //201129LML
    // this is crashing delete storms;
    // dont delete atmospheric_CO2_change (no longer owned)                       //171207
 }

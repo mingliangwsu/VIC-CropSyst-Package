@@ -71,7 +71,7 @@ class Aerodynamics
  public: // constructors
     Aerodynamics
        (const Wind_speed &_wind_speed                                            //150215
-       ,float64  _wind_measurement_height        = 2.0
+       ,float64  _wind_measurement_height        = 10.0                          //201201LML hard coded : changed from 2.0
        ,float64  _temperature_measurement_height = 2.0);
     float64 calc_normalized_wind_speed(float64 wind_speed_m_ts)           const; //011008
     // This will work for any time step

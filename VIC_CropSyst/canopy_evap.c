@@ -568,6 +568,7 @@ double canopy_evap(const soil_con_struct   &soil_con,
            //170920LML         #else
            //170920LML         canopy_fraction();                                            //keyvan added this to avoid overestimation of evaporation from canopy
            //170920LML         #endif
+#ifdef ENABLE_IRRIGATION_CANOPY_INTERCEPTION
            if (Wdew_max > 0) {
                if (irrig_aft_evap > 0 && !surface_or_drip) {
                    double canopy_initial_deficit = std::max<double>(0,
@@ -589,6 +590,7 @@ double canopy_evap(const soil_con_struct   &soil_con,
 //180522LML//#endif
                }
            }
+#endif
 
            canopyevap = crop_potential_ET * pow((tmp_Wdew / Wdew_max),(2.0/3.0))
                                      * delta_t / SEC_PER_DAY;                    //180522LML

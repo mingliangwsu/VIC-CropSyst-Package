@@ -457,8 +457,8 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #endif
                  <<","<<(active_crop ? active_crop->get_canopy_interception_global_green() : 0)
                     //200323RLN get_fract_canopy_cover_green()     : 0)
-                 //<<","<<(active_crop ? active_crop->get_canopy_biomass_kg_m2()   : 0)
-                 <<","<<(active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0)
+                 <<","<<(active_crop ? active_crop->get_canopy_biomass_kg_m2() : 0)
+                 //<<","<<(active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0)
                  //<<","<<(active_crop ? active_crop->get_latest_yield_kg_m2()     : 0)
                  <<","<<(active_crop? ((day_since_start_of_harvest==0) ? active_crop->get_latest_yield_kg_m2() : 0.0) : 0.0)
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
@@ -516,7 +516,8 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].VCS.relative_humidity_max
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].VCS.relative_humidity_min
                  <<","<<m_to_mm(snow.depth)
-                 <<","<<(active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0)
+                 //<<","<<(active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0)
+                 <<","<<(active_crop ? active_crop->get_canopy_biomass_kg_m2() : 0)
 #endif
 #ifdef PRINT_SOM_FOR_DEBUG
                  <<","<<VIC_land_unit_get(VIC::SURFACE_RESIDUE_C_MASS)
@@ -636,7 +637,8 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #endif
          temp.Green_Canopy_Cover = (active_crop ? active_crop->get_canopy_interception_global_green()     : 0);
          //temp.Biomass_kg_m2 = (active_crop ? active_crop->get_canopy_biomass_kg_m2()   : 0);
-         temp.Biomass_kg_m2 = (active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0);
+         //temp.Biomass_kg_m2 = (active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0);
+         temp.Biomass_kg_m2 = active_crop ? active_crop->get_canopy_biomass_kg_m2() : 0;
          temp.Yield_kg_m2 = active_crop? ((day_since_start_of_harvest==0) ? active_crop->get_latest_yield_kg_m2() : 0.0) : 0.0;
          // temp.Yield_kg_m2 = (active_crop ? active_crop->get_latest_yield_kg_m2()     : 0);
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST

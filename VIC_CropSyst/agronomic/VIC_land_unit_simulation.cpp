@@ -265,9 +265,9 @@ bool Land_unit_simulation::setup_weather_from_VIC()
    CS::meteorology::Storms *loc_storms = 0;
    //190723LML bool update_weather = weather_provider->update();
    const double psychrometric_constant = weather_provider->psychrometric_constant.get_kPa_per_C();
-   double ra = VIC_cell.VCS.aero_resist_daily[PET_SHORT][0] ;                        //150608
-   weather_provider->aerodynamic_resistance_ref_plants/*(day/m)*/ = CORN::must_be_greater_or_equal_to(ra,1.0e-5) / (float64)Seconds_per_day;
-   weather_provider->aerodynamics.resistance_of_plants_reference_s_m.update_amount_in_preset_units(CORN::must_be_greater_or_equal_to(ra,1.0e-5));
+   //201216LML double ra = VIC_cell.VCS.aero_resist_daily[PET_SHORT][0] ;                        //150608
+   //201216LML weather_provider->aerodynamic_resistance_ref_plants/*(day/m)*/ = CORN::must_be_greater_or_equal_to(ra,1.0e-5) / (float64)Seconds_per_day;
+   //201216LML weather_provider->aerodynamics.resistance_of_plants_reference_s_m.update_amount_in_preset_units(CORN::must_be_greater_or_equal_to(ra,1.0e-5));
 
 #ifdef LIU_DEBUG
    /*

@@ -21,7 +21,8 @@ class Wind_speed
    inline Wind_speed()
       : CS::Parameter_float64
          (INTENSIVE,0.0,UC_meters_per_second,CORN::unknown_quality)
-      , reference_height_m(measurement_height_wind_speed_standard_agronomic_m)   //150427
+      //, reference_height_m(measurement_height_wind_speed_standard_agronomic_m)   //150427
+      , reference_height_m(10.0)                                                 //201216LML HARD CODED FOR GridMet Data
       {}
    inline float64 get_m_s()  const { return in_prescribed_units();}
    inline float64 get_m_d()  const { return m_per_sec_to_m_per_day(get_m_s());}

@@ -693,6 +693,7 @@ int main (int argc, char *argv[])
 #endif
                     << "," << temp->Green_Canopy_Cover
                     << "," << temp->Biomass_kg_m2
+                    << "," << temp->Fruit_dry_biomass_kg_m2
                     << "," << temp->Yield_kg_m2
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->Root_depth_mm

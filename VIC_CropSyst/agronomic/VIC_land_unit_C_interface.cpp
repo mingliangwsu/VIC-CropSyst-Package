@@ -190,6 +190,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #endif
                  <<"Green_Canopy_Cover,"
                  <<"Biomass_kg_m2,"
+                 <<"Fruit_dry_biomass_kg_m2,"
                  <<"Yield_kg_m2,"
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"Root_depth_mm,"
@@ -313,6 +314,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #endif
              <<"Green_Canopy_Cover,"
              <<"Biomass_kg_m2,"
+             <<"Fruit_dry_biomass_kg_m2,"
              <<"Yield_kg_m2,"
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
              <<"Root_depth_mm,"
@@ -458,6 +460,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<","<<(active_crop ? active_crop->get_canopy_interception_global_green() : 0)
                     //200323RLN get_fract_canopy_cover_green()     : 0)
                  <<","<<(active_crop ? active_crop->get_canopy_biomass_kg_m2() : 0)
+                 <<","<<(active_crop ? (active_crop->is_fruit() ? active_crop->get_fruit_dry_biomass_kg_ha()/10000. : 0) : 0)
                  //<<","<<(active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0)
                  //<<","<<(active_crop ? active_crop->get_latest_yield_kg_m2()     : 0)
                  <<","<<(active_crop? ((day_since_start_of_harvest==0) ? active_crop->get_latest_yield_kg_m2() : 0.0) : 0.0)
@@ -639,6 +642,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
          //temp.Biomass_kg_m2 = (active_crop ? active_crop->get_canopy_biomass_kg_m2()   : 0);
          //temp.Biomass_kg_m2 = (active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0);
          temp.Biomass_kg_m2 = active_crop ? active_crop->get_canopy_biomass_kg_m2() : 0;
+         temp.Fruit_dry_biomass_kg_m2 = active_crop ? (active_crop->is_fruit() ? active_crop->get_fruit_dry_biomass_kg_ha()/10000. : 0) : 0;
          temp.Yield_kg_m2 = active_crop? ((day_since_start_of_harvest==0) ? active_crop->get_latest_yield_kg_m2() : 0.0) : 0.0;
          // temp.Yield_kg_m2 = (active_crop ? active_crop->get_latest_yield_kg_m2()     : 0);
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST

@@ -158,6 +158,7 @@ double canopy_evap(const soil_con_struct   &soil_con,
   double rc;
   int    Ndist = options.NDIST;
   #ifdef VIC_CROPSYST_VERSION
+  double irrig_efficiency = 0;
   veg_lib_struct &veglib_specific = *veg_con[iveg].VCS.veg_lib[band];
   #else
   veg_lib_struct &veglib_specific = veg_lib[veg_class];
@@ -414,6 +415,7 @@ double canopy_evap(const soil_con_struct   &soil_con,
                      Irrigation_library[irrigation_index].irrigation_efficiency;
              table_irrigation_runoff_loss = irreff.table_irrigation_runoff_loss; //180511LML
              table_deep_percolation_loss  = irreff.table_irrigation_deep_percolation_loss; //180531LML
+             irrig_efficiency = irreff.table_irrigation_efficiency;
              double irrigation_capacity_mm = irreff.maximum_capacity * delta_t
                                              / SEC_PER_DAY;                      //(mm/T) 170303LML corrected the unit 160104LML
              double soil_water_demand_mm = 0;                                    //160115LML
@@ -643,6 +645,8 @@ double canopy_evap(const soil_con_struct   &soil_con,
            tmp_cell_data->VCS.irrigation_runoff = runoff_from_irrig_sys;
            tmp_cell_data->VCS.irrigation_netdemand = out_soil_water_demand_mm;
            tmp_cell_data->VCS.irrigation_water  = total_irrig;
+           tmp_cell_data->VCS.table_irrigation_efficiency = irrig_efficiency;
+           //tmp_cell_data->VCS.net_irrigation = irrig_for_pot_infiltration;       //210129
            tmp_cell_data->VCS.evap_from_irrigation_syst = evap_from_irrig_sys;
         } else                                                                   // if not a crop
         #endif //VIC_CROPSYST_VERSION

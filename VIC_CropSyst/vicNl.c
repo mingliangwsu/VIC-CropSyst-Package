@@ -709,6 +709,7 @@ int main (int argc, char *argv[])
                     << "," << temp->irrig_netdemand_mm
 #endif
                     << "," << temp->irrig_total_mm
+                    << "," << temp->net_irrig_total_mm
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->irrig_evap_mm
                     << "," << temp->irrig_runoff_mm

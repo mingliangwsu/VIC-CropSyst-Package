@@ -311,6 +311,7 @@ int surface_fluxes(char                 overstory,
   double                 store_soilevap[2];
   double                 store_irrigation_netdemand[2];                          //180327LML
   double                 store_irrigation_water[2];                              //150702LML
+  double                 store_net_irrigation_water[2];                          //150702LML
   double                 store_irrigation_actual[2];                             //150714LML
   double                 store_irrigation_evap[2];                               //150702LML
   double                 store_irrigation_runoff[2];                             //150702LML
@@ -503,6 +504,7 @@ int surface_fluxes(char                 overstory,
     store_soilevap[dist]                    = 0;
     store_irrigation_netdemand[dist]        = 0;
     store_irrigation_water[dist]            = 0;
+    store_net_irrigation_water[dist]        = 0;
     store_irrigation_actual[dist]           = 0;
     store_irrigation_evap[dist]             = 0;
     store_irrigation_runoff[dist]           = 0;
@@ -857,6 +859,7 @@ int surface_fluxes(char                 overstory,
 #endif
         if (N_steps==0) store_irrigation_evap[dist]             += cell->VCS.evap_from_irrigation_syst;     //150702LML
         if (N_steps==0) store_irrigation_water[dist]            += cell->VCS.irrigation_water;        //150702LML
+        //if (N_steps==0) store_net_irrigation_water[dist]        += cell->VCS.net_irrigation;
         if (N_steps==0) store_irrigation_actual[dist]           += cell->VCS.actual_irrigation_reach_ground_amount;      //150714LML
         if (N_steps==0) store_irrigation_runoff[dist]           += cell->VCS.irrigation_runoff;             //150702LML
         if (N_steps==0) store_irrigation_intercept[dist]        += cell->VCS.intercepted_irrigation;        //150702LML
@@ -1052,6 +1055,7 @@ int surface_fluxes(char                 overstory,
       current_crop->irrigation_evap               = store_irrigation_evap[dist];            //150702LML
 //190130RLN redundent      current_crop->irrigation_netdemand          = store_irrigation_netdemand[dist];
       current_crop->irrigation_water              = store_irrigation_water[dist];           //150702LML
+      //current_crop->net_irrigation                = store_net_irrigation_water[dist];
       current_crop->irrigation_runoff             = store_irrigation_runoff[dist];          //150702LML
       current_crop->intercepted_irrigation        = store_irrigation_intercept[dist];       //150702LML
       current_crop->evap_intercepted_irrig_water  = store_irrigation_intercept_evap[dist];  //150702LML

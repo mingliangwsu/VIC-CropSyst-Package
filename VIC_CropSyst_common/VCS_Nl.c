@@ -344,9 +344,10 @@ double solve_wet_bulb(double Ts, va_list ap)
 void clear_cell_irrigation_water_fluxes(cell_data_struct *current_cell)
 {
   //Initialize water fluxes from current crop in current time step
-    current_cell->VCS.evap_from_irrigation_syst      = 0;
-    current_cell->VCS.irrigation_netdemand = 0.0;
-    current_cell->VCS.irrigation_water         = 0;
+    current_cell->VCS.evap_from_irrigation_syst         = 0;
+    current_cell->VCS.irrigation_netdemand              = 0.0;
+    current_cell->VCS.irrigation_water                  = 0;
+    //current_cell->VCS.net_irrigation                    = 0;
     current_cell->VCS.actual_irrigation_reach_ground_amount = 0;                     //150714LML
     current_cell->VCS.deep_percolation_from_irrigation = 0;                      //180531LML
     current_cell->VCS.irrigation_runoff              = 0;

@@ -533,6 +533,7 @@ int  full_energy(char                 NEWCELL,
               crop->irrigation_evap               = 0;
               crop->irrigation_netdemand          = 0;
               crop->irrigation_water              = 0;
+              //crop->net_irrigation                = 0;
               crop->irrigation_runoff             = 0;
               crop->intercepted_irrigation        = 0;
               crop->evap_intercepted_irrig_water  = 0;

@@ -222,10 +222,12 @@ typedef struct {
                                                                                  //crop model waht is getting into the water.  Added by Kiran Chinnayakanahalli 11222010*
   double irrigation_netdemand;                                                   //(mm) net irrigation demand
   double irrigation_water;                                                       //*the amount of water added as irrigation water.  KJC 03312011 *
+  //double net_irrigation;                                                         //210129 irrigation after loss
   double aero_resist_daily[N_PET_TYPES][3];                                      //150608LML for CropSyst
   double pot_evap_daily[N_PET_TYPES];                                            //*150608LML array of different types of potential evaporation (mm/day) *
   int iscrop;                                                                    //*to identify if this is a crop paramter. 1-crop paramter, 0-not a crop parameter. Default is 0.*
   double infiltration_daily_m;                                                   //151001LML used for CropSyst chemical transport
+  double table_irrigation_efficiency;                                            //210129
 } VCS_cell_data_struct;
 
 #if (VIC_CROPSYST_VERSION>=3)
@@ -284,6 +286,7 @@ typedef struct crop_data_struct {
   float irrigation_netdemand;                                                    //(mm) net irrigation water demand 180327LML
   float irrigation_water;                                                        //* if inflow < refill_water_depth, = (refill_water_depth-precipitaion)/irrigation efficiency, mm *
                                                                                  //LML 150415 it's total amount of irrigation
+  //float net_irrigation;                                                          //210129 irrigation after loss
   float irrigation_evap;                                                         //*stores evaporation from irrigation systems- Oct-1-2012 Keyvan LML note: from water drops or surface flow*
   #if (VIC_CROPSYST_VERSION == 2)
   float cell_avg_transp;                                                         //21/SEP/2012 added for checking the water balance in a cell

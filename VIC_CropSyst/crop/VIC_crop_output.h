@@ -45,6 +45,7 @@ typedef struct {
     double irrig_netdemand_mm;
 #endif
     double irrig_total_mm;
+    double net_irrig_total_mm;
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
     double irrig_evap_mm;
     double irrig_runoff_mm;

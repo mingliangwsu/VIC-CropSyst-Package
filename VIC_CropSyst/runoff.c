@@ -614,6 +614,7 @@ int  runoff(cell_data_struct  *cell_wet,
                 liq[lindex] = liq[lindex] + (inflow + cell->VCS.actual_irrigation_reach_ground_amount - dt_runoff)
                     - (Q12[lindex] + evap[lindex][frost_area]);
                 cell->VCS.irrigation_water = 0.0;
+                //cell->VCS.net_irrigation = 0.0;
               } else {
                 liq[lindex] = liq[lindex] + (inflow - dt_runoff)
                     - (Q12[lindex] + evap[lindex][frost_area]);

@@ -33,6 +33,7 @@ void initialize_crop(crop_data_struct *crop)
     //crop->CropSystHandle = 0;
     crop->irrigation_netdemand = 0.0;
     crop->irrigation_water=0.0;
+    //crop->net_irrigation=0.0;
     crop->growth_stage = NGS_QUIESCENCE; //200208RLN NGS_DORMANT_or_INACTIVE;
     crop->water_stress_index = 0;
 

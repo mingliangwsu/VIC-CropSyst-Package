@@ -210,6 +210,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<"irrig_netdemand_mm,"
 #endif
                  <<"irrig_total_mm,"
+                 <<"net_irrig_total_mm,"
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"irrig_evap_mm,"
                  <<"irrig_runoff_mm,"
@@ -335,6 +336,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
              <<"irrig_netdemand_mm,"
 #endif
              <<"irrig_total_mm,"
+             <<"net_irrig_total_mm,"
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
              <<"irrig_evap_mm,"
              <<"irrig_runoff_mm,"
@@ -482,6 +484,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<","<<temp_vic_crop.irrigation_netdemand
 #endif
                  <<","<<temp_vic_crop.irrigation_water
+                 <<","<<(temp_vic_crop.irrigation_water*active_land_unit->ref_VIC_cell().VCS.table_irrigation_efficiency)
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<temp_vic_crop.irrigation_evap
                  <<","<<temp_vic_crop.irrigation_runoff
@@ -659,6 +662,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
          temp.irrig_netdemand_mm = temp_vic_crop.irrigation_netdemand;
 #endif
          temp.irrig_total_mm = temp_vic_crop.irrigation_water;
+         temp.net_irrig_total_mm = (temp_vic_crop.irrigation_water*active_land_unit->ref_VIC_cell().VCS.table_irrigation_efficiency);
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
          temp.irrig_evap_mm = temp_vic_crop.irrigation_evap;
          temp.irrig_runoff_mm = temp_vic_crop.irrigation_runoff;

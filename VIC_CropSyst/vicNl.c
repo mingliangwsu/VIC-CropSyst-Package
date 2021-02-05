@@ -719,6 +719,7 @@ int main (int argc, char *argv[])
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                     << "," << temp->Crop_Canopy_E_mm
                     << "," << temp->snow_sublimation
+                    << "," << temp->snow_melt
                     << "," << temp->ET_mm
 #endif
                     << "," << temp->VIC_ET_mm

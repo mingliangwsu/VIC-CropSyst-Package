@@ -55,6 +55,7 @@ typedef struct {
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
     double Crop_Canopy_E_mm;
     double snow_sublimation;
+    double snow_melt;
     double ET_mm;
 #endif
     double VIC_ET_mm;

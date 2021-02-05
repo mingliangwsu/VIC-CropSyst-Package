@@ -221,6 +221,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"Crop_Canopy_E_mm,"
                  <<"snow_sublimation,"
+                 <<"snow_melt,"
                  <<"ET_mm,"
 #endif
                  <<"VIC_ET_mm,"
@@ -347,6 +348,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
              <<"Crop_Canopy_E_mm,"
              <<"snow_sublimation,"
+             <<"snow_melt,"
              <<"ET_mm,"
 #endif
              <<"VIC_ET_mm,"
@@ -495,6 +497,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<canopy_evap_mm
                  <<","<<((snow.vapor_flux + snow.canopy_vapor_flux) * 1000.0)        //190507
+                 <<","<<snow.melt
                  <<","<<total_et
 #endif
                  <<","<<total_VIC_et
@@ -672,6 +675,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
          temp.Crop_Canopy_E_mm = canopy_evap_mm;
          temp.snow_sublimation = ((snow.vapor_flux + snow.canopy_vapor_flux) * 1000.0);        //190507
+         temp.snow_melt = snow.melt;
          temp.ET_mm = total_et;
 #endif
          temp.VIC_ET_mm = total_VIC_et;

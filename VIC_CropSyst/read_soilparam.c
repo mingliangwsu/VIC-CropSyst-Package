@@ -730,8 +730,14 @@ soil_con_struct read_soilparam(FILE *soilparam,
      //for_debuging#    }
      //for_debuging#
      //for_debuging#}
-
-
+#ifdef DEBUG_SOIL_PROPERTY
+      char out_soil_file_name[300];
+      sprintf(out_soil_file_name,"%s/soilp_%.5f_%.5f.asc",filenames.result_dir,
+                 temp.lat,
+                 temp.lng);
+      std::ofstream fsoilp(out_soil_file_name,std::ofstream::out);
+      fsoilp << "layer,depth_mm,porosity,b_campbell,AE,Ksat_mm_day,FC_mm,WP_mm\n";
+#endif
       for(layer=0;layer<options.Nlayer;layer++) {
         temp.VCS.silt[layer]=1-temp.VCS.clay[layer]-temp.quartz[layer];
         temp.soil_density[layer]=2650.0;   // Added by Keyvan?
@@ -768,9 +774,23 @@ soil_con_struct read_soilparam(FILE *soilparam,
         //printf("L(%d)\tsilt(%.5f)\tclay(%.5f)\tquarts(%.5f)\tb_campbell(%.5f)\tAE(%.5f)\tporosity(%.5f)\tMax_moist(%.5f)\tWcr(%.5f)\tWpwp(%.5f)\n",
         //       layer,temp.silt[layer],temp.clay[layer],temp.quartz[layer],temp.b_campbell[layer],temp.AE[layer],temp.porosity[layer],temp.depth[layer] * temp.porosity[layer] * 1000.,temp.Wcr[layer],temp.Wpwp[layer]);
 
-
+#ifdef DEBUG_SOIL_PROPERTY
+        fsoilp << layer                         << ","
+               << temp.depth[layer]*1000        << ","
+               << temp.porosity[layer]          << ","
+               << temp.VCS.b_campbell[layer]    << ","
+               << temp.VCS.AE[layer]       << ","
+               << temp.Ksat[layer]              << ","
+               << temp.VCS.Field_Capacity[layer]<< ","
+               << temp.Wpwp[layer]              << ","
+               << std::endl;
+#endif
         } // for layer
+#ifdef DEBUG_SOIL_PROPERTY
+      fsoilp.close();
+#endif
       } // if(options.clay_input==1)
+
      temp.VCS.S_max = calc_Maximum_sorptivity(temp.quartz[0] * 100.0,
                            temp.VCS.clay[0] * 100, temp.porosity[0],
                            temp.VCS.b_campbell[0]);

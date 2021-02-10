@@ -736,7 +736,7 @@ soil_con_struct read_soilparam(FILE *soilparam,
                  temp.lat,
                  temp.lng);
       std::ofstream fsoilp(out_soil_file_name,std::ofstream::out);
-      fsoilp << "layer,depth_mm,porosity,bulk_density,b_campbell,AE,Ksat_mm_day,FC_mm,WP_mm\n";
+      fsoilp << "layer,depth_mm,porosity,bulk_density,sand,silt,clay,b_campbell,AE,Ksat_mm_day,FC_mm,WP_mm\n";
 #endif
       for(layer=0;layer<options.Nlayer;layer++) {
         temp.VCS.silt[layer]=1-temp.VCS.clay[layer]-temp.quartz[layer];
@@ -779,6 +779,9 @@ soil_con_struct read_soilparam(FILE *soilparam,
                << temp.depth[layer]*1000        << ","
                << temp.porosity[layer]          << ","
                << temp.bulk_density[layer]      << ","
+               << temp.quartz[layer]      << ","
+               << temp.VCS.silt[layer]      << ","
+               << temp.VCS.clay[layer]      << ","
                << temp.VCS.b_campbell[layer]    << ","
                << temp.VCS.AE[layer]       << ","
                << temp.Ksat[layer]              << ","

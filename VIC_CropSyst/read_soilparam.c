@@ -741,29 +741,34 @@ soil_con_struct read_soilparam(FILE *soilparam,
       for(layer=0;layer<options.Nlayer;layer++) {
         temp.VCS.silt[layer]=1-temp.VCS.clay[layer]-temp.quartz[layer];
         temp.soil_density[layer]=2650.0;   // Added by Keyvan?
-        temp.porosity[layer]= 0.332 - 0.0007251 * temp.quartz[layer]*100 + log10(temp.VCS.clay[layer]*100) * 0.1276;
+        temp.porosity[layer]= 0.332 - 0.0007251 * temp.quartz[layer]*100. + log10(temp.VCS.clay[layer]*100.) * 0.1276;
         temp.bulk_density[layer]= temp.soil_density[layer]* (1-temp.porosity[layer]);
-        temp.VCS.b_campbell[layer]=-(-3.14-0.00222* pow((temp.VCS.clay[layer])*100,2.0)-0.00003484* pow(temp.quartz [layer]*100, 2.0)* temp.VCS.clay[layer]*100);
-        double A_value=100.0 * exp(-4.396 - 0.0715 * temp.VCS.clay[layer]*100 -   0.000488 * pow(temp.quartz[layer]*100,2.0) - 0.00004285 * pow(temp.quartz[layer]*100,2.0) * temp.VCS.clay[layer]*100);
+        temp.VCS.b_campbell[layer]=-(-3.14-0.00222* pow((temp.VCS.clay[layer])*100.,2.0)-0.00003484* pow(temp.quartz [layer]*100., 2.0)* temp.VCS.clay[layer]*100.);
+        double A_value=100.0 * exp(-4.396 - 0.0715 * temp.VCS.clay[layer]*100 -   0.000488 * pow(temp.quartz[layer]*100.,2.0) - 0.00004285 * pow(temp.quartz[layer]*100.,2.0) * temp.VCS.clay[layer]*100.);
         temp.VCS.AE[layer]= -A_value * pow(temp.porosity[layer],-temp.VCS.b_campbell[layer]);
         double WPFC = -13.833*log(temp.VCS.clay[layer]*100)+10.356;
         //temp.Ksat[layer]= 10*24*exp(12.012-0.0755* temp.quartz[layer]*100 + (-3.895+0.03671*temp.quartz[layer]-0.1103*temp.VCS.clay[layer]+ 0.00087546* pow (temp.VCS.clay[layer] * 100., 2.0))/temp.porosity[layer]);  //170303LML revised pow (temp.clay[layer],
 
-        temp.Ksat[layer]= 10*24*exp(12.012-0.0755* temp.quartz[layer]*100 + (-3.895+0.03671*temp.quartz[layer]*100.0-0.1103*temp.VCS.clay[layer]*100.0+ 0.00087546* pow (temp.VCS.clay[layer] * 100., 2.0))/temp.porosity[layer]);  //170303LML revised pow (temp.clay[layer],
+        temp.Ksat[layer]= 10*24*exp(12.012-0.0755* temp.quartz[layer]*100. + (-3.895+0.03671*temp.quartz[layer]*100.0-0.1103*temp.VCS.clay[layer]*100.0+ 0.00087546* pow (temp.VCS.clay[layer] * 100., 2.0))/temp.porosity[layer]);  //170303LML revised pow (temp.clay[layer],
 
 
         //std::clog << "l:" << layer << "\tKsat_mm_day:" << temp.Ksat[layer] << "\tquartz_frac:" << temp.quartz[layer] << "\tclay_frac:" << temp.VCS.clay[layer] << "\tporpsity:" << temp.porosity[layer] << std::endl;
-
+        /*210210LML revised to be consistent with CropSyst
         if (temp.VCS.silt[layer]>0.7){
                 WPFC=-33;
         }
         else if (WPFC>-15){
                 WPFC=-15;
         }
+        */
+        if (temp.VCS.silt[layer]>0.8){
+                WPFC=-33;
+        }
+        if (WPFC > 10.0) WPFC = 10.0;
 
         //190806LML temp.Wcr[layer]  = temp.depth[layer]*1000 * temp.porosity[layer]*    pow((WPFC/temp.VCS.AE[layer]),-1/temp.VCS.b_campbell[layer]); //keyvan changed
         //temp.Wcr[layer]=temp.Wcr[layer]*temp.porosity[layer];
-        temp.VCS.Field_Capacity[layer]  = temp.depth[layer]*1000 * temp.porosity[layer]*    pow((WPFC/temp.VCS.AE[layer]),-1/temp.VCS.b_campbell[layer]); //190806LML
+        temp.VCS.Field_Capacity[layer]  = temp.depth[layer]*1000 * temp.porosity[layer]* pow((WPFC/temp.VCS.AE[layer]),-1.0/temp.VCS.b_campbell[layer]); //190806LML
         temp.Wcr[layer] = temp.VCS.Field_Capacity[layer] * 0.7; //190806LML https://vic.readthedocs.io/en/develop/Documentation/Definitions/
 
 
@@ -773,6 +778,12 @@ soil_con_struct read_soilparam(FILE *soilparam,
         temp.VCS.water_pot_at_FC[layer] = -33.0;                                 //170504LML
         //printf("L(%d)\tsilt(%.5f)\tclay(%.5f)\tquarts(%.5f)\tb_campbell(%.5f)\tAE(%.5f)\tporosity(%.5f)\tMax_moist(%.5f)\tWcr(%.5f)\tWpwp(%.5f)\n",
         //       layer,temp.silt[layer],temp.clay[layer],temp.quartz[layer],temp.b_campbell[layer],temp.AE[layer],temp.porosity[layer],temp.depth[layer] * temp.porosity[layer] * 1000.,temp.Wcr[layer],temp.Wpwp[layer]);
+
+        //210210LML CropSyst calculation
+        double fc = temp.depth[layer]*1000 * pow(33.33/A_value,-1.0/temp.VCS.b_campbell[layer]);
+        double wp = temp.depth[layer]*1000 * pow(1500./A_value,-1.0/temp.VCS.b_campbell[layer]);
+        temp.VCS.Field_Capacity[layer] = fc;
+        temp.Wpwp[layer] = wp;
 
 #ifdef DEBUG_SOIL_PROPERTY
         fsoilp << layer                         << ","

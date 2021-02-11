@@ -768,12 +768,13 @@ soil_con_struct read_soilparam(FILE *soilparam,
 
         //190806LML temp.Wcr[layer]  = temp.depth[layer]*1000 * temp.porosity[layer]*    pow((WPFC/temp.VCS.AE[layer]),-1/temp.VCS.b_campbell[layer]); //keyvan changed
         //temp.Wcr[layer]=temp.Wcr[layer]*temp.porosity[layer];
-        temp.VCS.Field_Capacity[layer]  = temp.depth[layer]*1000 * temp.porosity[layer]* pow((WPFC/temp.VCS.AE[layer]),-1.0/temp.VCS.b_campbell[layer]); //190806LML
-        temp.Wcr[layer] = temp.VCS.Field_Capacity[layer] * 0.7; //190806LML https://vic.readthedocs.io/en/develop/Documentation/Definitions/
+
+        //210211LML
+        //temp.VCS.Field_Capacity[layer]  = temp.depth[layer]*1000 * temp.porosity[layer]* pow((WPFC/temp.VCS.AE[layer]),-1.0/temp.VCS.b_campbell[layer]); //190806LML
+        //temp.Wcr[layer] = temp.VCS.Field_Capacity[layer] * 0.7; //190806LML https://vic.readthedocs.io/en/develop/Documentation/Definitions/
+        //temp.Wpwp[layer] = temp.depth[layer]*1000  * temp.porosity[layer]* pow((-1500/temp.VCS.AE[layer]),-1/temp.VCS.b_campbell[layer]); //keyvan changed- yield is very sensetive to Wpwp
 
 
-
-        temp.Wpwp[layer] = temp.depth[layer]*1000  * temp.porosity[layer]* pow((-1500/temp.VCS.AE[layer]),-1/temp.VCS.b_campbell[layer]); //keyvan changed- yield is very sensetive to Wpwp
         //temp.Wpwp[layer]= temp.Wpwp[layer]*temp.porosity[layer];
         temp.VCS.water_pot_at_FC[layer] = -33.0;                                 //170504LML
         //printf("L(%d)\tsilt(%.5f)\tclay(%.5f)\tquarts(%.5f)\tb_campbell(%.5f)\tAE(%.5f)\tporosity(%.5f)\tMax_moist(%.5f)\tWcr(%.5f)\tWpwp(%.5f)\n",
@@ -784,6 +785,7 @@ soil_con_struct read_soilparam(FILE *soilparam,
         double wp = temp.depth[layer]*1000 * pow(1500./A_value,-1.0/temp.VCS.b_campbell[layer]);
         temp.VCS.Field_Capacity[layer] = fc;
         temp.Wpwp[layer] = wp;
+        temp.Wcr[layer] = temp.VCS.Field_Capacity[layer] * 0.7;
 
 #ifdef DEBUG_SOIL_PROPERTY
         fsoilp << layer                         << ","

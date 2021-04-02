@@ -740,12 +740,12 @@ global_param_struct get_global_param(filenames_struct *names,
           else options.VCS.CO2_trans=TRUE;
       }
       else if( strcasecmp("CO2_FILE",optstr)==0){
-          sscanf(cmdstr,"%*s %s",names->VCS.CO2_FILE /*&options.CO2_PPM*/); //keyvan 130529
+          sscanf(cmdstr,"%*s %s",names->VCS.CO2_FILE /*&options.CO2_PPM*/);     //keyvan 130529
 
       }
       else if( strcasecmp("CO2_PPM",optstr)==0){
-          sscanf(cmdstr,"%*s %d",&options.VCS.CO2_PPM);
-
+          sscanf(cmdstr,"%*s %lf",&options.VCS.CO2_PPM);
+          printf("%f\n",options.VCS.CO2_PPM);
       }
       #if !defined(FULL_IRRIGATION) || defined(OUTPUT_FULLIRRIGATION_PATTERN)
       else if ( strcasecmp("IRRIG_PATTERN",optstr)==0){

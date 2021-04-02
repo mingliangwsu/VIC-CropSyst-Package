@@ -467,7 +467,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<","<<(active_crop ? (active_crop->is_fruit() ? active_crop->get_fruit_dry_biomass_kg_ha()/10000. : 0) : 0)
                  //<<","<<(active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0)
                  //<<","<<(active_crop ? active_crop->get_latest_yield_kg_m2()     : 0)
-                 <<","<<(active_crop? ((day_since_start_of_harvest==0) ? active_crop->get_latest_yield_kg_m2() : 0.0) : 0.0)
+                 <<","<<(active_crop ? ((day_since_start_of_harvest==0) ? active_crop->get_latest_yield_kg_m2() : 0.0) : 0.0)
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<m_to_mm(active_crop ? active_crop->get_recorded_root_depth_m()   : 0)
 #ifdef VCS_V5

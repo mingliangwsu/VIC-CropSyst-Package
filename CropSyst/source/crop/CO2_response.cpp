@@ -7,6 +7,7 @@
 #include "corn/math/moremath.h"
 #include "canopy_cover_continuum.h"
 #include "corn/math/compare.hpp"
+#include <iostream>
 namespace CropSyst
 {
    static const float64 CO2_conc_at_saturated_photosynthesis = 1100.0;
@@ -122,6 +123,7 @@ void Crop_CO2_response::update_with_new_atmphospheric_CO2()       rectification_
    actual_biomass_gain_ratio_in_response_to_CO2_RUE
          =  growth_relative_to_baseline
           / growth_at_CO2_when_RUE_was_determined_relative_to_baseline_CO2;
+   std::clog << "curr_CO2_conc:" << curr_CO2_conc << std::endl;
 }
 //_update_with_new_atmphospheric_CO2________________________________2013-12-09_/
 void Crop_CO2_response::update()                                  rectification_

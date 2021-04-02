@@ -17,6 +17,8 @@
 #include "common/weather/day/sun_days.h"
 #include "common/weather/hour/sun_hours.h"
 #include "management/management_param_V4.h"
+#include "common/weather/atmospheric_CO2_change.h"
+#include "common/biometeorology/parameter/CO2_atmospheric_conc.h"
 namespace VIC
 {
 //______________________________________________________________________________
@@ -59,7 +61,23 @@ enum CropSyst_Variables{
   DENITRIFICATION_N2O_N,
   CropSyst_Variables_counts
 };
-
+//______________________________________________________________________________
+class Atmospheric_CO2_change
+: public Atmospheric_CO2_change_element
+{
+ public:
+   CS::CO2_atmospheric_concentration  curr_CO2_conc;                             //150507
+ public:
+   Atmospheric_CO2_change
+   (const CORN::date32 &simdate_raw_);                                          //171207
+   //virtual bool end_year()                                        modification_;
+   inline virtual float64 get_current_CO2_conc()                           const
+      { return curr_CO2_conc.ppm(); }
+   inline virtual const CS::CO2_atmospheric_concentration
+      &ref_CO2_current_conc()                                              const //150507
+      { return curr_CO2_conc; }
+};
+//_Atmospheric_CO2_change_linear_______________________________________________/
 //______________________________________________________________________________
 class Land_unit_simulation
 :public extends_ CropSyst::Land_unit_simulation
@@ -92,6 +110,7 @@ class Land_unit_simulation
    //190723LML Sun_hours      sun_hours;                                                     //150707RLN
    //190723LML CS::Solar_irradiance_extraterrestrial_hourly extraterrestrial_solar_irradiance;   //150707RLN
    Weather_provider *weather_provider;                                           //160118RLN
+   Atmospheric_CO2_change atmospheric_CO2;                                      //210401
    double air_temperature_min_tomorrow;
    double air_temperature_max_yesterday;
    CropSyst::Irrigation_operation *curr_irrigation_operation;                    //170221_150718LML

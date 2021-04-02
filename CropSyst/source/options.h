@@ -174,6 +174,7 @@
 #     define CROP_ORCHARD
 #  endif
 */
+#define CO2_CHANGE
 #  undef EROSION
 #  undef SALINITY
 #  undef WATERTABLE

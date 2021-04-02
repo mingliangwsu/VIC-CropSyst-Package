@@ -77,7 +77,12 @@ class Land_unit_meteorological
  public:
    provided_ CS::Weather_subdaily   *subdaily;contribute_ bool subdaily_owned;   //151212
    provided_ CS::Weather_hours      *hourly;  contribute_ bool hourly_owned;     //151212
+#ifdef VIC_CROPSYST_VERSION
+ public:
+   cognate_
+#else
  private: // could be protected
+#endif
    Atmospheric_CO2_change_element *atmospheric_CO2_change;                       //171207
       // optional NULL when no CO2 change                                        //090316
       // Not currently owned (now given to simulation elements list)             //171207
@@ -139,6 +144,8 @@ class Land_unit_meteorological
       // Used by CropSyst proper, OFoot
    bool know_weather_spanning                                                    //151215
       (Weather_spanning_interface &weather_known)                    cognition_;
+   bool know_Atmospheric_CO2                                                    //04012021LML
+      (Atmospheric_CO2_change_element *atmospheric_CO2_change_)      cognition_;
    Atmospheric_CO2_change_element *                                              //171207
       instanciate_CO2
       (const CORN::OS::File_name &recalibration_filename

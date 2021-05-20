@@ -579,6 +579,8 @@ int  runoff(cell_data_struct  *cell_wet,
                 if(Q12[lindex] > max_Q12 && max_Q12 > 0.0){ ///Keyvan defined this variable to prevent full depletion of soil moisture above the field capacity
                   Q12[lindex] = max_Q12;//201106LML + 0.1;
                 }
+                //if (lindex == 2 && time_step == 0) std::clog << " liq:" << tmp_liq << " b:" << soil_con->VCS.b_campbell[lindex] << " Sat:" << soil_con->max_moist[lindex] << " FC:" << soil_con->VCS.Field_Capacity[lindex] << " Q12:" << Q12[lindex] << std::endl;
+
                 //if(tmp_liq < /*190806LML soil_con->Wcr[lindex]*/ soil_con->VCS.Field_Capacity[lindex] && Q12[lindex] > 0.001){ ///to make sure that soil water transfer is not significant after the field capacity
                 //  Q12[lindex] = 0.001;
                 //}

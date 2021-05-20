@@ -187,8 +187,8 @@ max_crop_water_uptake_mm = 6;
       {  // When water content gets near PWP the layer becomes inactive.
          // the RAF is adjusted to account for this.
          root_activity_factor_sl
-         = ((soil_WP_layer < parameters_LWP_wilt_point) ? 0 : 1.0)               //170413_150828LML
-           - pow(((soil_WP_layer - SWP_at_FC)
+         = soil_WP_layer < parameters_LWP_wilt_point ? 0 :
+           1.0 - pow(((soil_WP_layer - SWP_at_FC)
                   / (parameters_LWP_wilt_point - SWP_at_FC)),dry_soil_root_activity_coef); // was 0.8
                //  050421 claudio changed to ^8  was ^4
       } // else // wet case in saturated conditions RAF is not constrained

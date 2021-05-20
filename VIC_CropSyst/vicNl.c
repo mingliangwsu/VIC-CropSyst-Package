@@ -556,14 +556,15 @@ int main (int argc, char *argv[])
               options.VCS.CO2_PPM=CO2_str[i].CO2_conc;
           }
         }
+        //std::clog << "CO2:" << options.VCS.CO2_PPM << std::endl;
         #endif
 
         if ( rec == global_param.nrecs - 1 ) LASTREC = TRUE;
         else LASTREC = FALSE;
 
-        //if (rec == 125) {
-        //    std::clog << "DEBUGGING main rec = 125\n";
-        //}
+        if (rec == 2381) {
+           std::clog << "DEBUGGING main rec = 125\n";
+        }
 
         ErrorFlag = dist_prec(&atmos[rec], &prcp, &soil_con, veg_con,
                               &lake_con, dmy, &global_param, &filep,

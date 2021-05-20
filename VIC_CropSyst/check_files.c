@@ -43,7 +43,8 @@ void check_files(filep_struct     *filep,
   filep->croplib=open_file(fnames->croplib,"r");/*KJC 02132011 */
   #endif
 //    filep->irrigation_pattern=open_file(fnames->irrigation_pattern,"rb");/*Keyvan 130530 */
-  filep->VCS.CO2_PPM=open_file(fnames->VCS.CO2_FILE,"rb");/*Keyvan 130605 */
+  if (options.VCS.CO2_trans)
+      filep->VCS.CO2_PPM=open_file(fnames->VCS.CO2_FILE,"rb");/*Keyvan 130605 */
   //LML 150413 #if (VIC_CROPSYST_VERSION>=3)
   //LML 150413 filep->crop_rotation_lib = open_file(fnames->crop_rotation_lib,"r"); /*LML 141104*/
   //LML 150413 #endif

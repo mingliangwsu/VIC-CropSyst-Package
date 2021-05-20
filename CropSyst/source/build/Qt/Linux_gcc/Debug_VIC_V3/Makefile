@@ -415,6 +415,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		../.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -718,6 +719,7 @@ Makefile: ../CropSyst_elements_V5_for_VIC_V3.pro /usr/lib/x86_64-linux-gnu/qt5/m
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -792,6 +794,7 @@ Makefile: ../CropSyst_elements_V5_for_VIC_V3.pro /usr/lib/x86_64-linux-gnu/qt5/m
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
@@ -8184,9 +8187,9 @@ OM_residues_profile_common.o: ../../../../organic_matter/OM_residues_profile_com
 		/home/liuming/dev/corn/math/statistical/statistics_descriptive.h \
 		/home/liuming/dev/common/weather/parameter/WP_air_temperature.h \
 		/home/liuming/dev/common/weather/parameter/WP_wind_speed.h \
+		../../../../organic_matter/OM_pools_common.h \
 		../../../../soil/soil_I.h \
 		../../../../soil/layers_I.h \
-		../../../../organic_matter/OM_pools_common.h \
 		../../../../organic_matter/OM_common.h \
 		/home/liuming/dev/common/biomatter/biomass_abstract.h \
 		/home/liuming/dev/common/physics/mass_common.h \
@@ -11369,6 +11372,7 @@ land_unit_sim.o: ../../../../land_unit_sim.cpp ../../../../land_unit_sim.h \
 		/home/liuming/dev/common/residue/residues_interface.h \
 		/home/liuming/dev/common/residue/residue_V4_common.h \
 		/home/liuming/dev/common/residue/residues_common.h \
+		../../../../organic_matter/OM_pools_common.h \
 		/home/liuming/dev/common/residue/residue_balancer.h \
 		/home/liuming/dev/common/biomatter/organic_biomatter_balance.h \
 		/home/liuming/dev/corn/data_source/vv_file.h \
@@ -11417,7 +11421,6 @@ land_unit_sim.o: ../../../../land_unit_sim.cpp ../../../../land_unit_sim.h \
 		../../../../soil/chemical_mass_profile.h \
 		../../../../soil/abiotic_environment.h \
 		../../../../organic_matter/single_pool/OM_pools_single.h \
-		../../../../organic_matter/OM_pools_common.h \
 		../../../../organic_matter/multiple_pool/OM_pools_multiple.h \
 		../../../../organic_matter/multiple_pool/OM_multiple_pool.h \
 		../../../../organic_matter/OM_common.h \

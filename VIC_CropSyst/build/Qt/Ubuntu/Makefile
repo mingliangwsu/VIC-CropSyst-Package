@@ -12,7 +12,7 @@ MAKEFILE      = Makefile
 
 CC            = g++
 CXX           = g++
-DEFINES       = -DCS_VERSION=5 -DCROPSYST_VERSION=5 -DWEATHER_PROVIDER_VERSION=5 -DVIC_CROPSYST_VERSION=3 -DCS_VERSION_NUMBERS=5,0,0 -DEVENT_SCHEDULER_VERSION=1 -DCROP_ORCHARD -DCROPSYST_HANDLE_CANOPY_EVAP -DLIU_DEBUG -DCROPSYST_MAX_DESCRIPTION_LENGTH=128 -DCROPSYST_VV_BOOL_FORM=CORN::VV_bool_entry::form_true -DNormal_crop_growth_stage=Normal_crop_event_sequence -DUSE_STD_STRING -DCHECK_WATER_BALANCE -DxUSE_CROPSYST_CROP_IRRIGATION -DxPRINT_VIC_SOIL_LAYERS_FOR_DEBUG -DxMECHANISTIC_IRRIGATION -DxMECHANISTIC_RUNOFF_TRUE -DIRRIGATION_FROM_DEMAND -DUSE_IRRIGATION_PARAM_FILE -DSATURATE_FLOW_TO_LOWER_LAYER_FIRST -DSEPERATE_SOIL_PARAMETER_AND_CROP_OUTPUT -DIRRIGATION_MANAGEMENT_QUALITY=1 -DONE_SNOWBAND_FOR_CROP -DxNOT_PRINT_CROP_DAILY_OUTPUTS -DINPUT_24HR_AVG_SOLAR_RADIATION -DIRRIG_PARAMETERFILE_DECIDE_IRRIGATION -DOLD_PROVIDE_CANOPY -DxDUMP_TO_STREAM_BUFFER_AT_FIRST_FOR_OUTPUT -DxCONST_SOIL_MIDDLE_LAYER_DEPTH -DxPRINT_SOM_FOR_DEBUG -DMAD_FOR_NETIRRIGATION_DEMAND=0.2 -DxCROP_DAILY_OUTPUT_MEMFIRST -DPOSTPONE_FIRST_IRRIGATION_PERENNIAL_CROPS -DFULL_IRRIGATION -DOUTPUT_FULLIRRIGATION_PATTERN -DxOUTPUT_SIMPLE_FOR_FORECAST -DxENABLE_IRRIGATION_CANOPY_INTERCEPTION -DQT_QML_DEBUG -DQT_CORE_LIB
+DEFINES       = -DCS_VERSION=5 -DCROPSYST_VERSION=5 -DWEATHER_PROVIDER_VERSION=5 -DVIC_CROPSYST_VERSION=3 -DCS_VERSION_NUMBERS=5,0,0 -DEVENT_SCHEDULER_VERSION=1 -DCROP_ORCHARD -DCROPSYST_HANDLE_CANOPY_EVAP -DLIU_DEBUG -DCROPSYST_MAX_DESCRIPTION_LENGTH=128 -DCROPSYST_VV_BOOL_FORM=CORN::VV_bool_entry::form_true -DNormal_crop_growth_stage=Normal_crop_event_sequence -DUSE_STD_STRING -DCHECK_WATER_BALANCE -DxUSE_CROPSYST_CROP_IRRIGATION -DPRINT_VIC_SOIL_LAYERS_FOR_DEBUG -DxMECHANISTIC_IRRIGATION -DxMECHANISTIC_RUNOFF_TRUE -DIRRIGATION_FROM_DEMAND -DUSE_IRRIGATION_PARAM_FILE -DSATURATE_FLOW_TO_LOWER_LAYER_FIRST -DSEPERATE_SOIL_PARAMETER_AND_CROP_OUTPUT -DIRRIGATION_MANAGEMENT_QUALITY=1 -DONE_SNOWBAND_FOR_CROP -DxNOT_PRINT_CROP_DAILY_OUTPUTS -DINPUT_24HR_AVG_SOLAR_RADIATION -DIRRIG_PARAMETERFILE_DECIDE_IRRIGATION -DOLD_PROVIDE_CANOPY -DxDUMP_TO_STREAM_BUFFER_AT_FIRST_FOR_OUTPUT -DxCONST_SOIL_MIDDLE_LAYER_DEPTH -DxPRINT_SOM_FOR_DEBUG -DMAD_FOR_NETIRRIGATION_DEMAND=0.2 -DxCROP_DAILY_OUTPUT_MEMFIRST -DPOSTPONE_FIRST_IRRIGATION_PERENNIAL_CROPS -DFULL_IRRIGATION -DOUTPUT_FULLIRRIGATION_PATTERN -DxOUTPUT_SIMPLE_FOR_FORECAST -DxENABLE_IRRIGATION_CANOPY_INTERCEPTION -DxDEBUG_SOIL_PROPERTY -DKEEP_VIC_Q12 -DQT_QML_DEBUG -DQT_CORE_LIB
 CFLAGS        = -pipe -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-write-strings -Wno-sign-compare -Wno-unused-value -Wno-reorder -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-parameter -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -fpermissive -w -g -O0 -Wno-reorder -Wno-unused-parameter -Wno-unused-but-set-parameter -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I../Linux_gcc -I. -I../../../../VIC_CropSyst_common -I../../../vic_5_emulator/vic/vic_run/include -I../../../vic_5_emulator/vic/drivers/shared_all/include -I../../../../VIC_CropSyst -I../../../build -I../../../crop -I/home/liuming/dev -I../../../../common -I../../../../corn -I../../../../CropSyst -I../../../../CropSyst/source -I../../../../USDA/NRCS -I../../../../corn/build/Qt/Linux_gcc/Debug -I../../../../CS_suite/build/Qt/CS_suite_static/Debug -I../../../../CropSyst/source/build/Qt/Linux_gcc/Debug_VIC_V3 -I../../../../UED/library/build/Qt/UED_static/Debug -I../../../../common/weather/build/Qt/weather_static/bin/debug -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
@@ -1260,6 +1260,7 @@ CalcAerodynamic.o: ../../../CalcAerodynamic.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o CalcAerodynamic.o ../../../CalcAerodynamic.c
 
@@ -1560,6 +1561,7 @@ CalcBlowingSnow.o: ../../../CalcBlowingSnow.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h \
 		../../../mtclim_constants_vic.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o CalcBlowingSnow.o ../../../CalcBlowingSnow.c
@@ -1861,6 +1863,7 @@ IceEnergyBalance.o: ../../../IceEnergyBalance.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o IceEnergyBalance.o ../../../IceEnergyBalance.c
 
@@ -2161,6 +2164,7 @@ SnowPackEnergyBalance.o: ../../../SnowPackEnergyBalance.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o SnowPackEnergyBalance.o ../../../SnowPackEnergyBalance.c
 
@@ -2461,6 +2465,7 @@ StabilityCorrection.o: ../../../StabilityCorrection.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o StabilityCorrection.o ../../../StabilityCorrection.c
 
@@ -2761,6 +2766,7 @@ advected_sensible_heat.o: ../../../advected_sensible_heat.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o advected_sensible_heat.o ../../../advected_sensible_heat.c
 
@@ -3061,6 +3067,7 @@ alloc_atmos.o: ../../../alloc_atmos.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o alloc_atmos.o ../../../alloc_atmos.c
 
@@ -3361,6 +3368,7 @@ arno_evap.o: ../../../arno_evap.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o arno_evap.o ../../../arno_evap.c
 
@@ -3661,6 +3669,7 @@ calc_air_temperature.o: ../../../calc_air_temperature.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_air_temperature.o ../../../calc_air_temperature.c
 
@@ -3961,6 +3970,7 @@ calc_atmos_energy_bal.o: ../../../calc_atmos_energy_bal.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_atmos_energy_bal.o ../../../calc_atmos_energy_bal.c
 
@@ -4261,6 +4271,7 @@ calc_cloud_cover_fraction.o: ../../../calc_cloud_cover_fraction.c ../../../vicNl
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_cloud_cover_fraction.o ../../../calc_cloud_cover_fraction.c
 
@@ -4561,6 +4572,7 @@ calc_forcing_stats.o: ../../../calc_forcing_stats.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_forcing_stats.o ../../../calc_forcing_stats.c
 
@@ -4861,6 +4873,7 @@ calc_longwave.o: ../../../calc_longwave.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_longwave.o ../../../calc_longwave.c
 
@@ -5161,6 +5174,7 @@ calc_rainonly.o: ../../../calc_rainonly.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_rainonly.o ../../../calc_rainonly.c
 
@@ -5461,6 +5475,7 @@ calc_root_fraction.o: ../../../calc_root_fraction.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_root_fraction.o ../../../calc_root_fraction.c
 
@@ -5761,6 +5776,7 @@ calc_snow_coverage.o: ../../../calc_snow_coverage.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_snow_coverage.o ../../../calc_snow_coverage.c
 
@@ -6061,6 +6077,7 @@ calc_surf_energy_bal.o: ../../../calc_surf_energy_bal.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_surf_energy_bal.o ../../../calc_surf_energy_bal.c
 
@@ -6361,6 +6378,7 @@ calc_veg_params.o: ../../../calc_veg_params.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_veg_params.o ../../../calc_veg_params.c
 
@@ -6661,6 +6679,7 @@ calc_water_energy_balance_errors.o: ../../../calc_water_energy_balance_errors.c 
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o calc_water_energy_balance_errors.o ../../../calc_water_energy_balance_errors.c
 
@@ -6961,6 +6980,7 @@ call_crop_model.o: ../../../call_crop_model.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h \
 		../../../crop/VIC_crop_variable_codes.h \
 		../../../crop/unit_tests/VIC_crop_test_weather.h
@@ -7263,6 +7283,7 @@ canopy_evap.o: ../../../canopy_evap.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h \
 		../../../agronomic/balanceitem.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o canopy_evap.o ../../../canopy_evap.c
@@ -7564,6 +7585,7 @@ check_files.o: ../../../check_files.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o check_files.o ../../../check_files.c
 
@@ -7864,6 +7886,7 @@ check_state_file.o: ../../../check_state_file.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o check_state_file.o ../../../check_state_file.c
 
@@ -8164,6 +8187,7 @@ close_files.o: ../../../close_files.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o close_files.o ../../../close_files.c
 
@@ -8464,6 +8488,7 @@ cmd_proc.o: ../../../cmd_proc.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o cmd_proc.o ../../../cmd_proc.c
 
@@ -8764,6 +8789,7 @@ compress_files.o: ../../../compress_files.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o compress_files.o ../../../compress_files.c
 
@@ -9064,6 +9090,7 @@ compute_dz.o: ../../../compute_dz.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o compute_dz.o ../../../compute_dz.c
 
@@ -9364,6 +9391,7 @@ compute_pot_evap.o: ../../../compute_pot_evap.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o compute_pot_evap.o ../../../compute_pot_evap.c
 
@@ -9664,6 +9692,7 @@ compute_treeline.o: ../../../compute_treeline.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o compute_treeline.o ../../../compute_treeline.c
 
@@ -9964,6 +9993,7 @@ compute_zwt.o: ../../../compute_zwt.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o compute_zwt.o ../../../compute_zwt.c
 
@@ -10264,6 +10294,7 @@ correct_precip.o: ../../../correct_precip.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o correct_precip.o ../../../correct_precip.c
 
@@ -10564,6 +10595,7 @@ display_current_settings.o: ../../../display_current_settings.c ../../../vicNl.h
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o display_current_settings.o ../../../display_current_settings.c
 
@@ -10864,6 +10896,7 @@ dist_prec.o: ../../../dist_prec.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o dist_prec.o ../../../dist_prec.c
 
@@ -11164,6 +11197,7 @@ estimate_T1.o: ../../../estimate_T1.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o estimate_T1.o ../../../estimate_T1.c
 
@@ -11464,6 +11498,7 @@ free_crop.o: ../../../free_crop.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o free_crop.o ../../../free_crop.c
 
@@ -11764,6 +11799,7 @@ free_dist_prcp.o: ../../../free_dist_prcp.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o free_dist_prcp.o ../../../free_dist_prcp.c
 
@@ -12064,6 +12100,7 @@ free_vegcon.o: ../../../free_vegcon.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o free_vegcon.o ../../../free_vegcon.c
 
@@ -12364,6 +12401,7 @@ frozen_soil.o: ../../../frozen_soil.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o frozen_soil.o ../../../frozen_soil.c
 
@@ -12664,6 +12702,7 @@ full_energy.o: ../../../full_energy.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o full_energy.o ../../../full_energy.c
 
@@ -12964,6 +13003,7 @@ func_atmos_energy_bal.o: ../../../func_atmos_energy_bal.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o func_atmos_energy_bal.o ../../../func_atmos_energy_bal.c
 
@@ -13264,6 +13304,7 @@ func_atmos_moist_bal.o: ../../../func_atmos_moist_bal.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o func_atmos_moist_bal.o ../../../func_atmos_moist_bal.c
 
@@ -13564,6 +13605,7 @@ func_canopy_energy_bal.o: ../../../func_canopy_energy_bal.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o func_canopy_energy_bal.o ../../../func_canopy_energy_bal.c
 
@@ -13864,6 +13906,7 @@ func_surf_energy_bal.o: ../../../func_surf_energy_bal.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o func_surf_energy_bal.o ../../../func_surf_energy_bal.c
 
@@ -14167,6 +14210,7 @@ get_force_type.o: ../../../get_force_type.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o get_force_type.o ../../../get_force_type.c
 
@@ -14467,6 +14511,7 @@ get_global_param.o: ../../../get_global_param.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o get_global_param.o ../../../get_global_param.c
 
@@ -14767,6 +14812,7 @@ ice_melt.o: ../../../ice_melt.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o ice_melt.o ../../../ice_melt.c
 
@@ -15067,6 +15113,7 @@ initialize_atmos.o: ../../../initialize_atmos.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_atmos.o ../../../initialize_atmos.c
 
@@ -15367,6 +15414,7 @@ initialize_crop.o: ../../../initialize_crop.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_crop.o ../../../initialize_crop.c
 
@@ -15667,6 +15715,7 @@ initialize_global.o: ../../../initialize_global.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_global.o ../../../initialize_global.c
 
@@ -15967,6 +16016,7 @@ initialize_lake.o: ../../../initialize_lake.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_lake.o ../../../initialize_lake.c
 
@@ -16267,6 +16317,7 @@ initialize_model_state.o: ../../../initialize_model_state.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_model_state.o ../../../initialize_model_state.c
 
@@ -16567,6 +16618,7 @@ initialize_new_storm.o: ../../../initialize_new_storm.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_new_storm.o ../../../initialize_new_storm.c
 
@@ -16867,6 +16919,7 @@ initialize_snow.o: ../../../initialize_snow.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_snow.o ../../../initialize_snow.c
 
@@ -17167,6 +17220,7 @@ initialize_soil.o: ../../../initialize_soil.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_soil.o ../../../initialize_soil.c
 
@@ -17467,6 +17521,7 @@ initialize_veg.o: ../../../initialize_veg.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_veg.o ../../../initialize_veg.c
 
@@ -17767,6 +17822,7 @@ lakes.eb.o: ../../../lakes.eb.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o lakes.eb.o ../../../lakes.eb.c
 
@@ -18067,6 +18123,7 @@ latent_heat_from_snow.o: ../../../latent_heat_from_snow.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o latent_heat_from_snow.o ../../../latent_heat_from_snow.c
 
@@ -18367,6 +18424,7 @@ make_cell_data.o: ../../../make_cell_data.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o make_cell_data.o ../../../make_cell_data.c
 
@@ -18667,6 +18725,7 @@ make_dist_prcp.o: ../../../make_dist_prcp.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o make_dist_prcp.o ../../../make_dist_prcp.c
 
@@ -18967,6 +19026,7 @@ make_dmy.o: ../../../make_dmy.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o make_dmy.o ../../../make_dmy.c
 
@@ -19267,6 +19327,7 @@ make_energy_bal.o: ../../../make_energy_bal.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o make_energy_bal.o ../../../make_energy_bal.c
 
@@ -19567,6 +19628,7 @@ make_in_and_outfiles.o: ../../../make_in_and_outfiles.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o make_in_and_outfiles.o ../../../make_in_and_outfiles.c
 
@@ -19867,6 +19929,7 @@ make_snow_data.o: ../../../make_snow_data.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o make_snow_data.o ../../../make_snow_data.c
 
@@ -20167,6 +20230,7 @@ make_veg_var.o: ../../../make_veg_var.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o make_veg_var.o ../../../make_veg_var.c
 
@@ -20467,6 +20531,7 @@ massrelease.o: ../../../massrelease.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o massrelease.o ../../../massrelease.c
 
@@ -20767,6 +20832,7 @@ modify_Ksat.o: ../../../modify_Ksat.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o modify_Ksat.o ../../../modify_Ksat.c
 
@@ -21067,6 +21133,7 @@ mtclim_vic.o: ../../../mtclim_vic.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h \
 		../../../mtclim_constants_vic.h \
 		../../../mtclim_parameters_vic.h
@@ -21369,6 +21436,7 @@ mtclim_wrapper.o: ../../../mtclim_wrapper.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h \
 		../../../mtclim_constants_vic.h \
 		../../../mtclim_parameters_vic.h
@@ -21671,6 +21739,7 @@ newt_raph_func_fast.o: ../../../newt_raph_func_fast.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o newt_raph_func_fast.o ../../../newt_raph_func_fast.c
 
@@ -21971,6 +22040,7 @@ nrerror.o: ../../../nrerror.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o nrerror.o ../../../nrerror.c
 
@@ -22271,6 +22341,7 @@ open_debug.o: ../../../open_debug.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o open_debug.o ../../../open_debug.c
 
@@ -22571,6 +22642,7 @@ open_file.o: ../../../open_file.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o open_file.o ../../../open_file.c
 
@@ -22871,6 +22943,7 @@ open_state_file.o: ../../../open_state_file.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o open_state_file.o ../../../open_state_file.c
 
@@ -23171,6 +23244,7 @@ output_list_utils.o: ../../../output_list_utils.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o output_list_utils.o ../../../output_list_utils.c
 
@@ -23471,6 +23545,7 @@ parse_output_info.o: ../../../parse_output_info.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o parse_output_info.o ../../../parse_output_info.c
 
@@ -23771,6 +23846,7 @@ penman.o: ../../../penman.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o penman.o ../../../penman.c
 
@@ -24071,6 +24147,7 @@ prepare_full_energy.o: ../../../prepare_full_energy.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o prepare_full_energy.o ../../../prepare_full_energy.c
 
@@ -24371,6 +24448,7 @@ put_data.o: ../../../put_data.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o put_data.o ../../../put_data.c
 
@@ -24671,6 +24749,7 @@ read_arcinfo_ascii.o: ../../../read_arcinfo_ascii.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_arcinfo_ascii.o ../../../read_arcinfo_ascii.c
 
@@ -24971,6 +25050,7 @@ read_atmos_data.o: ../../../read_atmos_data.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_atmos_data.o ../../../read_atmos_data.c
 
@@ -25271,6 +25351,7 @@ read_croplib.o: ../../../read_croplib.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_croplib.o ../../../read_croplib.c
 
@@ -25571,6 +25652,7 @@ read_cropparam.o: ../../../read_cropparam.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_cropparam.o ../../../read_cropparam.c
 
@@ -25871,6 +25953,7 @@ read_forcing_data.o: ../../../read_forcing_data.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_forcing_data.o ../../../read_forcing_data.c
 
@@ -26171,6 +26254,7 @@ read_initial_model_state.o: ../../../read_initial_model_state.c ../../../vicNl.h
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_initial_model_state.o ../../../read_initial_model_state.c
 
@@ -26471,6 +26555,7 @@ read_lakeparam.o: ../../../read_lakeparam.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_lakeparam.o ../../../read_lakeparam.c
 
@@ -26771,6 +26856,7 @@ read_snowband.o: ../../../read_snowband.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_snowband.o ../../../read_snowband.c
 
@@ -27071,6 +27157,7 @@ read_soilparam.o: ../../../read_soilparam.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_soilparam.o ../../../read_soilparam.c
 
@@ -27371,6 +27458,7 @@ read_soilparam_arc.o: ../../../read_soilparam_arc.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_soilparam_arc.o ../../../read_soilparam_arc.c
 
@@ -27671,6 +27759,7 @@ read_veglib.o: ../../../read_veglib.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_veglib.o ../../../read_veglib.c
 
@@ -27971,6 +28060,7 @@ read_vegparam.o: ../../../read_vegparam.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_vegparam.o ../../../read_vegparam.c
 
@@ -28271,6 +28361,7 @@ redistribute_during_storm.o: ../../../redistribute_during_storm.c ../../../vicNl
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o redistribute_during_storm.o ../../../redistribute_during_storm.c
 
@@ -28571,6 +28662,7 @@ root_brent.o: ../../../root_brent.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o root_brent.o ../../../root_brent.c
 
@@ -28871,6 +28963,7 @@ runoff.o: ../../../runoff.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h \
 		../../../agronomic/balanceitem.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o runoff.o ../../../runoff.c
@@ -29172,6 +29265,7 @@ set_output_defaults.o: ../../../set_output_defaults.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o set_output_defaults.o ../../../set_output_defaults.c
 
@@ -29472,6 +29566,7 @@ snow_intercept.o: ../../../snow_intercept.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o snow_intercept.o ../../../snow_intercept.c
 
@@ -29772,6 +29867,7 @@ snow_melt.o: ../../../snow_melt.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o snow_melt.o ../../../snow_melt.c
 
@@ -30072,6 +30168,7 @@ snow_utility.o: ../../../snow_utility.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o snow_utility.o ../../../snow_utility.c
 
@@ -30372,6 +30469,7 @@ soil_conduction.o: ../../../soil_conduction.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o soil_conduction.o ../../../soil_conduction.c
 
@@ -30672,6 +30770,7 @@ soil_thermal_eqn.o: ../../../soil_thermal_eqn.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o soil_thermal_eqn.o ../../../soil_thermal_eqn.c
 
@@ -30972,6 +31071,7 @@ solve_snow.o: ../../../solve_snow.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o solve_snow.o ../../../solve_snow.c
 
@@ -31272,6 +31372,7 @@ store_moisture_for_debug.o: ../../../store_moisture_for_debug.c ../../../vicNl.h
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o store_moisture_for_debug.o ../../../store_moisture_for_debug.c
 
@@ -31572,6 +31673,7 @@ surface_fluxes.o: ../../../surface_fluxes.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h \
 		../../../crop/VIC_crop_variable_codes.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o surface_fluxes.o ../../../surface_fluxes.c
@@ -31873,6 +31975,7 @@ svp.o: ../../../svp.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o svp.o ../../../svp.c
 
@@ -32173,6 +32276,7 @@ vicNl.o: ../../../vicNl.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h \
 		../../../../corn/application/explaination/explainations.h \
 		../../../../corn/application/explaination/explaination_location.h \
@@ -32477,6 +32581,7 @@ vicerror.o: ../../../vicerror.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o vicerror.o ../../../vicerror.c
 
@@ -32777,6 +32882,7 @@ water_energy_balance.o: ../../../water_energy_balance.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o water_energy_balance.o ../../../water_energy_balance.c
 
@@ -33077,6 +33183,7 @@ water_under_ice.o: ../../../water_under_ice.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o water_under_ice.o ../../../water_under_ice.c
 
@@ -33377,6 +33484,7 @@ write_atmosdata.o: ../../../write_atmosdata.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_atmosdata.o ../../../write_atmosdata.c
 
@@ -33677,6 +33785,7 @@ write_data.o: ../../../write_data.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_data.o ../../../write_data.c
 
@@ -33977,6 +34086,7 @@ write_debug.o: ../../../write_debug.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_debug.o ../../../write_debug.c
 
@@ -34277,6 +34387,7 @@ write_forcing_file.o: ../../../write_forcing_file.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_forcing_file.o ../../../write_forcing_file.c
 
@@ -34577,6 +34688,7 @@ write_header.o: ../../../write_header.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_header.o ../../../write_header.c
 
@@ -34877,6 +34989,7 @@ write_layer.o: ../../../write_layer.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_layer.o ../../../write_layer.c
 
@@ -35177,6 +35290,7 @@ write_model_state.o: ../../../write_model_state.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_model_state.o ../../../write_model_state.c
 
@@ -35477,6 +35591,7 @@ write_snow_data.o: ../../../write_snow_data.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_snow_data.o ../../../write_snow_data.c
 
@@ -35777,6 +35892,7 @@ write_soilparam.o: ../../../write_soilparam.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_soilparam.o ../../../write_soilparam.c
 
@@ -36077,6 +36193,7 @@ write_vegparam.o: ../../../write_vegparam.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_vegparam.o ../../../write_vegparam.c
 
@@ -36377,6 +36494,7 @@ write_vegvar.o: ../../../write_vegvar.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o write_vegvar.o ../../../write_vegvar.c
 
@@ -36863,6 +36981,7 @@ VIC_land_unit_simulation.o: ../../../agronomic/VIC_land_unit_simulation.cpp ../.
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../agronomic/VIC_land_unit_C_interface.h \
 		../../../crop/VIC_crop_output.h \
 		../../../global.h \
@@ -37201,6 +37320,7 @@ VIC_land_unit_C_interface.o: ../../../agronomic/VIC_land_unit_C_interface.cpp ..
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../vicNl.h \
 		../../../pubtools.h \
 		../../../../VIC_CropSyst_common/VCS_Nl.h \
@@ -37603,6 +37723,7 @@ VIC_soil_hydrology.o: ../../../crop/VIC_soil_hydrology.c ../../../crop/VIC_soil_
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../crop/VIC_crop_variable_codes.h \
 		../../../../VIC_CropSyst_common/VCS_Nl.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o VIC_soil_hydrology.o ../../../crop/VIC_soil_hydrology.c
@@ -38054,6 +38175,7 @@ read_irrigparam.o: ../../../read_irrigparam.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o read_irrigparam.o ../../../read_irrigparam.c
 
@@ -38747,6 +38869,7 @@ VCS_Nl.o: ../../../../VIC_CropSyst_common/VCS_Nl.c ../../../vic_5_emulator/vic/v
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
 		../../../LAKE.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o VCS_Nl.o ../../../../VIC_CropSyst_common/VCS_Nl.c
 

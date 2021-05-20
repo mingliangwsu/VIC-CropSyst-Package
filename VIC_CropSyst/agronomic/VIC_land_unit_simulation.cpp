@@ -31,6 +31,11 @@
 //______________________________________________________________________________
 namespace VIC {
 extern CORN::Enumeration_list rotations_parameters;
+
+
+Atmospheric_CO2_change::Atmospheric_CO2_change(const CORN::date32 &simdate_raw_)
+    :Atmospheric_CO2_change_element(simdate_raw_)
+{};
 //_2014-10-22___________________________________________________________________
 Land_unit_simulation::Land_unit_simulation
 (
@@ -90,6 +95,7 @@ Land_unit_simulation::Land_unit_simulation
 ,scenario_control_and_model_options(false)                                       //160421RLN
 ,geolocation(VIC_soil_con.lat,VIC_soil_con.lng,VIC_soil_con.elevation)
 //170525 ,meterology(today,geolocation,NO_SNOW_PACK)
+,atmospheric_CO2(simdate_raw)                                                   //04012021
 ,meterology(simdate_raw /*190130 .ref_date32()*/,geolocation,NO_SNOW_PACK)
 ,location_params(geolocation) //190128RLN ,0,0,0) //(Need VIC version numbers)
 //150707,extraterrestrial_solar_irradiance_day(UC_MJ_m2,geolocation,_today)
@@ -129,6 +135,7 @@ Land_unit_simulation::Land_unit_simulation
 
     soil->provide_temperature_profile();
 */
+    meteorology.know_Atmospheric_CO2(&atmospheric_CO2);                         //04012021
     soil = &vic_soil_for_CropSyst;                                              //190723LML
     //soil->layers = soil->ref_layers();                                          //200708LML
     //soil->hydrology = soil->ref_hydrology();                                    //200709LML
@@ -269,6 +276,7 @@ bool Land_unit_simulation::setup_weather_from_VIC()
    //201216LML weather_provider->aerodynamic_resistance_ref_plants/*(day/m)*/ = CORN::must_be_greater_or_equal_to(ra,1.0e-5) / (float64)Seconds_per_day;
    //201216LML weather_provider->aerodynamics.resistance_of_plants_reference_s_m.update_amount_in_preset_units(CORN::must_be_greater_or_equal_to(ra,1.0e-5));
 
+
 #ifdef LIU_DEBUG
    /*
    std::clog << "year:"         << (int)global_today.get_year()
@@ -295,6 +303,14 @@ bool Land_unit_simulation::start_day()                            modification_
     bool started = setup_weather_from_VIC();
        //&& weather_provider->update()
        //190723LML && slope_saturated_vapor_pressure_plus_psychrometric_resistance_reference->update().is_valid()
+
+    //04012021 update CO2
+    //meteorology.atmospheric_CO2_change
+    //VIC CO2 concentration: options.VCS.CO2_PPM;
+    weather_provider->atmospheric_CO2_conc_ppm = options.VCS.CO2_PPM;
+    atmospheric_CO2.curr_CO2_conc.set_ppm(options.VCS.CO2_PPM,CORN::measured_quality);
+    //std::clog << "CO2_PPM:" << weather_provider->atmospheric_CO2_conc_ppm << std::endl;
+
     started &= CropSyst::Land_unit_simulation_VX::start_day();
     //190723LML if (meteorology.subdaily && meteorology.subdaily_owned)  meteorology.subdaily->update();               //190515LML
     //190723LML if (meteorology.hourly   && meteorology.hourly_owned)    meteorology.hourly->update(today.get_DOY());  //190515LML

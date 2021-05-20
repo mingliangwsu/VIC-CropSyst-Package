@@ -173,7 +173,7 @@ bool Land_unit_meteorological::know_weather_spanning
 }
 //_know_weather_spanning____________________________________________2015-12-15_/
 bool Land_unit_meteorological::know_Atmospheric_CO2                                                    //04012021LML
-   (Atmospheric_CO2_change_element *atmospheric_CO2_change_)           cognition_
+   (Atmospheric_CO2_change_element *atmospheric_CO2_change_)          cognition_
 {
     atmospheric_CO2_change = atmospheric_CO2_change_;
     return true;

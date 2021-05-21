@@ -421,13 +421,13 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
         //std::clog << "VIC_shortgrass_ET:" << (active_land_unit->ref_VIC_cell().VCS.pot_evap_daily[PET_SHORT]) << std::endl;
 #ifndef CROP_DAILY_OUTPUT_MEMFIRST
         std::string growth_stage_description;                                    //200208RLN
-        /*200817RLN  uncomment if really needed
-        nat8 periods = active_crop->describe_periods(growth_stage_description);
-         if (periods)                                                            //200420
-            period_descriptions.string_items(growth_stage_description,' ');                                //200420
-
-        */
-
+        CORN::Text_list period_stage;
+        //*200817RLN  uncomment if really needed
+        if (active_crop) {
+            nat8 periods = active_crop->describe_periods(period_stage);
+            if (periods)                                                            //200420
+                period_stage.string_items(growth_stage_description,' ');                                //200420
+        }
         if ( (debugout.rdstate() & std::ofstream::failbit ) != 0 ) {
               std::cerr << "Error write file:" << out_file_name << "\n";
               return 1;

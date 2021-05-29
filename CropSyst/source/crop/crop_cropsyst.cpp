@@ -1805,6 +1805,9 @@ Crop_complete::harvest
          ,terminate,0.0); // no harvest index
    if (terminate)                                                                //030516
    {  // just trigger termination                                                //040506
+
+      trigger_synchronization(NGS_HARVEST);                                      //052821LML set HARVEST for final clipping
+
       end_season();                                                              //160618
       trigger_synchronization(NGS_TERMINATED);                                   //040506
       terminate_pending=true;                                                    //040514
@@ -1893,6 +1896,8 @@ will correct the problem Fabio was seeing
 
       if (phenology.respond_to_clipping())                                       //181108
       {  // float64 reset_thermal_time =parameters->phenology.initiation.emergence; //040830
+
+         initiate_accrescence();                                                //052821LML
 
          canopy_leaf_growth->know_accrescence(phenology.get_accrescence_period());  //200210
 

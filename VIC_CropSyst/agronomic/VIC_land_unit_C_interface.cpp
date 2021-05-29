@@ -418,6 +418,11 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
         Soil::Chemicals_profile *temp_chemical = active_land_unit->get_soil_chemicals(); //200208RLN
         int16 day_since_start_of_harvest = (active_crop? active_crop->ref_phenology().get_days_since_start_of(NGS_HARVEST) : 0);
  
+
+        //double tyield = active_crop ? active_crop->get_latest_yield_kg_m2() : 0.0; //052821LML
+        //std::clog << "day_since_start_of_harvest:" << day_since_start_of_harvest << " tyield:" << tyield << std::endl;
+
+
         //std::clog << "VIC_shortgrass_ET:" << (active_land_unit->ref_VIC_cell().VCS.pot_evap_daily[PET_SHORT]) << std::endl;
 #ifndef CROP_DAILY_OUTPUT_MEMFIRST
         std::string growth_stage_description;                                    //200208RLN
@@ -468,6 +473,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  //<<","<<(active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0)
                  //<<","<<(active_crop ? active_crop->get_latest_yield_kg_m2()     : 0)
                  <<","<<(active_crop ? ((day_since_start_of_harvest==0) ? active_crop->get_latest_yield_kg_m2() : 0.0) : 0.0)
+                 //<<","<<tyield
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<m_to_mm(active_crop ? active_crop->get_recorded_root_depth_m()   : 0)
 #ifdef VCS_V5

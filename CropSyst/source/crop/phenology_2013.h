@@ -48,7 +48,7 @@ class Phenology_2013
    virtual bool is_in_yield_formation()                            affirmation_;
    inline virtual bool is_in_fructescence()                        affirmation_  { assert(false); return false;} //181109
    inline virtual bool is_in_veraison()                            affirmation_  { assert(false); return false;} //181109
-   inline virtual bool is_in_rapid_fruit_development()             affirmation_  { /* assert(false);*/ return false;} //181109
+   inline virtual bool is_in_rapid_fruit_development()             affirmation_  { /* assert(false);*/ return growth_stage == FGS_RAPID_FRUIT_DEVELOPMENT;} //LML 220318 false;} //181109
 
    virtual bool is_in_culminescence()                              affirmation_; //181107
    virtual bool is_in_senescence()                                 affirmation_; //141125

@@ -1472,7 +1472,8 @@ bool Crop_complete::consider_inactive_period()
       // canopy_leaf_growth check is needed, otherwise we may start looking
       // for end season before we are even growing.                              //080401
        && !phenology.is_in_accrescence()                                         //200420
-       && (phenology.is_matured() || phenology.is_in_rapid_fruit_development())) //LML 220318
+       && (phenology.is_matured() || phenology.is_in_rapid_fruit_development()
+                                  || phenology.is_in_culminescence()))          //LML 220318 05272022
    {  // We are at start of dormancy
       if (quiescence_start_requirement->is_satisfied())                          //021202
       {

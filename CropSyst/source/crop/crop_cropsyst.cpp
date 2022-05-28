@@ -1471,9 +1471,11 @@ bool Crop_complete::consider_inactive_period()
        && canopy_leaf_growth                                                     //190707
       // canopy_leaf_growth check is needed, otherwise we may start looking
       // for end season before we are even growing.                              //080401
-       && !phenology.is_in_accrescence()                                         //200420
+       && ((parameters->is_fruit_tree() && !phenology.is_in_accrescence())
+           || !parameters->is_fruit_tree()) //200420   05272022LML for alfalfa, it can be dorment during accrescence period
        && (phenology.is_matured() || phenology.is_in_rapid_fruit_development()
-                                  || phenology.is_in_culminescence()))          //LML 220318 05272022
+                                  || phenology.is_in_culminescence()
+                                  || phenology.is_in_accrescence()))             //LML 220318 05272022
    {  // We are at start of dormancy
       if (quiescence_start_requirement->is_satisfied())                          //021202
       {

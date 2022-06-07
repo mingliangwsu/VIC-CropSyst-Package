@@ -853,6 +853,11 @@ soil_con_struct read_soilparam(FILE *soilparam,
             temp.Wpwp[layer] = temp.max_moist[layer] * 0.8;
             fprintf(stderr,"set Wpwp = max_moist * 0.8!\n");
         }
+        //06062022LML fix the problem with FC > max_moist
+        //use 50%
+        if (temp.VCS.Field_Capacity[layer] > temp.max_moist[layer]) {
+            temp.VCS.Field_Capacity[layer] = 0.5 * temp.max_moist[layer];
+        }
         #endif
 //#if (VIC_CROPSYST_VERSION>=3)
         //170215LML need talk with Keyvan. The original equations might give Wcr bigger than max_moist

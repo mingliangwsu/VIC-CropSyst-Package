@@ -575,10 +575,17 @@ int  runoff(cell_data_struct  *cell_wet,
                         - resid_moist[lindex])),
                         3.0 + 2.0 * soil_con->VCS.b_campbell[lindex]); /*keyvan put this one here to be consistent in new soil parameters*/
                 
+
+                //fprintf(stderr,"lindex:%d liq:%f resid:%f fc:%f Q12:%f b:%f\n",
+                //        lindex,tmp_liq,resid_moist[lindex],soil_con->VCS.Field_Capacity[lindex],Q12[lindex],soil_con->VCS.b_campbell[lindex]);
+
+
                 max_Q12 = (tmp_liq-/*190806LML soil_con->Wcr[lindex]*/ soil_con->VCS.Field_Capacity[lindex]); ///dt=24
                 if(Q12[lindex] > max_Q12 && max_Q12 > 0.0){ ///Keyvan defined this variable to prevent full depletion of soil moisture above the field capacity
                   Q12[lindex] = max_Q12;//201106LML + 0.1;
                 }
+
+
                 //if (lindex == 2 && time_step == 0) std::clog << " liq:" << tmp_liq << " b:" << soil_con->VCS.b_campbell[lindex] << " Sat:" << soil_con->max_moist[lindex] << " FC:" << soil_con->VCS.Field_Capacity[lindex] << " Q12:" << Q12[lindex] << std::endl;
 
                 //if(tmp_liq < /*190806LML soil_con->Wcr[lindex]*/ soil_con->VCS.Field_Capacity[lindex] && Q12[lindex] > 0.001){ ///to make sure that soil water transfer is not significant after the field capacity
@@ -588,6 +595,9 @@ int  runoff(cell_data_struct  *cell_wet,
                 if(tmp_liq < soil_con->VCS.Field_Capacity[lindex]){
                   Q12[lindex] = 0.0;
                 }
+
+                //fprintf(stderr,"final Q12:%f \n",Q12[lindex]);
+
 
 #endif
               }
@@ -672,7 +682,12 @@ int  runoff(cell_data_struct  *cell_wet,
 #endif
               inflow = (Q12[lindex] + tmp_inflow);
               Q12[lindex] += tmp_inflow;
+
+
               //fprintf(stderr,"af l:%d liq:%f Q12:%f\n",lindex,liq[lindex],Q12[lindex]);
+
+
+
             } //* end loop through soil layers *
             /**************************************************
             Compute Baseflow

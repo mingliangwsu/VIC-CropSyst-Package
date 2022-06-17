@@ -1478,7 +1478,7 @@ bool Crop_complete::consider_inactive_period()
                                   || phenology.is_in_accrescence())
        && simdate.get_DOY() > 182)                                               //LML 220318 05272022
    {  // We are at start of dormancy
-      if (quiescence_start_requirement->is_satisfied())                          //021202
+      if (quiescence_start_requirement->is_satisfied() || simdate.get_DOY() >= 349)                          //021202  06172022LML added the latest day
       {
          log_event("Dormancy or inactive period begins" );
          delete quiescence_start_requirement; quiescence_start_requirement = 0;  //030514

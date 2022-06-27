@@ -189,7 +189,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             Irrigation_library[i].irrigation_efficiency;
         if (gtype == FLOOD || gtype == RILL || gtype == FURROW) {                //surface
             irrig_eff.uniformity = 0.5;
-            irrig_eff.maximum_capacity = 30.0;
+            irrig_eff.maximum_capacity = 100.0;                                   //06272022LML 30
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.70;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.50;
             else                        irrig_eff.presumed_efficiency = 0.80;
@@ -203,7 +203,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
                    && (Irrigation_library[i].IrrigationType_code != IrrigTP_Sub_surf_drip_perfect_eliminate_top)) {
             irrig_eff.time_irrig = 20;
             irrig_eff.uniformity = 0.95;
-            irrig_eff.maximum_capacity = 20.0;
+            irrig_eff.maximum_capacity = 100.0;                                   //06272022LML 20
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.90;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.70;
             else                        irrig_eff.presumed_efficiency = 0.95;
@@ -225,7 +225,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.max_allowable_depletion                   = 0.2;           //201111LML
         } else if (gtype == WHEEL_LINE) {
             irrig_eff.uniformity = 0.95;
-            irrig_eff.maximum_capacity = 30.0;
+            irrig_eff.maximum_capacity = 100.0;                                   //06272022LML 30
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.8;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.65;
             else                        irrig_eff.presumed_efficiency = 0.85;
@@ -236,7 +236,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.max_allowable_depletion                   = 0.4;          //201111LML 0.5 06232022LML changed to 0.4
         } else if (gtype == SOLID_SET) {
             irrig_eff.uniformity = 0.95;
-            irrig_eff.maximum_capacity = 30.0;
+            irrig_eff.maximum_capacity = 100.0;                                   //06272022LML 30
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.8;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.65;
             else                        irrig_eff.presumed_efficiency = 0.85;
@@ -247,7 +247,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.max_allowable_depletion                   = 0.4;          //201111LML 0.5 06232022LML changed to 0.4
         } else if (gtype == BIG_GUN) {
             irrig_eff.uniformity = 0.95;
-            irrig_eff.maximum_capacity = 30.0;
+            irrig_eff.maximum_capacity = 100.0;                                   //06272022LML 30
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.75;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.6;
             else                        irrig_eff.presumed_efficiency = 0.8;
@@ -258,7 +258,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.max_allowable_depletion                   = 0.4;          //201111LML 0.5 06232022LML changed to 0.4
         } else if (gtype == CENTER_PIVOT) {
             irrig_eff.uniformity = 0.92;
-            irrig_eff.maximum_capacity = 20.0;
+            irrig_eff.maximum_capacity = 100.0;                                   //06272022LML 20
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.85;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.75;
             else                        irrig_eff.presumed_efficiency = 0.90;

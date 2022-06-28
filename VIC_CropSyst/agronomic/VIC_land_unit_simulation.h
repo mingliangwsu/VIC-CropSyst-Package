@@ -59,6 +59,7 @@ enum CropSyst_Variables{
   CO2_C_LOSS_SOM,                                                                //SOM and MB
   NITRIFICATION_N2O_N,
   DENITRIFICATION_N2O_N,
+  Water_Stress_Index,
   CropSyst_Variables_counts
 };
 //______________________________________________________________________________

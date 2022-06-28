@@ -21,6 +21,8 @@ bool need_irrigation(double, double, int, double, layer_data_struct *, const soi
                      ,double max_capacity = 0                                   //190724LML
                      ,double *real_added_water = 0                              //190724LML
                      ,double top_layer_to_fc_fraction = 1.0
+                     ,double water_stress_index = 0
+                     ,double water_stress_tolerance = 0.1
         );                   //190805LML control drip irrigations over fruit trees (vine in this case)
 double calc_wetted_percentage(const Irrigation_Type irrigation_code,
                               const soil_con_struct &soil_con,

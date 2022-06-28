@@ -264,6 +264,7 @@ double canopy_evap(const soil_con_struct   &soil_con,
         if (is_crop) {
             double out_soil_water_demand_mm = 0;                                 //160115LML
             bool isPerennial = VIC_land_unit_is_current_crop_fruit_tree();
+            double water_stress_index = VIC_land_unit_get(VIC::Water_Stress_Index);
            //**first calculate the amount of potential ET**
            #if VIC_CROPSYST_VERSION==2
            int short_grass_number  = 109;
@@ -456,6 +457,8 @@ double canopy_evap(const soil_con_struct   &soil_con,
                                                  ,irrigation_capacity_mm
                                                  ,&real_filled_water
                                                  ,top_layer_to_fc_fraction
+                                                 ,water_stress_index             //06282022LML
+                                                 ,WATER_STRESS_TOLERANCE_FOR_IRRIGATION   //06282022LML
                                                  );
              } else {                                                            //201028LML irrigation is trigered by manual irrigation events
                  require_irrigation = true;

@@ -55,6 +55,8 @@ bool need_irrigation(double MAD_crop_specific
                         ,double max_capacity                                     //190724LML
                         ,double *real_added_water                                //190724LML
                         ,double top_layer_to_fc_fraction                         //190805LML
+                        ,double water_stress_index
+                        ,double water_stress_tolerance
                         )
 {
     bool irrigation = false;
@@ -129,7 +131,7 @@ bool need_irrigation(double MAD_crop_specific
 
 
     //if (((depletion > MAD_crop_specific) || (water_deficit_to_FC > irrigation_capacity_mm_T)) && water_deficit_to_FC > 0.0) {    //190918 removed the
-    if ((depletion > MAD_crop_specific) && water_deficit_to_FC > 0.0) {          //190918 LML removed the condition for irrigation capacity
+    if (((depletion > MAD_crop_specific) || (water_stress_index > water_stress_tolerance)) && water_deficit_to_FC > 0.0) {          //190918 LML removed the condition for irrigation capacity
         irrigation = true;
         irrigation_demand = water_deficit_to_FC;
 

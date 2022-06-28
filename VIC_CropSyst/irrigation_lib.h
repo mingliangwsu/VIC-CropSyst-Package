@@ -15,6 +15,12 @@ about irrigation systems and efficiencies
 //160504LML #define IRRIGATION_TYPES    40
 #ifdef VIC_CROPSYST_VERSION
 #if (VIC_CROPSYST_VERSION>=3)
+
+//06282022LML
+#ifndef WATER_STRESS_TOLERANCE_FOR_IRRIGATION
+#define WATER_STRESS_TOLERANCE_FOR_IRRIGATION 0.1
+#endif
+
 typedef struct Irrigation_Efficiency
 {
     //170830 #ifdef USE_SIMPLIFIED_IRRIGATION_TYPES

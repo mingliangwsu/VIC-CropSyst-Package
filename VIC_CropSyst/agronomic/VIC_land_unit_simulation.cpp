@@ -551,6 +551,9 @@ float64 Land_unit_simulation::get(nat32 variable_code) const
         case VC_root_depth_mm:
             outvalue = m_to_mm(crop_active_or_intercrop->get_recorded_root_depth_m());
             break;
+        case Water_Stress_Index:
+            outvalue = crop_active_or_intercrop->get_water_stress_index();
+            break;
         }
     } else {
         switch (variable_code) {
@@ -606,6 +609,9 @@ float64 Land_unit_simulation::get(nat32 variable_code) const
             outvalue = 1.0;
             break;
         case VC_root_depth_mm:
+            outvalue = 0.0;
+            break;
+        case Water_Stress_Index:
             outvalue = 0.0;
             break;
         }

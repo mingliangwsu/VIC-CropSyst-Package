@@ -174,6 +174,15 @@ float64 Crop_common::process_transpiration_m
          / limited_pot_transpiration                                             //011117
       : 1.0;
    water_stress_stats.append((float32)water_stress);                             //011023
+
+
+   //if ((1-water_stress) > 0.05)
+   //    printf("water_stress:%lf water_limited_act_transpiration:%lf limited_pot_transpiration:%lf \n",
+   //       (1-water_stress),water_limited_act_transpiration * 1000.,limited_pot_transpiration * 1000.);
+
+
+
+
    /* NYI if water_stress
    canopy_warming_equiv_water_depth =  limited_pot_transpiration
       - water_limited_act_transpiration;

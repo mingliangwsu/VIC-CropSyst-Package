@@ -739,6 +739,7 @@ int    runoff(cell_data_struct *, cell_data_struct *,
               #if (VIC_CROPSYST_VERSION>=3)
               ,veg_var_struct *
               ,veg_var_struct *
+              ,bool
               #endif
               );
 double get_total_soil_moisture(const layer_data_struct* vic_layer,

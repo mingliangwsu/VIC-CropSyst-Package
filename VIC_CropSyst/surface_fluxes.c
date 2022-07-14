@@ -1104,6 +1104,29 @@ int surface_fluxes(char                 overstory,
     (*inflow_wet) = ppt[WET];
     (*inflow_dry) = ppt[DRY];
 
+
+    //07142022LML check if irrigation field
+    bool irrigated_field = false;
+#if (VIC_CROPSYST_VERSION>=3)
+    int rotation_code = veg_con[iveg].VCS.veg_class_code;
+    bool is_crop = iscrop(rotation_code);
+    if (is_crop) {
+        int rotation_or_crop_veg_class_code = -1;                                      //161212LML
+        int rotation_cycle_index = -1;                                                 //161212LML
+        DecomposeVegclassCode(veg_class_code,rotation_or_crop_veg_class_code,
+                          rotation_cycle_index);                                   //161212LML
+        Irrigation_Type irrigation_mode     = NO_IRRIGATION;
+        bool full_irrigation;
+        bool find_irrig_type = find_irrigation_type(
+                    soil_con->VCS.irrigation_type_list,
+                    rotation_or_crop_veg_class_code,irrigation_mode,
+                    full_irrigation);
+        if (irrigation_mode != NO_IRRIGATION && options.VCS.do_irrigate_crop)
+            irrigated_field = true;
+    }
+#endif
+
+
     ErrorFlag = runoff(cell_wet, cell_dry, energy, soil_con, ppt,
                        #if EXCESS_ICE
                        SubsidenceUpdate,
@@ -1115,6 +1138,7 @@ int surface_fluxes(char                 overstory,
                        #if (VIC_CROPSYST_VERSION>=3)
                        ,veg_var_dry                                             //150929LML
                        ,veg_var_wet                                             //150929LML
+                       ,irrigated_field                                         //07142022LML
                        #endif
                        );
     return( ErrorFlag );

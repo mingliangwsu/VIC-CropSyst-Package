@@ -404,7 +404,7 @@ double canopy_evap(const soil_con_struct   &soil_con,
                   && dmy->day_in_year <= 304                                     //do not irigate after Septempber. This might change by a day in the leap year. 07292011 KJC
                   && current_crop->growth_stage < NGS_DORMANT_or_INACTIVE));     //Do not irrigate when growth stage is less than the dormancy.
            #endif
-           if (isInCropIrrigationSeason && options.VCS.do_irrigate_crop) {
+           if (isInCropIrrigationSeason && options.VCS.do_irrigate_crop && (delta_t == SEC_PER_DAY)) {      //07142022LML the irrigation only happens at daily step
              irrigation_index = get_irrig_lib_index(irrigation_mode);
              if (irrigation_index < 0) {
                 std::cerr << "\n\nINPUT ERROR: irrigation_mode:"

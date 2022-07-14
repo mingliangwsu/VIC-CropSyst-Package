@@ -18,7 +18,7 @@ about irrigation systems and efficiencies
 
 //06282022LML
 #ifndef WATER_STRESS_TOLERANCE_FOR_IRRIGATION
-#define WATER_STRESS_TOLERANCE_FOR_IRRIGATION 0.1
+#define WATER_STRESS_TOLERANCE_FOR_IRRIGATION 1.0
 #endif
 
 typedef struct Irrigation_Efficiency

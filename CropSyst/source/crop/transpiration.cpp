@@ -104,6 +104,15 @@ float64 Crop_transpiration_2::calc_transpiration
       : 0.0;
     Act_Transp_m = uptake_act_m + (interception_for_transpiration_m);            //160415RLN
    interception_canopy_m = unconsumed_interception_canopy_m;                     //160825_160414RLN
+
+
+   //if (Act_Transp_m/N_limited_pot_transpiration_CO2adjusted_m < 0.9)
+   //    printf("Act_Transp_mm:%lf uptake_act_mm:%lf interception_for_transpiration_mm:%lf pt:%lf\n"
+   //       ,Act_Transp_m*1000.,uptake_act_m*1000.,interception_for_transpiration_m*1000.0
+   //       ,N_limited_pot_transpiration_CO2adjusted_m * 1000);
+
+
+
    return Act_Transp_m;
 }
 //_Crop_transpiration_2::calc_transpiration____________________________________/
@@ -235,6 +244,11 @@ max_crop_water_uptake_mm = 6;
          : 0.0;
       } // for sublayer
       root_hydraulic_cond *= root_cond_adj;
+
+
+      //printf("root_cond_adj:%lf\n",root_cond_adj);
+
+
       float64 root_plus_top_hydraulic_cond
       = (root_hydraulic_cond + top_hydraulic_cond);
       plant_hydraulic_cond
@@ -305,6 +319,19 @@ max_crop_water_uptake_mm = 6;
          //     The extracted amount is passed to the soil by the caller
          water_uptake_m[sublayer] = water_uptake_sublayer_m;                     //050331
          uptake_act_m += water_uptake_sublayer_m;                                //050331
+
+
+         //if (transpiration_ratio < 0.9)
+         //   printf("sublayer:%d uptake_act_mm:%lf soil_WP_layer:%lf layer_plant_hydraulic_cond:%lf soil_osmotic_pot_sol:%lf leaf_water_pot:%lf t_ratio:%lf\n"
+         //       ,sublayer
+         //       ,water_uptake_sublayer_m*1000.
+         //       ,soil_WP_layer
+         //       ,layer_plant_hydraulic_cond[sublayer]
+         //       ,soil_osmotic_pot_sol
+         //       ,leaf_water_pot
+         //       ,transpiration_ratio);
+
+
       } // each sublayer
    }  // else Plant_Hydraulic_Conductivity <= 0.0
       // so water_uptake is 0 for all layers (already initialized to 0.0).
@@ -325,6 +352,18 @@ float64 Crop_transpiration_2::calc_leaf_water_potential
    float64 leaf_water_pot = soil_avg_water_pot
       - Max_Crop_Water_Uptake
       / plant_hydraulic_cond;
+
+
+   //if (leaf_water_pot < leaf_water_pot_onset_of_stress_)
+   //    printf("leaf_water_pot:%lf soil_avg_water_pot:%lf Max_Crop_Water_Uptake:%lf plant_hydraulic_cond:%lf ratio:%lf\n",
+   //           leaf_water_pot,
+   //           soil_avg_water_pot,
+   //           Max_Crop_Water_Uptake,
+   //           plant_hydraulic_cond,
+   //           Max_Crop_Water_Uptake/plant_hydraulic_cond);
+
+
+
    if (leaf_water_pot < leaf_water_pot_onset_of_stress_ )
    {
       float64 PHC_adj = 0.5 + (0.5 * (leaf_water_pot - leaf_water_pot_wilt_)

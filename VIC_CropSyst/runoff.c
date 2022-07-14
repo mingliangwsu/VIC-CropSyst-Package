@@ -34,6 +34,7 @@ int  runoff(cell_data_struct  *cell_wet,
             #if (VIC_CROPSYST_VERSION>=3)
             ,veg_var_struct   *veg_var_dry                                           //150929LML
             ,veg_var_struct   *veg_var_wet                                           //150929LML
+            ,bool irrigated_field
             #endif
             )
 /**********************************************************************
@@ -410,6 +411,7 @@ int  runoff(cell_data_struct  *cell_wet,
 
           /** Set Layer Maximum Moisture Content **/
           max_moist[lindex] = soil_con->max_moist[lindex];
+
           //fprintf(stderr,"layer:%d max_moist:%f\n",lindex, max_moist[lindex]);
 
           /** Set Layer Temperature **/
@@ -518,6 +520,11 @@ int  runoff(cell_data_struct  *cell_wet,
           dt_inflow  =  inflow / (double) dt;
           dt_outflow =  0.0;
           //layer->days_after_irrigation +=1;
+
+          //07132022LML distribute daily irrigation water into each time step loop
+          double irrig_to_ground_dt = cell->VCS.actual_irrigation_reach_ground_amount / (double) dt;  //(mm/dt)
+          cell->VCS.irrigation_water = 0.0;
+
           for (time_step = 0; time_step < dt; time_step++) { ///time step loop
 #if defined(VIC_CROPSYST_VERSION) && defined(NITROGEN)
             clear_layer_array64(new_liq_vwc);                                        //150729LML
@@ -579,8 +586,25 @@ int  runoff(cell_data_struct  *cell_wet,
                 //fprintf(stderr,"lindex:%d liq:%f resid:%f fc:%f Q12:%f b:%f\n",
                 //        lindex,tmp_liq,resid_moist[lindex],soil_con->VCS.Field_Capacity[lindex],Q12[lindex],soil_con->VCS.b_campbell[lindex]);
 
+                //if (tmp_liq > soil_con->VCS.Field_Capacity[lindex])
+                //std::clog << "lindex:" << lindex
+                //          << " Q12:" << Q12[lindex]
+                //          << " Ksat:" << Ksat[lindex]
+                //          << " tmp_liq:" << tmp_liq
+                //          << " resid_moist:" << resid_moist[lindex]
+                //          << " b:" << soil_con->VCS.b_campbell[lindex]
+                //          << " FC:" << soil_con->VCS.Field_Capacity[lindex]
+                //          << std::endl;
 
-                max_Q12 = (tmp_liq-/*190806LML soil_con->Wcr[lindex]*/ soil_con->VCS.Field_Capacity[lindex]); ///dt=24
+
+
+                max_Q12 = CORN::must_be_greater_or_equal_to(tmp_liq-/*190806LML soil_con->Wcr[lindex]*/ soil_con->VCS.Field_Capacity[lindex],0.); //dt=24
+
+                //07142022LML under irrigation condition,redistribute all layer's water content to FC
+#ifndef NO_REDISTRIBUTE_IRRIGATION_INSTANTLY
+                if (irrigated_field && (Q12[lindex] < max_Q12)) Q12[lindex] = max_Q12;
+#endif
+
                 if(Q12[lindex] > max_Q12 && max_Q12 > 0.0){ ///Keyvan defined this variable to prevent full depletion of soil moisture above the field capacity
                   Q12[lindex] = max_Q12;//201106LML + 0.1;
                 }
@@ -618,14 +642,21 @@ int  runoff(cell_data_struct  *cell_wet,
               /* transport moisture for all sublayers **/
               tmp_inflow = 0.;
               //190507 if(cell->VCS.irrigation_water > 0 && lindex == 0 && time_step == 0){
-              if(cell->VCS.actual_irrigation_reach_ground_amount > 0 && lindex == 0 && time_step == 0){
+              //if(cell->VCS.actual_irrigation_reach_ground_amount > 0 && lindex == 0 && time_step == 0){
+              if(irrig_to_ground_dt > 0 && lindex == 0){
 #ifdef CHECK_WATER_BALANCE
-                check_soil_water.AddFluxIn(cell->VCS.actual_irrigation_reach_ground_amount);
+                check_soil_water.AddFluxIn(irrig_to_ground_dt);
 #endif
+
+                //std::clog << "actual_irrigation_reach_ground_amount:" << irrig_to_ground_dt
+                //          << " dt_runoff:" << dt_runoff
+                //          << std::endl;
+
+
                 //190507 liq[lindex] = liq[lindex] + (inflow + cell->VCS.irrigation_water - dt_runoff)
-                liq[lindex] = liq[lindex] + (inflow + cell->VCS.actual_irrigation_reach_ground_amount - dt_runoff)
+                liq[lindex] = liq[lindex] + (inflow + irrig_to_ground_dt - dt_runoff)
                     - (Q12[lindex] + evap[lindex][frost_area]);
-                cell->VCS.irrigation_water = 0.0;
+                //cell->VCS.irrigation_water = 0.0;
                 //cell->VCS.net_irrigation = 0.0;
               } else {
                 liq[lindex] = liq[lindex] + (inflow - dt_runoff)
@@ -648,6 +679,10 @@ int  runoff(cell_data_struct  *cell_wet,
                     if ( tmplayer < 0 ) {
                       /** If top layer saturated, add to runoff **/
                       runoff[frost_area] += tmp_inflow;
+
+                      if (tmp_inflow > 0)
+                          std::clog << " 1 Outflow:" << tmp_inflow << std::endl;
+
                       tmp_inflow = 0;
                     }
                     else {
@@ -745,6 +780,11 @@ int  runoff(cell_data_struct  *cell_wet,
                 if(tmplayer<0) {
                   /** If top layer saturated, add to runoff **/
                   runoff[frost_area] += tmp_moist;
+
+                  if (tmp_inflow > 0)
+                      std::clog << " 2 Outflow:" << tmp_inflow << std::endl;
+
+
                   tmp_moist = 0;
                 }
                 else {

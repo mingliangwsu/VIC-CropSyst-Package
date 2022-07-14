@@ -538,9 +538,9 @@ int main (int argc, char *argv[])
                  <<" DOY:"      <<(int)global_simdate/*200827 global_today*/.get_DOY()
                  <<std::endl;
 
-        if (global_simdate /*200727RLN global_today*/.get_year() == 1979 && global_simdate /*200727RLN global_today*/.get_DOY() == 250){
-            std::clog << "Debug_DOY:" << global_simdate/*200827 global_today*/.get_DOY() << std::endl;
-        }
+        //if (global_simdate /*200727RLN global_today*/.get_year() == 1983 && global_simdate /*200727RLN global_today*/.get_DOY() == 184){
+        //    std::clog << "Debug_DOY:" << global_simdate/*200827 global_today*/.get_DOY() << std::endl;
+        //}
 
 #endif
         //std::clog<<"NREC:"      <<global_param.nrecs
@@ -561,10 +561,6 @@ int main (int argc, char *argv[])
 
         if ( rec == global_param.nrecs - 1 ) LASTREC = TRUE;
         else LASTREC = FALSE;
-
-        if (rec == 2381) {
-           std::clog << "DEBUGGING main rec = 125\n";
-        }
 
         ErrorFlag = dist_prec(&atmos[rec], &prcp, &soil_con, veg_con,
                               &lake_con, dmy, &global_param, &filep,

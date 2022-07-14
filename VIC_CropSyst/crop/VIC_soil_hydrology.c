@@ -98,6 +98,13 @@ bool need_irrigation(double MAD_crop_specific
           //if (i == 0) water_deficit_to_FC += std::max<double>(soil_con.max_moist[i] - layer[i].moist, 0.0);   //190806LML at least make the top layer saturated?
           //else
         water_deficit_to_FC       += std::max<double>(/*190806LML soil_con.Wcr[i]*/ soil_con.VCS.Field_Capacity[i] - layer[i].moist, 0.0);
+
+        //std::clog << "i:" << i
+        //          << " FC:" << soil_con.VCS.Field_Capacity[i]
+        //          << " moist:" << layer[i].moist
+        //          << " water_deficit_to_FC:" << water_deficit_to_FC
+        //          << std::endl;
+
     }
 
     //observe depletion
@@ -131,9 +138,13 @@ bool need_irrigation(double MAD_crop_specific
 
 
     //if (((depletion > MAD_crop_specific) || (water_deficit_to_FC > irrigation_capacity_mm_T)) && water_deficit_to_FC > 0.0) {    //190918 removed the
+    //if (water_stress_index > 0.05)
+    //    printf("water_stress_index:%lf depletion:%lf MAD_crop_specific:%lf\n",water_stress_index,depletion,MAD_crop_specific);
+
     if (((depletion > MAD_crop_specific) || (water_stress_index > water_stress_tolerance)) && water_deficit_to_FC > 0.0) {          //190918 LML removed the condition for irrigation capacity
         irrigation = true;
         irrigation_demand = water_deficit_to_FC;
+        //printf("irrigation_demand:%lf\n",irrigation_demand);
 
         if (fill_water_to_fc) {
             double available_water_to_fill = max_capacity;

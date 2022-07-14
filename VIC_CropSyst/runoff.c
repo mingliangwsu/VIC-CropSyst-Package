@@ -601,7 +601,7 @@ int  runoff(cell_data_struct  *cell_wet,
                 max_Q12 = CORN::must_be_greater_or_equal_to(tmp_liq-/*190806LML soil_con->Wcr[lindex]*/ soil_con->VCS.Field_Capacity[lindex],0.); //dt=24
 
                 //07142022LML under irrigation condition,redistribute all layer's water content to FC
-#ifndef NO_REDISTRIBUTE_IRRIGATION_INSTANTLY
+#ifndef NO_REDISTRIBUTE_MOISTURE_OVER_IRRIGATION_FIELD_INSTANTLY
                 if (irrigated_field && (Q12[lindex] < max_Q12)) Q12[lindex] = max_Q12;
 #endif
 

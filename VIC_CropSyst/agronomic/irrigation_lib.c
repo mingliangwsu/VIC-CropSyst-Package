@@ -256,17 +256,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_evap_loss                = 0.4;
             irrig_eff.table_irrigation_runoff_loss              = 0.05;
 
-
-
-
-
-
             irrig_eff.max_allowable_depletion                   = 0.6;          //201111LML 0.5 06232022LML changed to 0.4   0.6 for testing!!!
-
-
-
-
-
 
 
         } else if (gtype == CENTER_PIVOT) {

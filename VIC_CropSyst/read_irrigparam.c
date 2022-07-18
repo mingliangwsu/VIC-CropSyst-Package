@@ -76,7 +76,7 @@ Irrigation_Type get_irrigation_type_from_str(const char *name)
   Irrigation_Type type = NO_IRRIGATION;
   if (strstr(name,"NO_IRRIGATION")                                  != 0) type = NO_IRRIGATION;
   else if (strstr(name,"CENTER_PIVOT")                              != 0) type = DEFAULT_CENTER_PIVOT;
-  else if (strstr(name,"SPRINKLER")                                 != 0) type = DEFAULT_MOVING_WHEEL;
+  else if (strstr(name,"SPRINKLER")                                 != 0) type = DEFAULT_SPRINKLER;
   else if (strstr(name,"BIG_GUN")                                   != 0) type = DEFAULT_BIG_GUN;
   else if (strstr(name,"SOLID_SET")                                 != 0) type = DEFAULT_SOLID_SET;
   else if (strstr(name,"MOVING_WHEEL")                              != 0) type = DEFAULT_MOVING_WHEEL;
@@ -93,6 +93,8 @@ Irrigation_Type get_irrigation_type_from_str(const char *name)
   else if (strstr(name,"DEFAULT_FLOOD")                             != 0) type = DEFAULT_FLOOD;
   else if (strstr(name,"DEFAULT_RILL")                              != 0) type = DEFAULT_RILL;
   else if (strstr(name,"DEFAULT_FURROW")                            != 0) type = DEFAULT_FURROW;
+  else if (strstr(name,"DEFAULT_SPRINKLER")                         != 0) type = DEFAULT_SPRINKLER;
+  else if (strstr(name,"DEFAULT_MICRO_SPRINKLER")                   != 0) type = DEFAULT_MICRO_SPRINKLER;
   else if (strstr(name,"IrrigTP_CP_impact_14VH_RainBird")           != 0) type = IrrigTP_CP_impact_14VH_RainBird;
   else if (strstr(name,"IrrigTP_CP_impact_M20VH_PM_RainBird")       != 0) type = IrrigTP_CP_impact_M20VH_PM_RainBird;
   else if (strstr(name,"IrrigTP_CP_impact_65PJ_RainBird")           != 0) type = IrrigTP_CP_impact_65PJ_RainBird;

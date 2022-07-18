@@ -108,6 +108,9 @@ struct VIC_Irrigation_library Irrigation_library[IRRIGATION_TYPE_ACCOUNTS] =
         ,{IrrigTP_flood_0_0,{0.3,0,0,0,0,0,0,0,0,0,0.9,5,0}}
         ,{IrrigTP_rill_0_0,{0.2,0,0,0,0,0,0,0,0,0,0.9,5,0}}
         ,{IrrigTP_furrow_0_0,{0.3,0,0,0,0,0,0,0,0,0,0.9,5,0}}
+
+        ,{DEFAULT_SPRINKLER,{0.05,4.06774193548387,4.5,45,0.9,1.001515,13.7,1295,25,26.7,0.1,24,1.52}}   //use solid set
+        ,{DEFAULT_MICRO_SPRINKLER,{0.05,4.06774193548387,4.5,45,0.9,1.001515,13.7,1295,25,26.7,0.1,24,1.52}}   //use solid set
         //170830LML #endif
     };
 #else
@@ -172,6 +175,8 @@ General_Irrigation_Type identify_general_irrigation_type(
     else if (irrigation == IrrigTP_flood_0_0)   gtype = FLOOD;
     else if (irrigation == IrrigTP_rill_0_0)    gtype = RILL;
     else if (irrigation == IrrigTP_furrow_0_0)  gtype = FURROW;
+    else if (irrigation == DEFAULT_SPRINKLER)   gtype = SPRINKLER;
+    else if (irrigation == DEFAULT_MICRO_SPRINKLER)   gtype = MICRO_SPRINKLER;
     return gtype;
 }
 //______________________________________________________________________________
@@ -203,7 +208,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
                    && (Irrigation_library[i].IrrigationType_code != IrrigTP_Sub_surf_drip_perfect_eliminate_top)) {
             irrig_eff.time_irrig = 20;
             irrig_eff.uniformity = 0.95;
-            irrig_eff.maximum_capacity = 20.0;                                   //06272022LML 20
+            irrig_eff.maximum_capacity = 30.0;                                  //06272022LML 20   071822COS 30
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.90;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.70;
             else                        irrig_eff.presumed_efficiency = 0.95;
@@ -211,12 +216,12 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.03;
             irrig_eff.table_irrigation_runoff_loss              = 0.0;
-            irrig_eff.max_allowable_depletion                   = 0.1;           //201111LML   071522COS 0.1
+            irrig_eff.max_allowable_depletion                   = 0.1;          //201111LML   071522COS 0.1
         } else if ((Irrigation_library[i].IrrigationType_code == IrrigTP_Sub_surf_drip_perfect)
                    || Irrigation_library[i].IrrigationType_code == IrrigTP_Sub_surf_drip_perfect_eliminate_top){   //190724LML
             irrig_eff.time_irrig = 20;
             irrig_eff.uniformity = 1.0;
-            irrig_eff.maximum_capacity = 8.0;                 //190725LML COS 50 mm    190918 COS set 8 mm
+            irrig_eff.maximum_capacity = 30.0;                                  //190725LML COS 50 mm    190918 COS set 8mm 071822COS 30mm
             irrig_eff.presumed_efficiency = 1.0;
             irrig_eff.table_irrigation_efficiency               = 1.0;
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
@@ -233,10 +238,10 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.3;
             irrig_eff.table_irrigation_runoff_loss              = 0.0;
-            irrig_eff.max_allowable_depletion                   = 0.2;          //201111LML 0.5 06232022LML changed to 0.4 071522COS 0.2
+            irrig_eff.max_allowable_depletion                   = 0.5;          //201111LML 0.5 06232022LML changed to 0.4 071522COS 0.2 071822COS 0.5
         } else if (gtype == SOLID_SET) {
             irrig_eff.uniformity = 0.95;
-            irrig_eff.maximum_capacity = 150.0;                                   //06272022LML 30
+            irrig_eff.maximum_capacity = 100.0;                                   //06272022LML 30  071822Matt 100
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.8;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.65;
             else                        irrig_eff.presumed_efficiency = 0.85;
@@ -244,10 +249,32 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.2;
             irrig_eff.table_irrigation_runoff_loss              = 0.0;
-            irrig_eff.max_allowable_depletion                   = 0.1;          //201111LML 0.5 06232022LML changed to 0.4  071522COS 0.1
+            irrig_eff.max_allowable_depletion                   = 0.3;          //201111LML 0.5 06232022LML changed to 0.4  071522COS 0.1   071822Matt (Orchard sprinkler)
+        } else if (gtype == SPRINKLER) {
+            irrig_eff.uniformity = 0.95;
+            irrig_eff.maximum_capacity = 250.0;                                 //071822COS
+            if (management_f == 1)      irrig_eff.presumed_efficiency = 0.8;
+            else if (management_f == 2) irrig_eff.presumed_efficiency = 0.65;
+            else                        irrig_eff.presumed_efficiency = 0.85;
+            irrig_eff.table_irrigation_efficiency               = 0.8;
+            irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
+            irrig_eff.table_irrigation_evap_loss                = 0.2;
+            irrig_eff.table_irrigation_runoff_loss              = 0.0;
+            irrig_eff.max_allowable_depletion                   = 0.5;          //071822 COS & Matt
+        } else if (gtype == MICRO_SPRINKLER) {
+            irrig_eff.uniformity = 0.95;
+            irrig_eff.maximum_capacity = 50.0;                                  //071822COS for set-move
+            if (management_f == 1)      irrig_eff.presumed_efficiency = 0.8;
+            else if (management_f == 2) irrig_eff.presumed_efficiency = 0.65;
+            else                        irrig_eff.presumed_efficiency = 0.85;
+            irrig_eff.table_irrigation_efficiency               = 0.8;
+            irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
+            irrig_eff.table_irrigation_evap_loss                = 0.2;
+            irrig_eff.table_irrigation_runoff_loss              = 0.0;
+            irrig_eff.max_allowable_depletion                   = 0.2;          //071822 COS
         } else if (gtype == BIG_GUN) {
             irrig_eff.uniformity = 0.95;
-            irrig_eff.maximum_capacity = 500.0;                                   //06272022LML 30
+            irrig_eff.maximum_capacity = 500.0;                                 //06272022LML 30 071822COS 500
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.75;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.6;
             else                        irrig_eff.presumed_efficiency = 0.8;
@@ -255,13 +282,10 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.4;
             irrig_eff.table_irrigation_runoff_loss              = 0.05;
-
             irrig_eff.max_allowable_depletion                   = 0.5;          //201111LML 0.5 06232022LML changed to 0.4   071522COS 0.5
-
-
         } else if (gtype == CENTER_PIVOT) {
             irrig_eff.uniformity = 0.92;
-            irrig_eff.maximum_capacity = 150.0;                                   //06272022LML 20
+            irrig_eff.maximum_capacity = 20.0;                                  //06272022LML 20  071522COS?
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.85;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.75;
             else                        irrig_eff.presumed_efficiency = 0.90;
@@ -269,7 +293,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.12;
             irrig_eff.table_irrigation_runoff_loss              = 0.03;
-            irrig_eff.max_allowable_depletion                   = 0.2;           //201111LML 071522COS 0.2
+            irrig_eff.max_allowable_depletion                   = 0.2;          //201111LML 071522COS 0.2
         }
     } //i
 }

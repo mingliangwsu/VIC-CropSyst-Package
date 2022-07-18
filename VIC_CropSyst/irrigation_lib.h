@@ -86,6 +86,8 @@ typedef enum General_Irrigation_Type{
     FLOOD                           = 6,
     RILL                            = 7,
     FURROW                          = 8,
+    SPRINKLER                       = 9,                                        //071822LML
+    MICRO_SPRINKLER                 = 10,                                       //071822LML
     GENERAL_IRRIGATION_TYPE_ACCOUNTS
 } General_Irrigation_Type;
 //______________________________________________________________________________
@@ -148,12 +150,15 @@ typedef enum Irrigation_Type{
 
     IrrigTP_furrow_0_0                          = 73,
     DEFAULT_FURROW                              = 73,                            //170830LML
+    DEFAULT_SPRINKLER                           = 74,                            //071822LML
+    DEFAULT_MICRO_SPRINKLER                     = 75                             //071822LML
     //171008LML IRRIGATION_TYPE_ACCOUNTS
 } irrigation_type;                                                               //190128RLN
 // BCC compiler need variable to declare
-#define IRRIGATION_TYPE_ACCOUNTS 48
+#define IRRIGATION_TYPE_ACCOUNTS 50
 //47
 //190724LML 46
+//071822LML 50
 #endif //VIC_CROPSYST_VERSION>=3
 typedef struct VIC_Irrigation_library
 {

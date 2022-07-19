@@ -285,7 +285,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.max_allowable_depletion                   = 0.5;          //201111LML 0.5 06232022LML changed to 0.4   071522COS 0.5
         } else if (gtype == CENTER_PIVOT) {
             irrig_eff.uniformity = 0.92;
-            irrig_eff.maximum_capacity = 20.0;                                  //06272022LML 20  071522COS?
+            irrig_eff.maximum_capacity = 30.0;                                  //06272022LML 20  071522COS? 071922Matt 30
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.85;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.75;
             else                        irrig_eff.presumed_efficiency = 0.90;
@@ -293,7 +293,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             irrig_eff.table_irrigation_deep_percolation_loss    = 0.0;
             irrig_eff.table_irrigation_evap_loss                = 0.12;
             irrig_eff.table_irrigation_runoff_loss              = 0.03;
-            irrig_eff.max_allowable_depletion                   = 0.2;          //201111LML 071522COS 0.2
+            irrig_eff.max_allowable_depletion                   = 0.1;          //201111LML 071522COS 0.2 071922Matt 0.1
         }
     } //i
 }

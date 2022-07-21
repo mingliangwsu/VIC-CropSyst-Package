@@ -194,7 +194,7 @@ void set_irrigation_efficiency_of_irrigation_library(const int management_f)
             Irrigation_library[i].irrigation_efficiency;
         if (gtype == FLOOD || gtype == RILL || gtype == FURROW) {                //surface
             irrig_eff.uniformity = 0.5;
-            irrig_eff.maximum_capacity = 150.0;                                   //06272022LML 30
+            irrig_eff.maximum_capacity = 250.0;                                   //06272022LML 30 072122Mat 250
             if (management_f == 1)      irrig_eff.presumed_efficiency = 0.70;
             else if (management_f == 2) irrig_eff.presumed_efficiency = 0.50;
             else                        irrig_eff.presumed_efficiency = 0.80;

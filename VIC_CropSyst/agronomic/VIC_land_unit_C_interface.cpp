@@ -183,6 +183,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"Accum_DD,"
                  <<"Accum_DD_clip,"
+                 <<"chill_hours_remaining,"
                  <<"Grow_Stage,"
                  //<<"VIC_LAI,"
                  //<<"LAI,"
@@ -438,7 +439,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
               return 1;
         }
 
-
+        double accum_chill = active_crop ? active_crop->get_fruit_chill_hours_remaining() : 0;
         debugout <<active_land_unit->ref_VIC_soil_con().gridcel
                  <<","<<std::setprecision(8)<<(double)active_land_unit->ref_VIC_soil_con().lng
                  <<","<<std::setprecision(7)<<(double)active_land_unit->ref_VIC_soil_con().lat
@@ -457,6 +458,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<(active_crop ? active_crop->get_accum_degree_days(/*200323RLN false*/) : 0)
                  <<","<<(active_crop ? active_crop->get_accum_degree_days(/*200323RLN true*/) : 0)
+                 <<","<<accum_chill
                  //<<","<<(active_crop ? active_crop->get_d (true) : 0)
                  <<","<<(active_crop ?
                             growth_stage_description

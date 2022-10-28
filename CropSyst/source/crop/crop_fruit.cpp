@@ -468,7 +468,7 @@ float64 Crop_orchard_fruit::distribute_todays_non_leaf_stem_growth
 (float64 todays_growth)                                            modification_
 {  float64 leaf_and_branch_growth = todays_growth;  // for normal crops everything goes to leaf stem(branch)
    bool at_max_fruit_load = is_at_max_fruit_load();                              //200608
-      if (max_fruit_load_achieved) //200709 (!at_max_fruit_load) //200608 (!is_at_max_fruit_load())                                               //081103
+      if (max_fruit_load_achieved || harvested) //200709 (!at_max_fruit_load) //200608 (!is_at_max_fruit_load())  //10282022LML after harvest, no new fruit                                             //081103
       {  // once we reach max fruit load, stop partitioning of biomass to fruit  //080912
          reserves_biomass += leaf_and_branch_growth;                             //200603
          leaf_and_branch_growth = 0;                                             //200603

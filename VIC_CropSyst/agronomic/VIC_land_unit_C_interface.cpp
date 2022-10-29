@@ -183,13 +183,13 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<"Accum_DD,"
                  <<"Accum_DD_clip,"
-                 <<"chill_hours_remaining,"
                  <<"Grow_Stage,"
                  //<<"VIC_LAI,"
                  //<<"LAI,"
                  <<"GAI,"
 #endif
                  <<"Green_Canopy_Cover,"
+                 <<"chill_hours_remaining,"
                  <<"Biomass_kg_m2,"
                  <<"Fruit_dry_biomass_kg_m2,"
                  <<"Yield_kg_m2,"
@@ -413,6 +413,8 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
         double total_et = transpiration_mm + total_evap; 
         double total_VIC_et = VIC_transpiration_mm + total_evap;    //190507 there is one day shift of transpiration and also an adjustment due to soil moisture limitation and water vertical flow
         double profile_liq_water = 0;
+        double accum_chill = active_crop ? active_crop->get_fruit_chill_hours_remaining() : 0;
+
         for (int i = 0; i < options.Nlayer; i++)
             profile_liq_water += active_land_unit->ref_VIC_cell().layer[i].moist;
         std::string active_crop_name(wactive_crop_name.begin(),wactive_crop_name.end());
@@ -439,7 +441,6 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
               return 1;
         }
 
-        double accum_chill = active_crop ? active_crop->get_fruit_chill_hours_remaining() : 0;
         debugout <<active_land_unit->ref_VIC_soil_con().gridcel
                  <<","<<std::setprecision(8)<<(double)active_land_unit->ref_VIC_soil_con().lng
                  <<","<<std::setprecision(7)<<(double)active_land_unit->ref_VIC_soil_con().lat
@@ -458,7 +459,6 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
                  <<","<<(active_crop ? active_crop->get_accum_degree_days(/*200323RLN false*/) : 0)
                  <<","<<(active_crop ? active_crop->get_accum_degree_days(/*200323RLN true*/) : 0)
-                 <<","<<accum_chill
                  //<<","<<(active_crop ? active_crop->get_d (true) : 0)
                  <<","<<(active_crop ?
                             growth_stage_description
@@ -469,6 +469,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<","<<(active_crop ? active_crop->get_GAI(true)                : 0)
 #endif
                  <<","<<(active_crop ? active_crop->get_canopy_interception_global_green() : 0)
+                 <<","<<accum_chill
                     //200323RLN get_fract_canopy_cover_green()     : 0)
                  <<","<<(active_crop ? active_crop->get_canopy_biomass_kg_m2() : 0)
                  <<","<<(active_crop ? (active_crop->is_fruit() ? active_crop->get_fruit_dry_biomass_kg_ha()/10000. : 0) : 0)

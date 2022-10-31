@@ -689,6 +689,7 @@ int main (int argc, char *argv[])
                     << "," << temp->GAI
 #endif
                     << "," << temp->Green_Canopy_Cover
+                    << "," << temp->accum_chill
                     << "," << temp->Biomass_kg_m2
                     << "," << temp->Fruit_dry_biomass_kg_m2
                     << "," << temp->Yield_kg_m2

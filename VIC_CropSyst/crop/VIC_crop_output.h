@@ -28,6 +28,7 @@ typedef struct {
     double GAI;
 #endif
     double Green_Canopy_Cover;
+    double accum_chill;
     double Biomass_kg_m2;
     double Fruit_dry_biomass_kg_m2;
     double Yield_kg_m2;

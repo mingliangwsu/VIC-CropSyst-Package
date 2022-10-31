@@ -316,7 +316,8 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
              <<"GAI,"
 #endif
              <<"Green_Canopy_Cover,"
-             <<"Biomass_kg_m2,"
+             <<"chill_hours_remaining,"
+              <<"Biomass_kg_m2,"
              <<"Fruit_dry_biomass_kg_m2,"
              <<"Yield_kg_m2,"
 #ifndef OUTPUT_SIMPLE_FOR_FORECAST
@@ -654,6 +655,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
          temp.GAI = (active_crop ? active_crop->get_GAI(true)                : 0);
 #endif
          temp.Green_Canopy_Cover = (active_crop ? active_crop->get_canopy_interception_global_green()     : 0);
+         temp.accum_chill = accum_chill;
          //temp.Biomass_kg_m2 = (active_crop ? active_crop->get_canopy_biomass_kg_m2()   : 0);
          //temp.Biomass_kg_m2 = (active_crop ? (active_crop->get_canopy_biomass_kg_m2() + active_crop->get_act_root_biomass_kg_m2()) : 0);
          temp.Biomass_kg_m2 = active_crop ? active_crop->get_canopy_biomass_kg_m2() : 0;

@@ -164,6 +164,9 @@ void initialize_atmos(atmos_data_struct        *atmos,
   double *tair;
   double *tskc;
   double *daily_vp;
+#if defined(VIC_CROPSYST_VERSION)
+  double *daily_srad_fdir;
+#endif
   double  min, max;
   double  rainonly;
   int     Ndays;
@@ -326,6 +329,9 @@ void initialize_atmos(atmos_data_struct        *atmos,
   tminhour   = (int *)    calloc(Ndays_local, sizeof(double));
   tskc       = (double *) calloc(Ndays_local*24, sizeof(double));
   daily_vp   = (double *) calloc(Ndays_local, sizeof(double));
+#if defined(VIC_CROPSYST_VERSION)
+  daily_srad_fdir  = (double *) calloc(Ndays_local, sizeof(double));
+#endif
   #if (VIC_CROPSYST_VERSION>=3)
   rhum_max   = (double *) calloc(Ndays_local, sizeof(double));
   rhum_min   = (double *) calloc(Ndays_local, sizeof(double));
@@ -914,7 +920,11 @@ void initialize_atmos(atmos_data_struct        *atmos,
   **************************************************/
   mtclim_wrapper(have_dewpt, have_shortwave, hour_offset, elevation, slope,
                    aspect, ehoriz, whoriz, annual_prec, phi, Ndays_local,
-                   dmy_local, prec, tmax, tmin, tskc, daily_vp, hourlyrad);
+                   dmy_local, prec, tmax, tmin, tskc, daily_vp, hourlyrad
+#if defined(VIC_CROPSYST_VERSION)
+                   ,daily_srad_fdir
+#endif
+                 );
 
   /***********************************************************
     Shortwave, part 2.
@@ -945,24 +955,15 @@ void initialize_atmos(atmos_data_struct        *atmos,
         atmos[rec].shortwave[i] += hourlyrad[idx];
       }
       atmos[rec].shortwave[i] /= options.SNOW_STEP;
-
-
       //std::clog << "i:" << i
       //          << "\tatmos[rec].shortwave[i]:" << atmos[rec].shortwave[i]
       //          << std::endl;
-
-
       sum += atmos[rec].shortwave[i];
     }
     if(NF>1) atmos[rec].shortwave[NR] = sum / (float)NF;
-
-
     //std::clog << "rec:" << rec
     //          << "\tatmos[rec].shortwave[NR]:" << atmos[rec].shortwave[NR]
     //          << std::endl;
-
-
-
   }
 
   /**************************************************************************
@@ -1492,6 +1493,21 @@ void initialize_atmos(atmos_data_struct        *atmos,
     if(NF>1) atmos[rec].tskc[NR] = sum / (float)NF;
   }
 
+#if defined(VIC_CROPSYST_VERSION)
+  //fraction of direct radiation
+  for (rec = 0; rec < global_param.nrecs; rec++) {
+    sum = 0;
+    for (j = 0; j < NF; j++) {
+      hour = rec*global_param.dt + j*options.SNOW_STEP + global_param.starthour - hour_offset_int;
+      if (global_param.starthour - hour_offset_int < 0) hour += 24;
+      idx = (int)((float)hour/24.0);
+      atmos[rec].shortwave_fdir[j] = daily_srad_fdir[idx];
+      sum += atmos[rec].shortwave_fdir[j];
+    }
+    if(NF>1) atmos[rec].shortwave_fdir[NR] = sum / (float)NF;
+  }
+#endif
+
   /*************************************************
     Longwave
   *************************************************/
@@ -1588,6 +1604,9 @@ void initialize_atmos(atmos_data_struct        *atmos,
   free(tminhour);
   free(tskc);
   free(daily_vp);
+#if defined(VIC_CROPSYST_VERSION)
+  free(daily_srad_fdir);
+#endif
   #if (VIC_CROPSYST_VERSION>=3)
   free(rhum_max);
   free(rhum_min);

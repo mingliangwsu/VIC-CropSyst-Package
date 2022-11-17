@@ -645,7 +645,11 @@ double modify_Ksat(double);
 void mtclim_wrapper(int, int, double, double, double, double,
                       double, double, double, double,
                       int, dmy_struct *, double *,
-                      double *, double *, double *, double *, double *);
+                      double *, double *, double *, double *, double *
+                    #if defined(VIC_CROPSYST_VERSION)
+                                  ,double *
+                    #endif
+                    );
 
 double new_snow_density(double);
 int    newt_raph(void (*vecfunc)(double *, double *, int, int, ...),

@@ -84,6 +84,9 @@ void alloc_atmos(int nrecs, atmos_data_struct **atmos)
       vicerror("Memory allocation error in alloc_atmos().");
       /*********added because of the coupling Keyvan Malek 01162013**/
 #ifdef VIC_CROPSYST_VERSION
+    (*atmos)[i].shortwave_fdir = (double *) calloc(NR+1, sizeof(double));
+    if ((*atmos)[i].shortwave_fdir == NULL)
+      vicerror("Memory allocation error in alloc_atmos().");
 /*130219
      (*atmos)[i].tmax = (double *) calloc(NR+1, sizeof(double));
     if ((*atmos)[i].tmax == NULL)
@@ -142,6 +145,7 @@ void free_atmos(const int nrecs, atmos_data_struct *atmos)
     free(atmos[i].wind);
 #ifdef VIC_CROPSYST_VERSION
     free(atmos[i].VCS.relative_humidity);                                        //keyvan added 130214
+    free(atmos[i].shortwave_fdir);
 #ifdef __BCPLUSPLUS__
 //190130RLN compiler doesn't see sph
 #else

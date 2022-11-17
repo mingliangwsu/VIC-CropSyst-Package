@@ -235,6 +235,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<"Tmax,"
                  <<"Tmin,"
                  <<"SWRAD_w_m2,"
+                 <<"SWRAD_fdir,"
                  <<"VP_kPa,"
                  <<"SPH_kg_kg,"
                  <<"RHUM_avg_%,"
@@ -363,6 +364,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
              <<"Tmax,"
              <<"Tmin,"
              <<"SWRAD_w_m2,"
+             <<"SWRAD_fdir,"
              <<"VP_kPa,"
              <<"SPH_kg_kg,"
              <<"RHUM_avg_%,"
@@ -525,6 +527,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].VCS.tmax
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].VCS.tmin
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].shortwave[options.VCS.NR]
+                 <<","<<active_land_unit->ref_VIC_atmos()[global_rec].shortwave_fdir[options.VCS.NR]
                  <<","<<active_land_unit->ref_VIC_atmos()[global_rec].vp[options.VCS.NR]
 #ifdef __BCPLUSPLUS__
 // RLN  compiler not finding sph
@@ -699,6 +702,7 @@ int VIC_land_unit_print_end_day_outputs(int growth_season_only,
          temp.Tmax = active_land_unit->ref_VIC_atmos()[global_rec].VCS.tmax;
          temp.Tmin = active_land_unit->ref_VIC_atmos()[global_rec].VCS.tmin;
          temp.SWRAD_w_m2 = active_land_unit->ref_VIC_atmos()[global_rec].shortwave[options.VCS.NR];
+         temp.SWRAD_fdir = active_land_unit->ref_VIC_atmos()[global_rec].shortwave_fdir[options.VCS.NR];
          temp.VP_kPa = active_land_unit->ref_VIC_atmos()[global_rec].vp[options.VCS.NR];
          temp.SPH_kg_kg = active_land_unit->ref_VIC_atmos()[global_rec].VCS.sph[options.VCS.NR];
          temp.RHUM_avg_per = active_land_unit->ref_VIC_atmos()[global_rec].VCS.relative_humidity[options.VCS.NR];

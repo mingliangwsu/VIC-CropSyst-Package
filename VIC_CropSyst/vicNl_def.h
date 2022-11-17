@@ -1048,6 +1048,7 @@ typedef struct {
 
 #ifdef VIC_CROPSYST_VERSION
   VCS_atmos_data_struct VCS;
+  double *shortwave_fdir;
   /*170412LML moved to VCS_Nl_def.h
   //KEYVAN added
   double tmax;                                                                   // max air temperature (C) * //keyvan NOV 2012 130219 RLN

@@ -69,6 +69,9 @@ typedef struct {
     double Tmax;
     double Tmin;
     double SWRAD_w_m2;
+//#ifdef OUTPUT_FRACTION_DIRECT_RADIATION
+    double SWRAD_fdir;
+//#endif
     double VP_kPa;
     double SPH_kg_kg;
     double RHUM_avg_per;

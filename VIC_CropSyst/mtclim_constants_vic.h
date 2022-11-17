@@ -108,6 +108,11 @@ typedef struct
   double *s_potrad; /* array of potential rad values */
   double *s_ttmax; /* array of clear sky transmittance values */
   double *s_tfmax; /* array of cloud transmittance factor values */
+
+#if defined(VIC_CROPSYST_VERSION)
+  double *s_srad_fdir;
+#endif
+
   /* end vic_change */
 } data_struct;
 

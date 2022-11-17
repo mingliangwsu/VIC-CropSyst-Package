@@ -730,6 +730,7 @@ int main (int argc, char *argv[])
                     << "," << temp->Tmax
                     << "," << temp->Tmin
                     << "," << temp->SWRAD_w_m2
+                    << "," << temp->SWRAD_fdir
                     << "," << temp->VP_kPa
                     << "," << temp->SPH_kg_kg
                     << "," << temp->RHUM_avg_per

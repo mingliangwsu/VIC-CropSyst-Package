@@ -61,7 +61,11 @@ void mtclim_to_vic(double hour_offset,
 		     int Ndays, dmy_struct *dmy, 
 		     double **tiny_radfract, control_struct *ctrl, 
 		     data_struct *mtclim_data, double *tskc, double *vp, 
-		     double *hourlyrad);
+             double *hourlyrad
+#if defined(VIC_CROPSYST_VERSION)
+             ,double *srad_fdir
+#endif
+                   );
 
 void mtclim_wrapper(int have_dewpt, int have_shortwave, double hour_offset,
 		      double elevation, double slope, double aspect,
@@ -69,7 +73,11 @@ void mtclim_wrapper(int have_dewpt, int have_shortwave, double hour_offset,
                       double annual_prcp, double lat, 
 		      int Ndays, dmy_struct *dmy, 
 		      double *prec, double *tmax, double *tmin, double *tskc,
-		      double *vp, double *hourlyrad) 
+              double *vp, double *hourlyrad
+#if defined(VIC_CROPSYST_VERSION)
+              ,double *srad_fdir
+#endif
+                    )
 /******************************************************************************
   mtclim_wrapper: interface between VIC and MTCLIM.
 
@@ -124,7 +132,11 @@ void mtclim_wrapper(int have_dewpt, int have_shortwave, double hour_offset,
   /* translate the mtclim structures back to the VIC data structures */
   mtclim_to_vic(hour_offset, Ndays,
 		  dmy, tiny_radfract, &ctrl,&mtclim_data, tskc, vp,
-		  hourlyrad);
+          hourlyrad
+#if defined(VIC_CROPSYST_VERSION)
+          ,srad_fdir
+#endif
+          );
 
   /* clean up */
   if (data_free(&ctrl, &mtclim_data)) {
@@ -229,7 +241,11 @@ void mtclim_to_vic(double hour_offset,
 		     int Ndays, dmy_struct *dmy, 
 		     double **tiny_radfract, control_struct *ctrl, 
 		     data_struct *mtclim_data, double *tskc, double *vp, 
-		     double *hourlyrad)
+             double *hourlyrad
+#if defined(VIC_CROPSYST_VERSION)
+             ,double *srad_fdir
+#endif
+                   )
 /******************************************************************************
   mtclim_to_vic: Store MTCLIM variables in VIC arrays.
 
@@ -312,5 +328,8 @@ void mtclim_to_vic(double hour_offset,
   for (i = 0; i < ctrl->ndays; i++) {
     tskc[i] = mtclim_data->s_tskc[i];
     vp[i] = mtclim_data->s_hum[i];
+#if defined(VIC_CROPSYST_VERSION)
+    srad_fdir[i] = mtclim_data->s_srad_fdir[i];
+#endif
   }
 }

@@ -365,6 +365,12 @@ int data_alloc(const control_struct *ctrl, data_struct *data)
     printf("Error allocating for site radiation array\n");
     ok=0;
   }
+#if defined(VIC_CROPSYST_VERSION)
+  if (ok && !(data->s_srad_fdir = (double*) malloc(ndays * sizeof(double)))) {
+    printf("Error allocating for site radiation array\n");
+    ok=0;
+  }
+#endif
   if (ok && !(data->s_dayl = (double*) malloc(ndays * sizeof(double)))) {
     printf("Error allocating for site daylength array\n");
     ok=0;
@@ -1168,6 +1174,11 @@ void compute_srad_humidity_onetime(int ndays, const control_struct *ctrl, data_s
     radiation for obstructed horizons */
     srad2 = flat_potrad[yday] * t_final * pdif * (sky_prop + DIF_ALB*(1.0-sky_prop)); 
 
+#if defined(VIC_CROPSYST_VERSION)
+    if ((srad1 + srad2) < 1e-12) data->s_srad_fdir[i] = 1.0;
+    else data->s_srad_fdir[i] = srad1 / (srad1 + srad2);
+#endif
+
     /* snow pack influence on radiation */
     if (options.MTCLIM_SWE_CORR && data->s_swe[i] > 0.0) {
       /* snow correction in J/m2/day */
@@ -1250,6 +1261,10 @@ int data_free(const control_struct *ctrl, data_struct *data)
   free(data->s_prcp);
   free(data->s_hum);
   free(data->s_srad);
+#if defined(VIC_CROPSYST_VERSION)
+  free(data->s_srad_fdir);
+#endif
+
   free(data->s_dayl);
   free(data->s_swe);
   /* start vic_change */

@@ -423,8 +423,9 @@ bool Crop_orchard_fruit::consider_inactive_period()                             
    considered &= Crop_complete::consider_inactive_period();                      //200402_190709_071120
       //200402 (avg_temperature);
       // was temperature_with_est_night
+
    if (fruit_chill_requirement)                                                  //021125
-   {   if (fruit_chill_requirement->is_satisfied())                              //021125
+   {   if (fruit_chill_requirement->is_satisfied())                             //021125
        {
           chill_requirement_satisfied_date.set(simdate);                         //081013
           delete fruit_chill_requirement; fruit_chill_requirement = 0;           //021125
@@ -443,6 +444,13 @@ bool Crop_orchard_fruit::consider_inactive_period()                             
           {
              float64 air_temperature_hour = ref_hourly_weather->get_air_temperature(hr); //080908
              fruit_chill_requirement->add_hour_temperature(air_temperature_hour);//050816
+          }
+          //230707LML under extreme condition, the chill is never satisfied, so will be wrongly accumulating.
+          //So if out of winter season, set the chill requirement satisfied whatever the temperature is
+
+
+          if(seasons.is_spring_or_summer_time() && fruit_chill_requirement->get_chill_hours_remaining() > 0) {
+                fruit_chill_requirement->set_chill_hours_reminning_negtive();
           }
        }
    }

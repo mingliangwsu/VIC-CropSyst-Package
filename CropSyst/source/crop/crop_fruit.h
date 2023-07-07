@@ -27,6 +27,7 @@ class Fruit_chill_requirement
       : chill_hours_remaining(chill_hours_needed)
       {}
    inline bool is_satisfied()  affirmation_ { return chill_hours_remaining < 0;}
+   inline set_chill_hours_reminning_negtive() {chill_hours_remaining = -1.0;}     //230707LML special cases the chill requirement never satisfied
  public:
    float32 add_hour_temperature(float64 temperature);                            //190709
       /// \returns correspoinding chill units deducted from chill_hours_remaining

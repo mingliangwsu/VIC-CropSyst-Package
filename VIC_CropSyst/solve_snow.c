@@ -188,6 +188,8 @@ double solve_snow(char                 overstory,
   vp        = atmos->vp[hidx];
   vpd       = atmos->vpd[hidx];
 
+
+
   /* initialize moisture variables */
   melt     = 0.;
   ppt[WET] = 0.;
@@ -201,8 +203,19 @@ double solve_snow(char                 overstory,
   (*delta_snow_heat) = 0.;
 
   /** Calculate Fraction of Precipitation that falls as Rain **/
-  rainonly      = calc_rainonly(air_temp, prec, MAX_SNOW_TEMP,
+  double rh = 0;
+  if ((is_approximately(MAX_SNOW_TEMP,-9999.) ||
+       is_approximately(MIN_RAIN_TEMP,-9999.))) {
+    rh = 100. * atmos->vp[hidx] / (atmos->vp[hidx] + atmos->vpd[hidx]);
+    rainonly = calc_rainonly_dynamic_threshold(air_temp,rh,prec,mu);
+  } else {
+    rainonly = calc_rainonly(air_temp, prec, MAX_SNOW_TEMP,
                 MIN_RAIN_TEMP, mu);
+  }
+  //if (prec > 0.001)
+  //  printf("solve_snow:  hidx:%d air_temp:%.2f prec:%.2f rh:%.2f snow_frac:%.2f\n",
+  //       hidx,air_temp,prec,rh,(prec - rainonly)/prec);
+
   snowfall[WET] = gauge_correction[SNOW] * (prec - rainonly);
   rainfall[WET] = gauge_correction[RAIN] * rainonly;
   snowfall[DRY] = 0.;

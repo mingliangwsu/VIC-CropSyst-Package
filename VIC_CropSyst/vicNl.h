@@ -174,6 +174,7 @@ double calc_longwave(const double tskc, const double  air_temp_celsius, const do
 void   calc_netlongwave(double *, double, double, double);
 double calc_netshort(double, int, double, double *);
 double calc_rainonly(const double,const double,const double,const double,double);
+double calc_rainonly_dynamic_threshold(const double,const double,const double,const double);
 double calc_rc(double,double,float,double,double,double,double,char);
 void   calc_root_fractions(const soil_con_struct&, veg_con_struct*);
 #if SPATIAL_SNOW

@@ -57,4 +57,31 @@ double calc_rainonly(const double air_temp,
   //fprintf(stderr,"MAX_SNOW_TEMP %f MIN_RAIN_TEMP %f\n",MAX_SNOW_TEMP,MIN_RAIN_TEMP);
   return(rainonly);
 }
+/******************************************************************************/
+double calc_rainonly_dynamic_threshold(
+             const double air_temp,
+             const double rh_percent,
+             const double prec,
+             const double mu) {
+/**********************************************************************
+The snow fraction is based on Jennings et al., 2018, Nature Communications
+Use Bivariate Ts and RH model
+**********************************************************************/
+
+  double rainonly = 0.;
+  if(air_temp >= 8) {
+    rainonly = prec;
+  } else if (air_temp <= -8) {
+    rainonly = 0;
+  } else {
+    rainonly = (1.0 - 1. / (1. + exp(-10.04 + 1.41 * air_temp + 0.09 * rh_percent)))
+               * prec;
+  }
+  if(mu < 1) rainonly = prec;
+
+  //if (prec > 0.00001)
+  //  printf("air_temp:%f rh_percent:%f snow_fraction:%.2f\n",
+  //       air_temp,rh_percent,(prec-rainonly)/prec);
+  return(rainonly);
+}
 #undef MIN_RAIN

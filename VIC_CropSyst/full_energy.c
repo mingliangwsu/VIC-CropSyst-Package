@@ -910,8 +910,21 @@ int  full_energy(char                 NEWCELL,
     lake_var->baseflow_in = (sum_baseflow * lake_con->rpercent + wetland_baseflow) * soil_con->cell_area * 0.001; // m3
     lake_var->channel_in  = atmos->channel_in[NR] * soil_con->cell_area * 0.001; // m3
     lake_var->prec        = atmos->prec[NR] * lake_var->sarea * 0.001; // m3
-    rainonly = calc_rainonly(atmos->air_temp[NR], atmos->prec[NR],
+    double rh = 0;
+    if ((is_approximately(global_param.MAX_SNOW_TEMP,-9999.) ||
+         is_approximately(global_param.MIN_RAIN_TEMP,-9999.))) {
+      rh = 100. * atmos->vp[NR] / (atmos->vp[NR] + atmos->vpd[NR]);
+      rainonly = calc_rainonly_dynamic_threshold(atmos->air_temp[NR],rh,atmos->prec[NR],1);
+    } else {
+      rainonly = calc_rainonly(atmos->air_temp[NR], atmos->prec[NR],
                              global_param.MAX_SNOW_TEMP, global_param.MIN_RAIN_TEMP, 1);
+    }
+
+
+    //printf("full_energy:  NR:%d air_temp:%.2f prec:%.2f rh:%.2f\n",
+    //       NR,atmos->air_temp[NR],atmos->prec[NR],rh);
+
+
     if ( (int)rainonly == ERROR ) {
       return( ERROR );
     }

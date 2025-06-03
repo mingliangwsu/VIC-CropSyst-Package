@@ -820,7 +820,6 @@ void collect_eb_terms(const energy_bal_struct &energy,
   out_data[OUT_LATENT_BAND].data[band]          -= energy.latent * Cv * lakefactor;
   out_data[OUT_SENSIBLE_BAND].data[band]        -= energy.sensible * Cv * lakefactor;
   out_data[OUT_GRND_FLUX_BAND].data[band]       -= energy.grnd_flux * Cv * lakefactor;
-
 }
 //______________________________________________________________________________
 double get_soilprofile_water_from_output_mm(const out_data_struct *outdata,

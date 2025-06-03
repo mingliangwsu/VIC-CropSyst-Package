@@ -456,6 +456,8 @@
 #define OUT_SNOW_PACKT_BAND     148                                              /* snow pack temperature [C] (ALMA_OUTPUT: [K]) */
 #define OUT_SNOW_SURFT_BAND     149                                              /* snow surface temperature [C] (ALMA_OUTPUT: [K]) */
 #define OUT_SWE_BAND            150                                              /* snow water equivalent in snow pack [mm] */
+//TESTING #define OUT_PREC_BAND            160                                              /* incoming precipitation [mm] */
+//TESTING #define OUT_TAIR_TEMP_BAND       161                                              /* air temperature [C] */
 // Dynamic Soil Property Terms - EXCESS_ICE option
 #if EXCESS_ICE
 #define OUT_SOIL_DEPTH          151                                              /* soil moisture layer depths [m] */

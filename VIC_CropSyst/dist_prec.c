@@ -120,7 +120,8 @@ int  dist_prec(atmos_data_struct   *atmos,
   //  If rec >= 0, proceed with simulation
   //**************************************************
   // check if state file has been used to initialize storm tracking
-  if ( init_dry_time >= 0 ) {
+  //if ( init_dry_time >= 0 ) {
+  if ( init_dry_time ) {
     // initialize storm tracking
     for (int veg = 0; veg <= veg_con[0].vegetat_type_num; veg++ ) {
       dry_time[veg]    = init_dry_time[veg];

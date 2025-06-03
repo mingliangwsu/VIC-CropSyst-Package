@@ -922,7 +922,7 @@ int surface_fluxes(char                 overstory,
     store_melt_energy       += step_melt_energy;
     store_sensible          += soil_energy.sensible;
     if ( step_snow.swq == 0 && INCLUDE_SNOW ) {
-      if ( last_snow_coverage == 0 && step_prec > 0 ) last_snow_coverage = 1;
+      if ( last_snow_coverage == 0 && step_prec ) last_snow_coverage = 1;
       store_advected_sensible += snow_energy.advected_sensible  * last_snow_coverage;
       store_advection         += snow_energy.advection          * last_snow_coverage;
       store_deltaCC           += snow_energy.deltaCC            * last_snow_coverage;

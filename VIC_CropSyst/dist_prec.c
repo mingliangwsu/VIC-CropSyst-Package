@@ -9,6 +9,8 @@ static char vcid[] = "$Id: dist_prec.c,v 5.10.2.6 2012/02/05 00:15:44 vicadmin E
 #include "agronomic/VIC_land_unit_simulation.h"
 //150930LML int init_grid_cell_crop_fluxes(Grid_cell_crop_output &grid_cell_crop_output);    //150929LML
 #endif
+#include "vic_state_csv.h"           /* 2026: soil/snow CSV state I/O */
+#include "crop/VIC_crop_state_csv.h" /* 2026: crop/vegetation CSV state I/O */
 
 int  dist_prec(atmos_data_struct   *atmos,
                dist_prcp_struct    *prcp,
@@ -281,5 +283,44 @@ int  dist_prec(atmos_data_struct   *atmos,
     write_model_state(prcp, veg_con[0].vegetat_type_num,
               soil_con->gridcel, filep, soil_con,
               still_storm, dry_time, *lake_con);
+
+  //************************************
+  //  2026: Save CSV state at the same assigned date, in addition to
+  //  (or instead of) the legacy binary/ASCII state above. See
+  //  vic_state_csv.h / crop/VIC_crop_state_csv.h. Soil/snow state
+  //  comes straight from `prcp`, exactly as write_model_state() uses
+  //  it above. Crop/vegetation state is read per veg tile from
+  //  prcp->veg_var[0][veg][0].crop_state (the crop_data_struct
+  //  pointer VIC-CropSyst V3 already attaches to each veg tile's
+  //  veg_var_struct -- see vicNl_def.h), and is written even if no
+  //  crop model is enabled (in which case every row is written with
+  //  is_active=0, which is harmless and keeps the CSV schema uniform
+  //  across cells/runs).
+  //************************************
+  if ( options.CSV_STATE_FILE
+       &&  ( dmy[rec].year == global_param->stateyear
+             && dmy[rec].month == global_param->statemonth
+             && dmy[rec].day == global_param->stateday
+             && ( rec+1 == global_param->nrecs
+                  || dmy[rec+1].day != global_param->stateday ) ) ) {
+    if ( filep->statefile_csv != NULL )
+      write_model_state_csv(filep->statefile_csv, prcp,
+                veg_con[0].vegetat_type_num, soil_con->gridcel,
+                soil_con, still_storm, dry_time, &dmy[rec]);
+#if VIC_CROPSYST_VERSION>=3
+    if ( filep->crop_statefile_csv != NULL ) {
+      int veg;
+      for ( veg = 0; veg <= veg_con[0].vegetat_type_num; veg++ ) {
+        crop_data_struct *this_veg_crop =
+            (veg < veg_con[0].vegetat_type_num)
+            ? prcp->veg_var[0][veg][0].crop_state
+            : NULL; /* bare soil tile: no crop */
+        write_crop_state_csv(filep->crop_statefile_csv, soil_con->gridcel,
+                  veg, this_veg_crop, &dmy[rec]);
+      }
+    }
+#endif
+  }
+
   return ( ErrorFlag );
 }

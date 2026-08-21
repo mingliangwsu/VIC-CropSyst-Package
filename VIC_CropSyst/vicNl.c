@@ -329,6 +329,32 @@ int main (int argc, char *argv[])
   if ( options.SAVE_STATE && strcmp( filenames.statefile, "NONE" ) != 0 )
     filep.statefile = open_state_file(filenames);
   else filep.statefile = NULL;
+
+  /* 2026: CSV state file support -- see vic_state_csv.h and
+     crop/VIC_crop_state_csv.h. Companion files are named by suffixing
+     the existing STATENAME / INIT_STATE paths with "_soil.csv" and
+     "_crop.csv" so no additional global-parameter-file keywords are
+     needed beyond CSV_STATE_FILE TRUE. */
+  filep.statefile_csv = NULL;
+  filep.crop_statefile_csv = NULL;
+  filep.init_state_csv_path[0] = '\0';
+  filep.init_crop_state_csv_path[0] = '\0';
+  if ( options.CSV_STATE_FILE ) {
+    if ( options.SAVE_STATE && strcmp( filenames.statefile, "NONE" ) != 0 ) {
+      sprintf(filenames.statefile_csv,      "%s_soil.csv", filenames.statefile);
+      sprintf(filenames.crop_statefile_csv, "%s_crop.csv", filenames.statefile);
+      filep.statefile_csv      = fopen(filenames.statefile_csv,      "w");
+      filep.crop_statefile_csv = fopen(filenames.crop_statefile_csv, "w");
+      if ( filep.statefile_csv == NULL )
+        nrerror("Unable to open CSV soil/snow state output file.");
+      if ( filep.crop_statefile_csv == NULL )
+        nrerror("Unable to open CSV crop/vegetation state output file.");
+    }
+    if ( options.INIT_STATE ) {
+      sprintf(filep.init_state_csv_path,      "%s_soil.csv", filenames.init_state);
+      sprintf(filep.init_crop_state_csv_path, "%s_crop.csv", filenames.init_state);
+    }
+  }
 #endif // !OUTPUT_FORCE
   /************************************
     Run Model for all Active Grid Cells
@@ -806,6 +832,10 @@ int main (int argc, char *argv[])
     fclose(filep.init_state);
   if ( options.SAVE_STATE && strcmp( filenames.statefile, "NONE" ) != 0 )
     fclose(filep.statefile);
+  if ( filep.statefile_csv != NULL )
+    fclose(filep.statefile_csv);
+  if ( filep.crop_statefile_csv != NULL )
+    fclose(filep.crop_statefile_csv);
 
 #endif /* !OUTPUT_FORCE */
   #if VIC_CROPSYST_VERSION>=3

@@ -3,6 +3,9 @@
 #define VIC_land_unit_simulationH
 // CropSyst/source should be added to the include paths                          //141206
 #include "CropSyst/source/land_unit_sim.h"
+#ifndef growth_stagesH
+#  include "crop/growth_stages.h" // for Normal_crop_event_sequence (2026, restore_state)
+#endif
 //200817 #include "CropSyst/source/arguments_CropSyst.h"
 #include "CS_suite/application/CS_arguments.h"
 #ifdef VCS_V5
@@ -238,6 +241,37 @@ class Land_unit_simulation
       ,float64               water_entering_soil
       ,soil_layer_array64   (water_flow))                          modification_;
    virtual float64 get(nat32 variable_code)                                const;
+   // 2026: dedicated accessors for the prognostic crop state values
+   // needed by crop/VIC_crop_state_csv.h. These are deliberately NOT
+   // routed through get(nat32) above, because get() dispatches on
+   // VIC::CropSyst_Variables (this header), a distinct, independently
+   // numbered enum from the Variable_code enum in
+   // crop/VIC_crop_variable_codes.h that the plain-C driver code uses
+   // for VIC_CropSyst_get(). Reusing the same numeric codes across
+   // both would only work by numeric coincidence and silently break
+   // if either enum is ever reordered; dedicated named accessors avoid
+   // that fragility entirely.
+   virtual float64 get_accum_degree_days_for_state()                       const;
+   virtual int      get_growth_stage_code_for_state()                      const;
+   virtual float64 get_root_biomass_kg_m2_for_state()                      const;
+   virtual float64 get_canopy_biomass_kg_m2_for_state()                    const;
+   virtual float64 get_GAI_for_state()                                     const;
+   virtual float64 get_root_depth_m_for_state()                           const;
+   virtual float64 get_water_stress_index_for_state()                      const;
+   // 2026: forwards to VIC_crop::CropSyst_proper_crop::restore_state() for
+   // whichever crop is currently active in this land unit's rotation (see
+   // crop_active_or_intercrop, inherited from CropSyst::Land_unit_simulation).
+   // Mirrors the forwarding pattern already used by get() above. Returns
+   // false if there is no active crop, or if the active crop object is not
+   // a VIC_crop::CropSyst_proper_crop (which would indicate this land unit
+   // is using an unsupported crop implementation).
+   virtual bool restore_state
+      (float64                    biomass_kg_m2
+      ,float64                    GAI
+      ,float64                    root_depth_m
+      ,Normal_crop_event_sequence growth_stage
+      ,float64                    accum_thermal_time_deg_day
+      )                                                            modification_;
    //_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
    //141208 The following 'know' methods could be eliminated
    // if the values can be setup in start_day() from

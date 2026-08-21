@@ -19,6 +19,31 @@ enum Variable_code
 ,  VC_transpiration_actual_mm
 ,  VC_canopy_cover_fraction_green                                                //121218
 ,  VC_canopy_cover_fraction_total                                                //121218
+/* 2026: additional codes added to support saving/restoring crop state
+   for scenario-branching "initial state" runs -- see
+   crop/VIC_crop_state_csv.h and VIC_CropSyst_proper_crop::restore_state().
+   These are prognostic/state variables (as opposed to the diagnostic
+   flux-like variables above) and are meaningful to capture and later
+   feed back into restore_state().
+
+   IMPORTANT: this Variable_code enum is consumed by
+   CropSyst_proper_crop::get() (see VIC_CropSyst_proper_crop.cpp) when
+   called directly on a CropSyst_proper_crop/Crop_CropSyst pointer.
+   It is a *different*, independently-numbered enum from
+   VIC::CropSyst_Variables (agronomic/VIC_land_unit_simulation.h),
+   which is what VIC_land_unit_get()/Land_unit_simulation::get() (the
+   actual V3 driver dispatch path -- see active_land_unit in
+   agronomic/VIC_land_unit_C_interface.cpp) uses instead. Passing a
+   Variable_code value into VIC_land_unit_get()/VIC_CropSyst_get() in a
+   V3 build will not reach the switch below; it will be interpreted as
+   a VIC::CropSyst_Variables value, which is almost certainly not what
+   was intended. For V3 crop-state CSV I/O, use the dedicated
+   VIC_land_unit_get_*_for_state() accessors in
+   agronomic/VIC_land_unit_C_interface.h instead (see
+   crop/VIC_crop_state_csv.c), which bypass this ambiguity entirely. */
+,  VC_accum_degree_days       // cumulative thermal time, degree-days
+,  VC_growth_stage_code       // current Normal_crop_event_sequence value
+,  VC_root_biomass_kg_m2      // actual root biomass, kg/m2
 /*
 // The following are by layer Add the soil layer number to specify
 // the variable by layer.

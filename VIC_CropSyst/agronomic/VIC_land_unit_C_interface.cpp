@@ -798,6 +798,66 @@ double VIC_land_unit_get
       : (double)0.0;
    return VIC_land_unit_get_return ;
 }
+/*_VIC_land_unit_restore_crop_state_________________________________2026______*/
+int VIC_land_unit_restore_crop_state
+(double biomass_kg_m2
+,double GAI
+,double root_depth_m
+,int    growth_stage_code
+,double accum_thermal_time_deg_day)
+{
+   return (active_land_unit)
+      ? (int)active_land_unit->restore_state
+           ((float64)biomass_kg_m2
+           ,(float64)GAI
+           ,(float64)root_depth_m
+           ,(Normal_crop_event_sequence)growth_stage_code
+           ,(float64)accum_thermal_time_deg_day)
+      : 0;
+}
+/*_2026________________________________________________________________________*/
+double VIC_land_unit_get_accum_degree_days()
+{
+   return (active_land_unit)
+      ? (double)active_land_unit->get_accum_degree_days_for_state()
+      : 0.0;
+}
+int VIC_land_unit_get_growth_stage_code()
+{
+   return (active_land_unit)
+      ? active_land_unit->get_growth_stage_code_for_state()
+      : (int)NGS_NONE;
+}
+double VIC_land_unit_get_root_biomass_kg_m2()
+{
+   return (active_land_unit)
+      ? (double)active_land_unit->get_root_biomass_kg_m2_for_state()
+      : 0.0;
+}
+double VIC_land_unit_get_canopy_biomass_kg_m2()
+{
+   return (active_land_unit)
+      ? (double)active_land_unit->get_canopy_biomass_kg_m2_for_state()
+      : 0.0;
+}
+double VIC_land_unit_get_GAI()
+{
+   return (active_land_unit)
+      ? (double)active_land_unit->get_GAI_for_state()
+      : 0.0;
+}
+double VIC_land_unit_get_root_depth_m()
+{
+   return (active_land_unit)
+      ? (double)active_land_unit->get_root_depth_m_for_state()
+      : 0.0;
+}
+double VIC_land_unit_get_water_stress_index()
+{
+   return (active_land_unit)
+      ? (double)active_land_unit->get_water_stress_index_for_state()
+      : 0.0;
+}
 /*_VIC_land_unit_get_______________________________________________2015-04-15_*/
 /* LML 150423
 double VIC_CropSyst_get_transpiration(double layerevap[MAX_LAYERS])

@@ -552,6 +552,10 @@ typedef struct {
   FILE *snowband;                                                                //* snow elevation band data file *
   FILE *soilparam;                                                               //* soil parameters for all grid cells *
   FILE *statefile;                                                               //* output model state file *
+  FILE *statefile_csv;                                                           //* 2026: output soil/snow state CSV file (see vic_state_csv.h) *
+  FILE *crop_statefile_csv;                                                      //* 2026: output crop/vegetation state CSV file (see crop/VIC_crop_state_csv.h) *
+  char  init_state_csv_path[MAXSTRING];                                          //* 2026: resolved path of the soil/snow CSV state file to read on INIT_STATE (built in vicNl.c from filenames.init_state) *
+  char  init_crop_state_csv_path[MAXSTRING];                                     //* 2026: resolved path of the crop/vegetation CSV state file to read on INIT_STATE *
   FILE *veglib;                                                                  //* vegetation parameters for all vege types *
   FILE *vegparam;                                                                //* fractional coverage info for grid cell *
 #ifdef VIC_CROPSYST_VERSION
@@ -586,6 +590,8 @@ typedef struct {
                                                                                  //ARC/INFO files *
   char  soil_dir[MAXSTRING];                                                     //* directory from which to read ARC/INFO soil files *
   char  statefile[MAXSTRING];                                                    //* name of file in which to store model state *
+  char  statefile_csv[MAXSTRING];                                                //* 2026: derived from statefile, "<statefile>_soil.csv" (see vic_state_csv.h) *
+  char  crop_statefile_csv[MAXSTRING];                                           //* 2026: derived from statefile, "<statefile>_crop.csv" (see crop/VIC_crop_state_csv.h) *
   char  veg[MAXSTRING];                                                          //* vegetation grid coverage file *
   char  veglib[MAXSTRING];                                                       //* vegetation parameter library file *
 #ifdef VIC_CROPSYST_VERSION
@@ -722,6 +728,13 @@ typedef struct {
   char   BINARY_STATE_FILE;                                                      //* TRUE = model state file is binary (default) *
   char   INIT_STATE;                                                             //* TRUE = initialize model state from file *
   char   SAVE_STATE;                                                             //* TRUE = save state file *
+  char   CSV_STATE_FILE;                                                         //* 2026: TRUE = also read/write a tabular CSV state file
+                                                                                 //   (soil/snow state via vic_state_csv.h and, if a crop
+                                                                                 //   model is enabled, crop/vegetation state via
+                                                                                 //   crop/VIC_crop_state_csv.h), in addition to (or instead
+                                                                                 //   of) the legacy BINARY_STATE_FILE/ASCII mechanism. This
+                                                                                 //   is what enables sharing one "initial state" snapshot
+                                                                                 //   across multiple scenario runs. Default = FALSE. *
 
   // output options
   char   ALMA_OUTPUT;                                                            // TRUE = output variables are in ALMA-compliant units; FALSE = standard VIC units *

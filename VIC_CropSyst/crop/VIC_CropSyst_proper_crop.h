@@ -48,6 +48,55 @@ class CropSyst_proper_crop
    virtual bool is_ready_for_clipping()                                    const;
    virtual bool respond_to_clipping()                              modification_;
    virtual bool perform_clipping_and_ensure_end_of_pseudodormancy()modification_;
+ public: // 2026 state restore support (scenario-branching / warm restart)
+   /**
+   \brief Pushes a previously-saved crop state snapshot into this
+   (freshly created) crop object so that a new run can resume growth
+   from the same point another run reached on a given day, instead of
+   re-simulating the crop from planting.
+   \param [in] biomass_kg_m2   total above ground biomass, kg/m2
+                                (same units as VC_biomass_current_t_ha / 10).
+   \param [in] GAI             green area index (unitless).
+   \param [in] root_depth_m    rooting depth, meters.
+   \param [in] growth_stage    the Normal_crop_event_sequence stage the
+                                crop had reached (see growth_stages.h).
+   \param [in] accum_thermal_time_deg_day
+                                cumulative thermal time (degree-days)
+                                the crop had accumulated. NOTE: there is
+                                currently no public setter for this
+                                quantity inside the CropSyst phenology
+                                engine (Phenology_2018 keeps it as a
+                                private accumulator). This parameter is
+                                accepted and recorded for reporting /
+                                validation purposes, and used to pick
+                                the closest matching growth stage when
+                                \p growth_stage is not supplied (< 0),
+                                but it does NOT currently force the
+                                internal degree-day accumulator to this
+                                exact value. Practically this means a
+                                restored crop resumes at the correct
+                                growth STAGE, and biomass/canopy/root
+                                are restored exactly, but thermal-time
+                                accumulation within that stage restarts
+                                from the stage's own activation point
+                                rather than from the precise saved
+                                value. See VIC_crop_state_csv.h and the
+                                project README for details and for how
+                                to extend this if exact GDD replay is
+                                required (it would need a small
+                                addition to Phenology_2018 itself to
+                                expose a protected/private accumulator
+                                such as GDDs via a public setter).
+   \return true if at least the growth stage and canopy/root state
+   were successfully restored.
+   */
+   virtual bool restore_state
+      (float64                    biomass_kg_m2
+      ,float64                    GAI
+      ,float64                    root_depth_m
+      ,Normal_crop_event_sequence growth_stage
+      ,float64                    accum_thermal_time_deg_day
+      )                                                            modification_;
 };
 //_2014-05-09___________________________________________________________________
 } // namespace VIC_crop

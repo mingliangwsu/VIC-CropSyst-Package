@@ -180,6 +180,7 @@ void initialize_global() {
   options.BINARY_STATE_FILE     = FALSE;
   options.INIT_STATE            = FALSE;
   options.SAVE_STATE            = FALSE;
+  options.CSV_STATE_FILE        = FALSE; // 2026: see vic_state_csv.h
   // output options
   options.ALMA_OUTPUT           = FALSE;
   options.BINARY_OUTPUT         = FALSE;

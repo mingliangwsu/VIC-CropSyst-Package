@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <vicNl.h>
 #include <string.h>
+#include "vic_state_csv.h" /* 2026: CSV state file support */
 
 #ifdef __BCPLUSPLUS__
 #define logf(x) log(x)
@@ -311,6 +312,25 @@ int initialize_model_state(dist_prcp_struct    *prcp,
     }
 #endif
 
+    /* 2026: CSV state file support (see vic_state_csv.h). When
+       CSV_STATE_FILE is set, the soil/snow state is read from the
+       companion "<init_state>_soil.csv" file (built from
+       filenames.init_state in vicNl.c) instead of the legacy
+       binary/ASCII file. If that cell is not present in the CSV
+       file, we fall through to the normal cold-start initialization
+       below rather than erroring out, since a state snapshot built
+       for a subset of cells is a reasonable/expected use case for
+       scenario work. */
+    if (options.CSV_STATE_FILE) {
+      int found = read_initial_model_state_csv(filep.init_state_csv_path,
+                       prcp, Nveg, options.SNOW_BAND, cellnum, soil_con,
+                       *init_STILL_STORM, *init_DRY_TIME);
+      if (!found)
+        fprintf(stderr, "WARNING: grid cell %d not found in CSV state file "
+                         "\"%s\"; falling back to cold-start initialization "
+                         "for this cell.\n", cellnum, filep.init_state_csv_path);
+    }
+    else
     read_initial_model_state(filep.init_state, prcp,
 			     Nveg, options.SNOW_BAND, cellnum, soil_con,
                  *init_STILL_STORM, *init_DRY_TIME, lake_con);

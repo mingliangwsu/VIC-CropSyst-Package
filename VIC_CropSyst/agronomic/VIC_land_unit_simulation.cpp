@@ -15,6 +15,7 @@
 #include "CropSyst/source/rot_param.h"
 #include "CropSyst/source/crop/crop_interfaced.h"
 #include "CropSyst/source/crop/phenology_I.h"
+#include "crop/VIC_CropSyst_proper_crop.h" // 2026: for restore_state() dynamic_cast target
 #include "organic_matter/OM_residues_profile_abstract.h"                         //150722LML
 #include "residue/residues_cycling.h"                                            //150722LML
 #include "residue/residues_interface.h"                                          //160509LML
@@ -663,6 +664,87 @@ float64 Land_unit_simulation::get(nat32 variable_code) const
     return outvalue;
 }
 //_get______________________________________________________________2014-10-23_/
+float64 Land_unit_simulation::get_accum_degree_days_for_state()            const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_accum_degree_days()
+       : 0.0;
+}
+//_get_accum_degree_days_for_state___________________________________2026______/
+int Land_unit_simulation::get_growth_stage_code_for_state()                const
+{
+    return crop_active_or_intercrop
+       ? (int)crop_active_or_intercrop->ref_phenology().get_growth_stage_sequence()
+       : (int)NGS_NONE;
+}
+//_get_growth_stage_code_for_state___________________________________2026______/
+float64 Land_unit_simulation::get_root_biomass_kg_m2_for_state()           const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_act_root_biomass_kg_m2()
+       : 0.0;
+}
+//_get_root_biomass_kg_m2_for_state__________________________________2026______/
+float64 Land_unit_simulation::get_canopy_biomass_kg_m2_for_state()         const
+{
+    // Note: crop_data_struct::biomass_current (see vicNl_def.h) is only
+    // ever populated in the legacy V2 driver path (call_crop_model.c);
+    // for V3 it is queried directly from the crop object here instead,
+    // exactly as get_root_biomass_kg_m2_for_state() does above.
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_canopy_biomass_kg_m2()
+       : 0.0;
+}
+//_get_canopy_biomass_kg_m2_for_state________________________________2026______/
+float64 Land_unit_simulation::get_GAI_for_state()                          const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_GAI(true)
+       : 0.0;
+}
+//_get_GAI_for_state__________________________________________________2026______/
+float64 Land_unit_simulation::get_root_depth_m_for_state()                const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_recorded_root_depth_m()
+       : 0.0;
+}
+//_get_root_depth_m_for_state_________________________________________2026______/
+float64 Land_unit_simulation::get_water_stress_index_for_state()           const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_water_stress_index()
+       : 0.0;
+}
+//_get_water_stress_index_for_state___________________________________2026______/
+bool Land_unit_simulation::restore_state
+(float64                    biomass_kg_m2
+,float64                    GAI
+,float64                    root_depth_m
+,Normal_crop_event_sequence growth_stage
+,float64                    accum_thermal_time_deg_day
+)                                                                   modification_
+{
+    // Forwards to whichever crop is currently active in this land unit's
+    // rotation, mirroring the crop_active_or_intercrop forwarding pattern
+    // used by get() above. crop_active_or_intercrop is a
+    // CropSyst::Crop_model_interface*; the concrete restore_state()
+    // implementation lives on VIC_crop::CropSyst_proper_crop (the only
+    // crop implementation VIC-CropSyst V3 currently instantiates -- see
+    // crop/VIC_CropSyst_proper_crop.h/.cpp), so a dynamic_cast is used
+    // here rather than widening the CropSyst engine's own
+    // Crop_model_interface with a VIC-specific method.
+    if (!crop_active_or_intercrop)
+        return false;
+    VIC_crop::CropSyst_proper_crop *restorable_crop =
+        dynamic_cast<VIC_crop::CropSyst_proper_crop *>(crop_active_or_intercrop);
+    if (!restorable_crop)
+        return false;
+    return restorable_crop->restore_state
+        (biomass_kg_m2, GAI, root_depth_m, growth_stage,
+         accum_thermal_time_deg_day);
+}
+//_restore_state____________________________________________________2026_______/
 bool Land_unit_simulation::initialize()                            modification_
 {
    //std::clog << "Scenario file name:" << arguments->provide_scenario_file_name().c_str() << std::endl;

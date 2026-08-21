@@ -465,6 +465,18 @@ global_param_struct get_global_param(filenames_struct *names,
         if(strcasecmp("FALSE",flgstr)==0) options.BINARY_STATE_FILE=FALSE;
 	else options.BINARY_STATE_FILE=TRUE;
       }
+      else if(strcasecmp("CSV_STATE_FILE",optstr)==0) {
+        /* 2026: enables the tabular CSV state format (soil/snow +
+           crop/vegetation) used for scenario-branching "initial state"
+           runs. See vic_state_csv.h and crop/VIC_crop_state_csv.h.
+           When TRUE, VIC additionally reads/writes CSV files named
+           from names->init_state / names->statefile with "_soil.csv"
+           and "_crop.csv" suffixes, alongside whatever
+           BINARY_STATE_FILE produces. */
+        sscanf(cmdstr,"%*s %s",flgstr);
+        if(strcasecmp("FALSE",flgstr)==0) options.CSV_STATE_FILE=FALSE;
+        else options.CSV_STATE_FILE=TRUE;
+      }
 
       /*************************************
        Define forcing files

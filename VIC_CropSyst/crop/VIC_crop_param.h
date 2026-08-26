@@ -9,12 +9,7 @@
 #else
 #  ifdef CROP_PARAMETERS_HARDCODED
 #  else
-#     #if (defined(_WIN32)  || defined(_WIN64))
-#        include "crop/crop_param_V5.h"
-#     else
-#        include "crop/crop_param_V5.h"
-            //CropSyst/crop/crop_param_V5.h"
-#     endif
+#     include "crop/crop_param_V4.h"   // was crop_param_V5.h — V5 still reads V4 files project-wide
 #  endif
 #endif
 

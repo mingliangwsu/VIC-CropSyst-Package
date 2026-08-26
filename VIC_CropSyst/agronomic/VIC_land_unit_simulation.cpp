@@ -1,7 +1,6 @@
 ﻿#ifdef VIC_CROPSYST_VERSION
 #include "VIC_land_unit_simulation.h"
 #include "VIC_land_unit_C_interface.h"
-
 #include "corn/measure/measures.h"
 #include "corn/data_source/vv_file.h"
 #include "corn/chronometry/date_32.h"
@@ -15,7 +14,6 @@
 #include "CropSyst/source/rot_param.h"
 #include "CropSyst/source/crop/crop_interfaced.h"
 #include "CropSyst/source/crop/phenology_I.h"
-#include "crop/VIC_CropSyst_proper_crop.h" // 2026: for restore_state() dynamic_cast target
 #include "organic_matter/OM_residues_profile_abstract.h"                         //150722LML
 #include "residue/residues_cycling.h"                                            //150722LML
 #include "residue/residues_interface.h"                                          //160509LML
@@ -716,7 +714,6 @@ float64 Land_unit_simulation::get_water_stress_index_for_state()           const
        ? crop_active_or_intercrop->get_water_stress_index()
        : 0.0;
 }
-//_get_water_stress_index_for_state___________________________________2026______/
 bool Land_unit_simulation::restore_state
 (float64                    biomass_kg_m2
 ,float64                    GAI
@@ -725,24 +722,22 @@ bool Land_unit_simulation::restore_state
 ,float64                    accum_thermal_time_deg_day
 )                                                                   modification_
 {
-    // Forwards to whichever crop is currently active in this land unit's
-    // rotation, mirroring the crop_active_or_intercrop forwarding pattern
-    // used by get() above. crop_active_or_intercrop is a
-    // CropSyst::Crop_model_interface*; the concrete restore_state()
-    // implementation lives on VIC_crop::CropSyst_proper_crop (the only
-    // crop implementation VIC-CropSyst V3 currently instantiates -- see
-    // crop/VIC_CropSyst_proper_crop.h/.cpp), so a dynamic_cast is used
-    // here rather than widening the CropSyst engine's own
-    // Crop_model_interface with a VIC-specific method.
-    if (!crop_active_or_intercrop)
-        return false;
-    VIC_crop::CropSyst_proper_crop *restorable_crop =
-        dynamic_cast<VIC_crop::CropSyst_proper_crop *>(crop_active_or_intercrop);
-    if (!restorable_crop)
-        return false;
-    return restorable_crop->restore_state
-        (biomass_kg_m2, GAI, root_depth_m, growth_stage,
-         accum_thermal_time_deg_day);
+    // 2026 TODO: no restore/setter mechanism currently exists on
+    // CropSyst::Crop_model_interface (crop/crop_interfaced.h), and the
+    // VIC_crop::CropSyst_proper_crop class this was originally written
+    // against is not part of the compiled build (its .cpp is not listed
+    // in any working Makefile_Kamiak, nor is its only other caller,
+    // VIC_crop_weather.cpp). Restoring saved crop state therefore
+    // requires adding a new virtual method to Crop_model_interface and
+    // implementing it in whichever concrete crop class is actually
+    // instantiated at runtime (see CropSyst/source, built as a separate
+    // library) -- not attempted here.
+    (void)biomass_kg_m2;
+    (void)GAI;
+    (void)root_depth_m;
+    (void)growth_stage;
+    (void)accum_thermal_time_deg_day;
+    return false;
 }
 //_restore_state____________________________________________________2026_______/
 bool Land_unit_simulation::initialize()                            modification_

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <vicNl.h>
 #include "VIC_crop_state_csv.h"
-#include "VIC_land_unit_C_interface.h"
+#include "agronomic/VIC_land_unit_C_interface.h"
 
 /*********************************************************************
   crop/VIC_crop_state_csv.c

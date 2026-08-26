@@ -28,7 +28,7 @@ class Vapor_pressure_deficit_daytime;
 class Transpiration_interface;
 namespace CropSyst
 {
-class Phenology_interface;
+class Phenology;
 class Crop_CO2_response;                                                         //110903
 }
 namespace CropSyst                                                               //110903

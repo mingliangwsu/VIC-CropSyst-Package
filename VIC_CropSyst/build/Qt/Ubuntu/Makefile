@@ -199,7 +199,9 @@ SOURCES       = ../../../CalcAerodynamic.c \
 		../../../../CS_suite/observation/CS_optation.cpp \
 		../../../../corn/dataset/span.cpp \
 		../../../../corn/application/arguments.cpp \
-		../../../../corn/OS/FS/path_discovery.cpp 
+		../../../../corn/OS/FS/path_discovery.cpp \
+		../../../crop/VIC_crop_state_csv.c \
+		../../../vic_state_csv.c 
 OBJECTS       = CalcAerodynamic.o \
 		CalcBlowingSnow.o \
 		IceEnergyBalance.o \
@@ -347,7 +349,9 @@ OBJECTS       = CalcAerodynamic.o \
 		CS_optation.o \
 		span.o \
 		arguments.o \
-		path_discovery.o
+		path_discovery.o \
+		VIC_crop_state_csv.o \
+		vic_state_csv.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -744,7 +748,9 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../../../../CS_suite/observation/CS_optation.cpp \
 		../../../../corn/dataset/span.cpp \
 		../../../../corn/application/arguments.cpp \
-		../../../../corn/OS/FS/path_discovery.cpp
+		../../../../corn/OS/FS/path_discovery.cpp \
+		../../../crop/VIC_crop_state_csv.c \
+		../../../vic_state_csv.c
 QMAKE_TARGET  = VIC_CropSyst
 DESTDIR       = 
 TARGET        = VIC_CropSyst
@@ -923,7 +929,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../global.h ../../../irrigation_lib.h ../../../mtclim42_vic.h ../../../mtclim_constants_vic.h ../../../mtclim_parameters_vic.h ../../../snow.h ../../../user_def.h ../../../vicNl.h ../../../vicNl_def.h ../../../wgtpar.h ../../../LAKE.h ../../../crop/vic_crop_land_unit_simulation.h ../../../agronomic/search_veg_lib.h ../../../agronomic/VIC_land_unit_C_interface.h ../../../agronomic/VIC_land_unit_simulation.h ../../../agronomic/VIC_soil.h ../../../../VIC/vic/vic_run/include/vic_physical_constants.h ../../../WSU_vicNl.h ../../../WSU_vicNl_def.h ../../../vic_5_emulator/vic/vic_run/include/vic_run.h ../../../vic_5_emulator/vic/vic_run/include/vic_def.h ../../../vic_5_emulator/vic/drivers/shared_all/include/vic_driver_shared_all.h ../../../../VIC_CropSyst_common/VCS_Nl.h ../../../../VIC_CropSyst_common/VCS_global.h ../../../../VIC_CropSyst_common/VCS_user_def.h ../../../crop/VIC_crop_C_interface.h ../../../crop/VIC_soil_hydrology.h ../../../crop/biometeorology/ET_common.h ../../../crop/biometeorology/ET_model.h ../../../crop/biometeorology/ET_reference.h ../../../crop/biometeorology/ET_reference_interface.h ../../../crop/soil/hydrology_interface.h ../../../crop/soil/layers_interface.h ../../../crop/unit_tests/VIC_crop_test_soil_WC.h ../../../crop/unit_tests/VIC_crop_test_weather.h ../../../../common/weather/ET_and_plant_influential_elements.h ../../../../common/weather/current_elements_interface.h ../../../../common/weather/parameter/WP_ET_reference.h ../../../../common/weather/parameter/WP_air_temperature.h ../../../../common/weather/parameter/WP_atmospheric_pressure.h ../../../../common/weather/parameter/WP_dew_point_temperature.h ../../../../common/weather/parameter/WP_precipitation.h ../../../../common/weather/parameter/WP_relative_humidity.h ../../../../common/weather/parameter/WP_solar_radiation.h ../../../../common/weather/parameter/WP_temperature.h ../../../../common/weather/parameter/WP_vapor_pressure.h ../../../../common/weather/parameter/WP_vapor_pressure_act.h ../../../../common/weather/parameter/WP_vapor_pressure_deficit.h ../../../../common/weather/parameter/WP_wind_speed.h ../../../../common/weather/parameter/weather_parameter.h ../../../../common/weather/parameter/WC_solar_radiation.h ../../../../common/weather/parameter/WC_vapor_pressure.h ../../../../common/weather/parameter/WC_dew_point_temperature.h ../../../../common/weather/parameter/WC_relative_humidity.h ../../../../common/weather/parameter/WC_ET_reference.h ../../../../common/weather/parameter/WC_vapor_pressure_deficit.h ../../../../common/weather/parameter/WC_vapor_pressure_act.h ../../../../common/weather/parameter/WC_psychrometric_const.h ../../../../common/weather/plant_influential_elements.h ../../../../common/weather/sun.h ../../../../common/weather/weather_crop_interface.h ../../../../common/weather/weather_interface.h ../../../../common/weather/weather_provider.h ../../../../common/weather/weather_types.h ../../../../CropSyst/source/crop/phenology_interface.h ../../../crop/VIC_weather_provider.h ../../../../CropSyst/source/land_unit_sim.h ../../../../CropSyst/source/cs_scenario.h ../../../../CropSyst/source/soil/chemicals_profile.h ../../../../CropSyst/source/soil.h ../../../../corn/container/item.h ../../../../CropSyst/source/options.h ../../../../common/residue/residues_cycling.h ../../../../CropSyst/source/organic_matter/OM_common.h ../../../../CropSyst/source/organic_matter/OM_pools_common.h ../../../../common/residue/residues_interface.h ../../../../common/residue/residue_V4_common.h ../../../../common/residue/residues_common.h ../../../../corn/container/container.h ../../../../corn/container/unilist.h ../../../../CropSyst/source/crop/canopy_growth_LAI_based_V5.h ../../../../CropSyst/source/cs_vars_abbrv.h ../../../../CropSyst/source/management/management_param_V5.h ../../../../CropSyst/source/N_sources.h ../../../../CropSyst/source/cs_operation.h ../../../../CropSyst/source/cs_operation_codes.h ../../../../common/simulation/operation.h ../../../../CropSyst/source/crop/canopy_growth_LAI_based.h ../../../../CS_suite/simulation/CS_simulation_element.h ../../../../CropSyst/source/soil/abiotic_environment.h ../../../../CropSyst/source/soil/disturbance.h ../../../../CS_suite/simulation/CS_land_unit.h ../../../../CropSyst/source/pond.h ../../../../common/simulation/simulation.h ../../../../common/weather/wthr.h ../../../../CropSyst/source/rot_param.h ../../../../CropSyst/source/cs_ET.h ../../../../UED/library/timeqry.h ../../../../common/weather/daily.h ../../../../common/simulation/balancer.h ../../../../common/biomatter/biomass_decomposition_param.h ../../../../CropSyst/source/organic_matter/multiple_pool/OM_multiple_pool.h ../../../../common/simulation/event_status.h ../../../../common/weather/wthrbase.h ../../../../common/simulation/log.h ../../../../common/weather/atmospheric_CO2_change_recalibration.h ../../../../CropSyst/source/soil.h ../../../../CropSyst/source/soil/tillage_effect.h ../../../../CropSyst/source/soil/soil_base.h ../../../../CropSyst/source/soil/chemicals_profile.h ../../../../common/weather/sky.h ../../../../common/weather/snow.h ../../../../common/weather/any_timestep/relhumid_est.h ../../../../common/weather/any_timestep/temperature_est.h ../../../../CropSyst/source/seeding_param.h ../../../../CropSyst/source/soil/layers.h ../../../../CropSyst/source/soil/sublayers.h ../../../../CropSyst/source/soil/hydraulic_properties.h ../../../../CropSyst/source/soil/structure_common.h ../../../../CropSyst/source/soil/structure_interface.h ../../../../common/weather/any_timestep/min_max_to_timestep_estimator.h ../../../../CropSyst/source/soil/nitrogen_common.h ../../../../common/soil/txtrhydr.h ../../../../CropSyst/source/soil/temperature_hourly.h ../../../../common/weather/hour/weather_hours.h ../../../../CropSyst/source/soil/temperature_functions.h ../../../../CS_suite/simulation/CS_simulation_unit.h ../../../../CropSyst/source/soil/hydrology_cascade.h ../../../../CropSyst/source/organic_matter/multiple_pool/OM_pools_multiple.h ../../../../CropSyst/source/organic_matter/OM_residues_profile_common.h ../../../../CropSyst/source/organic_matter/single_pool/OM_pools_single.h ../../../../CropSyst/source/cs_event.h ../../../../CropSyst/source/soil/temperature_profile.h ../../../../CropSyst/source/cs_accum.h ../../../../CropSyst/source/perform_op.h ../../../../CropSyst/source/cs_mgmt.h ../../../../CropSyst/source/soil/profile_texture.h ../../../../CropSyst/source/soil/nitrogen_profile.h ../../../../CropSyst/source/soil/chemical_profile.h ../../../../USDA/NRCS/RUSLE2/SDR_field_ops.h ../../../../common/weather/hour/sun_hours.h ../../../../common/weather/hour/solar_irrad_hour.h ../../../../common/weather/hour/ET_irrad_hour.h ../../../../CS_suite/simulation/CS_event_scheduler.h ../../../../CropSyst/source/soil/hydrology.h ../../../../CropSyst/source/organic_matter/OM_residues_profile_abstract.h ../../../../CropSyst/source/organic_matter/single_pool/OM_single_pool.h ../../../../CropSyst/source/soil/surface_temperature.h ../../../../CropSyst/source/crop/crop_orchard_Kemanian_Stockle.h ../../../../CropSyst/source/crop/crop_interfaced_cropsyst.h ../../../../CropSyst/source/inorganic_NH4.h ../../../../CropSyst/source/crop/crop_orchard_common.h ../../../../CropSyst/source/crop/crop_cropsyst.h ../../../../CropSyst/source/crop/crop_interfaced.h ../../../../USDA/NRCS/soil/survey/domains.h ../../../../CropSyst/source/soil/chemical_balance.h ../../../../CropSyst/source/soil/chemical_mass_profile.h ../../../../CropSyst/source/crop/crop_orchard_Oyarzun_Stockle.h ../../../../CropSyst/source/cs_events.h ../../../../CropSyst/source/crop/crop_biomass.h ../../../../CropSyst/source/crop/canopy_growth.h ../../../crop/VIC_CropSyst_proper_crop.h ../../../crop/VIC_crop_common.h ../../../crop/VIC_crop_interface.h ../../../../CropSyst/source/crop/phenology_sequencer.h ../../../../common/biomatter/biomass_abstract.h ../../../../CropSyst/source/crop/canopy_cover_continuum.h ../../../../CropSyst/source/crop/canopy_growth_cover_based.h ../../../../CropSyst/source/crop/canopy_growth_portioned.h ../../../../CropSyst/source/crop/crop_param_V5.h ../../../../CropSyst/source/crop/crop_param_class.h ../../../../corn/parameters/parameters_datarec.h ../../../../corn/parameters/parameters.h ../../../../CropSyst/source/crop/crop_param_struct.h ../../../../CropSyst/source/management/management_param_class.h ../../../../CropSyst/source/management/management_param_struct.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../../CalcAerodynamic.c ../../../CalcBlowingSnow.c ../../../IceEnergyBalance.c ../../../SnowPackEnergyBalance.c ../../../StabilityCorrection.c ../../../advected_sensible_heat.c ../../../alloc_atmos.c ../../../arno_evap.c ../../../calc_air_temperature.c ../../../calc_atmos_energy_bal.c ../../../calc_cloud_cover_fraction.c ../../../calc_forcing_stats.c ../../../calc_longwave.c ../../../calc_rainonly.c ../../../calc_root_fraction.c ../../../calc_snow_coverage.c ../../../calc_surf_energy_bal.c ../../../calc_veg_params.c ../../../calc_water_energy_balance_errors.c ../../../call_crop_model.c ../../../canopy_evap.c ../../../check_files.c ../../../check_state_file.c ../../../close_files.c ../../../cmd_proc.c ../../../compress_files.c ../../../compute_dz.c ../../../compute_pot_evap.c ../../../compute_treeline.c ../../../compute_zwt.c ../../../correct_precip.c ../../../display_current_settings.c ../../../dist_prec.c ../../../estimate_T1.c ../../../free_crop.c ../../../free_dist_prcp.c ../../../free_vegcon.c ../../../frozen_soil.c ../../../full_energy.c ../../../func_atmos_energy_bal.c ../../../func_atmos_moist_bal.c ../../../func_canopy_energy_bal.c ../../../func_surf_energy_bal.c ../../../get_dist.c ../../../get_force_type.c ../../../get_global_param.c ../../../ice_melt.c ../../../initialize_atmos.c ../../../initialize_crop.c ../../../initialize_global.c ../../../initialize_lake.c ../../../initialize_model_state.c ../../../initialize_new_storm.c ../../../initialize_snow.c ../../../initialize_soil.c ../../../initialize_veg.c ../../../lakes.eb.c ../../../latent_heat_from_snow.c ../../../make_cell_data.c ../../../make_dist_prcp.c ../../../make_dmy.c ../../../make_energy_bal.c ../../../make_in_and_outfiles.c ../../../make_snow_data.c ../../../make_veg_var.c ../../../massrelease.c ../../../modify_Ksat.c ../../../mtclim_vic.c ../../../mtclim_wrapper.c ../../../newt_raph_func_fast.c ../../../nrerror.c ../../../open_debug.c ../../../open_file.c ../../../open_state_file.c ../../../output_list_utils.c ../../../parse_output_info.c ../../../penman.c ../../../prepare_full_energy.c ../../../put_data.c ../../../read_arcinfo_ascii.c ../../../read_atmos_data.c ../../../read_croplib.c ../../../read_cropparam.c ../../../read_forcing_data.c ../../../read_initial_model_state.c ../../../read_lakeparam.c ../../../read_snowband.c ../../../read_soilparam.c ../../../read_soilparam_arc.c ../../../read_veglib.c ../../../read_vegparam.c ../../../redistribute_during_storm.c ../../../root_brent.c ../../../runoff.c ../../../set_output_defaults.c ../../../snow_intercept.c ../../../snow_melt.c ../../../snow_utility.c ../../../soil_conduction.c ../../../soil_thermal_eqn.c ../../../solve_snow.c ../../../store_moisture_for_debug.c ../../../surface_fluxes.c ../../../svp.c ../../../vicNl.c ../../../vicerror.c ../../../water_energy_balance.c ../../../water_under_ice.c ../../../write_atmosdata.c ../../../write_data.c ../../../write_debug.c ../../../write_forcing_file.c ../../../write_header.c ../../../write_layer.c ../../../write_model_state.c ../../../write_snow_data.c ../../../write_soilparam.c ../../../write_vegparam.c ../../../write_vegvar.c ../../../global.c ../../../agronomic/VIC_soil.cpp ../../../agronomic/VIC_land_unit_simulation.cpp ../../../agronomic/VIC_land_unit_C_interface.cpp ../../../../UED/library/UED_fname.cpp ../../../../common/simulation/operation.cpp ../../../crop/VIC_soil_hydrology.c ../../../../CropSyst/source/cs_scenario_directory.cpp ../../../../CropSyst/source/crop/yield.cpp ../../../agronomic/balanceitem.cpp ../../../read_irrigparam.c ../../../../CS_suite/observation/CS_inspector.cpp ../../../../CS_suite/simulation/CS_simulation_element_plugin.cpp ../../../../common/biometeorology/ET_reference.cpp ../../../../CS_suite/observation/CS_examination.cpp ../../../../corn/measure/measures.cpp ../../../../corn/measure/common_units.cpp ../../../vic_5_emulator/vic/vic_run/src/physics.c ../../../vic_5_emulator/vic/drivers/shared_all/src/initialize_parameters.c ../../../../VIC_CropSyst_common/VCS_Nl.c ../../../../corn/chronometry/time_conversion.cpp ../../../agronomic/irrigation_lib.c ../../../../corn/chronometry/date_time_A.cpp ../../../../corn/math/numerical/interpolation/interpolator_temporal.cpp ../../../crop/VIC_crop_output.cpp ../../../../CS_suite/observation/CS_optation.cpp ../../../../corn/dataset/span.cpp ../../../../corn/application/arguments.cpp ../../../../corn/OS/FS/path_discovery.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../../CalcAerodynamic.c ../../../CalcBlowingSnow.c ../../../IceEnergyBalance.c ../../../SnowPackEnergyBalance.c ../../../StabilityCorrection.c ../../../advected_sensible_heat.c ../../../alloc_atmos.c ../../../arno_evap.c ../../../calc_air_temperature.c ../../../calc_atmos_energy_bal.c ../../../calc_cloud_cover_fraction.c ../../../calc_forcing_stats.c ../../../calc_longwave.c ../../../calc_rainonly.c ../../../calc_root_fraction.c ../../../calc_snow_coverage.c ../../../calc_surf_energy_bal.c ../../../calc_veg_params.c ../../../calc_water_energy_balance_errors.c ../../../call_crop_model.c ../../../canopy_evap.c ../../../check_files.c ../../../check_state_file.c ../../../close_files.c ../../../cmd_proc.c ../../../compress_files.c ../../../compute_dz.c ../../../compute_pot_evap.c ../../../compute_treeline.c ../../../compute_zwt.c ../../../correct_precip.c ../../../display_current_settings.c ../../../dist_prec.c ../../../estimate_T1.c ../../../free_crop.c ../../../free_dist_prcp.c ../../../free_vegcon.c ../../../frozen_soil.c ../../../full_energy.c ../../../func_atmos_energy_bal.c ../../../func_atmos_moist_bal.c ../../../func_canopy_energy_bal.c ../../../func_surf_energy_bal.c ../../../get_dist.c ../../../get_force_type.c ../../../get_global_param.c ../../../ice_melt.c ../../../initialize_atmos.c ../../../initialize_crop.c ../../../initialize_global.c ../../../initialize_lake.c ../../../initialize_model_state.c ../../../initialize_new_storm.c ../../../initialize_snow.c ../../../initialize_soil.c ../../../initialize_veg.c ../../../lakes.eb.c ../../../latent_heat_from_snow.c ../../../make_cell_data.c ../../../make_dist_prcp.c ../../../make_dmy.c ../../../make_energy_bal.c ../../../make_in_and_outfiles.c ../../../make_snow_data.c ../../../make_veg_var.c ../../../massrelease.c ../../../modify_Ksat.c ../../../mtclim_vic.c ../../../mtclim_wrapper.c ../../../newt_raph_func_fast.c ../../../nrerror.c ../../../open_debug.c ../../../open_file.c ../../../open_state_file.c ../../../output_list_utils.c ../../../parse_output_info.c ../../../penman.c ../../../prepare_full_energy.c ../../../put_data.c ../../../read_arcinfo_ascii.c ../../../read_atmos_data.c ../../../read_croplib.c ../../../read_cropparam.c ../../../read_forcing_data.c ../../../read_initial_model_state.c ../../../read_lakeparam.c ../../../read_snowband.c ../../../read_soilparam.c ../../../read_soilparam_arc.c ../../../read_veglib.c ../../../read_vegparam.c ../../../redistribute_during_storm.c ../../../root_brent.c ../../../runoff.c ../../../set_output_defaults.c ../../../snow_intercept.c ../../../snow_melt.c ../../../snow_utility.c ../../../soil_conduction.c ../../../soil_thermal_eqn.c ../../../solve_snow.c ../../../store_moisture_for_debug.c ../../../surface_fluxes.c ../../../svp.c ../../../vicNl.c ../../../vicerror.c ../../../water_energy_balance.c ../../../water_under_ice.c ../../../write_atmosdata.c ../../../write_data.c ../../../write_debug.c ../../../write_forcing_file.c ../../../write_header.c ../../../write_layer.c ../../../write_model_state.c ../../../write_snow_data.c ../../../write_soilparam.c ../../../write_vegparam.c ../../../write_vegvar.c ../../../global.c ../../../agronomic/VIC_soil.cpp ../../../agronomic/VIC_land_unit_simulation.cpp ../../../agronomic/VIC_land_unit_C_interface.cpp ../../../../UED/library/UED_fname.cpp ../../../../common/simulation/operation.cpp ../../../crop/VIC_soil_hydrology.c ../../../../CropSyst/source/cs_scenario_directory.cpp ../../../../CropSyst/source/crop/yield.cpp ../../../agronomic/balanceitem.cpp ../../../read_irrigparam.c ../../../../CS_suite/observation/CS_inspector.cpp ../../../../CS_suite/simulation/CS_simulation_element_plugin.cpp ../../../../common/biometeorology/ET_reference.cpp ../../../../CS_suite/observation/CS_examination.cpp ../../../../corn/measure/measures.cpp ../../../../corn/measure/common_units.cpp ../../../vic_5_emulator/vic/vic_run/src/physics.c ../../../vic_5_emulator/vic/drivers/shared_all/src/initialize_parameters.c ../../../../VIC_CropSyst_common/VCS_Nl.c ../../../../corn/chronometry/time_conversion.cpp ../../../agronomic/irrigation_lib.c ../../../../corn/chronometry/date_time_A.cpp ../../../../corn/math/numerical/interpolation/interpolator_temporal.cpp ../../../crop/VIC_crop_output.cpp ../../../../CS_suite/observation/CS_optation.cpp ../../../../corn/dataset/span.cpp ../../../../corn/application/arguments.cpp ../../../../corn/OS/FS/path_discovery.cpp ../../../crop/VIC_crop_state_csv.c ../../../vic_state_csv.c $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -10905,7 +10911,9 @@ dist_prec.o: ../../../dist_prec.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
 		../../../../common/weather/atmospheric_CO2_change.h \
-		../../../LAKE.h
+		../../../LAKE.h \
+		../../../vic_state_csv.h \
+		../../../crop/VIC_crop_state_csv.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o dist_prec.o ../../../dist_prec.c
 
 estimate_T1.o: ../../../estimate_T1.c ../../../vicNl.h \
@@ -16326,7 +16334,8 @@ initialize_model_state.o: ../../../initialize_model_state.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
 		../../../../common/weather/atmospheric_CO2_change.h \
-		../../../LAKE.h
+		../../../LAKE.h \
+		../../../vic_state_csv.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_model_state.o ../../../initialize_model_state.c
 
 initialize_new_storm.o: ../../../initialize_new_storm.c ../../../vicNl.h \
@@ -39218,6 +39227,610 @@ path_discovery.o: ../../../../corn/OS/FS/path_discovery.cpp ../../../../corn/OS/
 		../../../../corn/container/SDF_list.h \
 		../../../../corn/OS/file_system_engine.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o path_discovery.o ../../../../corn/OS/FS/path_discovery.cpp
+
+VIC_crop_state_csv.o: ../../../crop/VIC_crop_state_csv.c ../../../vicNl.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_def.h \
+		../../../../VIC_CropSyst_common/VCS_Nl_def.h \
+		../../../irrigation_lib.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_physical_constants.h \
+		../../../vicNl_def.h \
+		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_driver_shared_all.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_run.h \
+		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_version.h \
+		../../../../corn/primitive.h \
+		../../../user_def.h \
+		../../../../VIC_CropSyst_common/VCS_user_def.h \
+		../../../snow.h \
+		../../../pubtools.h \
+		../../../../corn/string \
+		../../../../corn/math/compare.hpp \
+		../../../global.h \
+		../../../../VIC_CropSyst_common/VCS_global.h \
+		../../../../corn/chronometry/date_32.h \
+		../../../../corn/chronometry/date_T.h \
+		../../../../corn/chronometry/date_A.h \
+		../../../../corn/chronometry/date_I.h \
+		../../../../corn/chronometry/temporal.h \
+		../../../../corn/chronometry/date_types.hpp \
+		../../../../corn/chronometry/date_types.hh \
+		../../../../corn/chronometry/time_types.hpp \
+		../../../../corn/chronometry/time_types.hh \
+		../../../../corn/const.h \
+		../../../../corn/chronometry/date_format.h \
+		../../../../VIC_CropSyst_common/VCS_Nl.h \
+		../../../crop/VIC_soil_hydrology.h \
+		../../../../CropSyst/source/crop/growth_stages.h \
+		../../../crop/VIC_crop_C_interface.h \
+		../../../../CropSyst/source/cs_scenario.h \
+		../../../../CropSyst/source/options.h \
+		../../../../CropSyst/source/CropSyst_version.h \
+		../../../../CropSyst/source/cmmnopts.h \
+		../../../../corn/condcomp.h \
+		../../../../CropSyst/source/organic_matter/OM_types.h \
+		../../../../corn/enum.h \
+		../../../../CropSyst/source/organic_matter/OM_params.h \
+		../../../../corn/parameters/parameter.h \
+		../../../../corn/measure/units.h \
+		../../../../corn/metrology/units_code.hpp \
+		../../../../corn/metrology/units_code.h \
+		../../../../corn/metrology/units_code_SI.h \
+		../../../../corn/metrology/units_code_common.h \
+		../../../../corn/metrology/units_code_temporal.h \
+		../../../../corn/metrology/units_code_CU.h \
+		../../../../corn/metrology/units_measure.h \
+		../../../../corn/metrology/units_clad.h \
+		../../../../corn/metrology/units_symbology.h \
+		../../../../corn/metrology/timestep.h \
+		../../../../corn/measure/units_deprecated.h \
+		../../../../corn/measure/units_enum.h \
+		../../../../corn/container/item.h \
+		../../../../corn/parameters/number_keyed.h \
+		../../../../corn/data_type_enum.h \
+		../../../../corn/format/field.h \
+		../../../../corn/chronometry/time_format.h \
+		../../../../common/soil/layering.h \
+		../../../../CS_suite/simulation/CS_simulation_unit.h \
+		../../../../CS_suite/simulation/CS_simulation_element.h \
+		../../../../corn/container/unilist.h \
+		../../../../corn/container/container.h \
+		../../../../corn/container/bilist.h \
+		../../../../CS_suite/observation/CS_observation.h \
+		../../../../corn/math/statistical/statistics_types.hpp \
+		../../../../corn/math/statistical/statistics_types.h \
+		../../../../CS_suite/observation/CS_emanator.h \
+		../../../../corn/container/enumlist.h \
+		../../../../corn/container/text_list.h \
+		../../../../corn/string/strconv.hpp \
+		../../../../corn/string/strconv.h \
+		../../../../corn/parameters/parameters_datarec.h \
+		../../../../corn/data_source/datarec.h \
+		../../../../corn/data_source/vv_entry.h \
+		../../../../corn/validate/validtyp.h \
+		../../../../corn/values_MSC.h \
+		../../../../corn/chronometry/date_time_64.h \
+		../../../../corn/chronometry/date_time_T.h \
+		../../../../corn/chronometry/date_time_A.h \
+		../../../../corn/chronometry/date_time_I.h \
+		../../../../corn/chronometry/time_I.h \
+		../../../../corn/chronometry/time_A.h \
+		../../../../corn/chronometry/time_fraction_T.h \
+		../../../../corn/OS/directory_entry_name.h \
+		../../../../corn/OS/file_system_types.h \
+		../../../../corn/dynamic_array/dynamic_array_T.h \
+		../../../../corn/math/moremath.h \
+		../../../../corn/std/std_iomanip.h \
+		../../../../corn/std/std_check.h \
+		../../../../corn/std/std_iostream.h \
+		../../../../corn/dataset/span.h \
+		../../../../corn/parameters/parameters.h \
+		../../../../corn/parameters/parameters_types.h \
+		../../../../CS_suite/simulation/CS_event_scheduler.h \
+		../../../../common/simulation/event_status.h \
+		../../../../common/simulation/event.h \
+		../../../../common/simulation/event_types.h \
+		../../../../common/simulation/synchronization.h \
+		../../../../CropSyst/source/crop/growth_stages.hpp \
+		../../../../corn/OS/directory_entry_name_concrete.h \
+		../../../../corn/OS/directory_entry_name_abstract.h \
+		../../../../CropSyst/source/crop/crop_param_V4.h \
+		../../../../CropSyst/source/crop/crop_param_class.h \
+		../../../../CropSyst/source/crop/crop_param_struct.h \
+		../../../../CropSyst/source/crop/crop_types.h \
+		../../../crop/options.h \
+		../../../../corn/measure/measures.h \
+		../../../../CropSyst/source/crop/crop_types.hpp \
+		../../../../common/soil/SCS/SCS.h \
+		../../../../USDA/NRCS/soil/survey/domains.h \
+		../../../../common/residue/residue_decomposition_param.h \
+		../../../../common/residue/residue_const.h \
+		../../../../corn/OS/filtered_filename.h \
+		../../../../corn/OS/file_type_description.h \
+		../../../../common/simulation/balancer.h \
+		../../../../UED/library/UED_types.h \
+		../../../../UED/library/codes.h \
+		../../../../corn/quality.hpp \
+		../../../../corn/quality.h \
+		../../../../corn/math/compare.h \
+		../../../../CS_suite/simulation/CS_simulation_control.h \
+		../../../../CS_suite/simulation/CS_identification.h \
+		../../../../common/simulation/log.h \
+		../../../../CS_suite/file_system/CS_databases.h \
+		../../../../CS_suite/file_system/CS_database_directory.h \
+		../../../../corn/OS/file_system_logical.h \
+		../../../../corn/OS/file_system.h \
+		../../../../corn/seclusion.h \
+		../../../../CropSyst/source/model_options.h \
+		../../../../common/weather/weather_types.h \
+		../../../../common/weather/parameter/WC_vapor_pressure_deficit.h \
+		../../../../common/weather/parameter/WP_vapor_pressure_deficit.h \
+		../../../../common/weather/parameter/WP_vapor_pressure.h \
+		../../../../common/CS_parameter_float64.h \
+		../../../../common/CS_parameter_cowl_T.h \
+		../../../../common/physics/property_cowl_T.h \
+		../../../../common/physics/property.h \
+		../../../../corn/measure/unitconv.h \
+		../../../../common/CS_parameter.h \
+		../../../../common/physics/property_complete.h \
+		../../../../common/physics/property/P_vapor_pressure.h \
+		../../../../common/physics/property/P_pressure.h \
+		../../../../common/weather/parameter/WC_vapor_pressure.h \
+		../../../../common/weather/parameter/WP_dew_point_temperature.h \
+		../../../../common/weather/parameter/WP_temperature.h \
+		../../../../common/physics/property/P_temperature.h \
+		../../../../common/weather/parameter/WP_vapor_pressure_act.h \
+		../../../../common/biometeorology/ET_model.h \
+		../../../../common/biometeorology/ET_reference_Priestley_Taylor.h \
+		../../../../CropSyst/source/cs_filenames.h \
+		../../../../CS_suite/file_system/CS_file_ext.hpp \
+		../../../../CS_suite/file_system/CS_file_ext.hh \
+		../../../../common/geodesy/geolocation.h \
+		../../../../common/geodesy/geocoordinate.h \
+		../../../../common/weather/loc_param.h \
+		../../../../UED/library/UED_fname.h \
+		../../../../common/weather/GEN_DAT_filename.h \
+		../../../../CropSyst/source/soil/soil_N_param.h \
+		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
+		../../../../CropSyst/source/rot_param.h \
+		../../../../CropSyst/source/cs_operation.h \
+		../../../../common/simulation/operation.h \
+		../../../../CropSyst/source/cs_operation_codes.h \
+		../../../../corn/math/statistical/sample_dataset_T.h \
+		../../../../corn/math/statistical/sample_T.h \
+		../../../../corn/math/statistical/statistics_descriptive.h \
+		../../../../CropSyst/source/seeding_param.h \
+		../../../agronomic/VIC_land_unit_simulation.h \
+		../../../../CropSyst/source/land_unit_sim.h \
+		../../../../CropSyst/source/pond.h \
+		../../../../common/evaporator.h \
+		../../../../common/physics/water_depth.h \
+		../../../../CropSyst/source/soil/runoff_SCS.h \
+		../../../../CropSyst/source/soil/runoff.h \
+		../../../../CropSyst/source/cs_UED_harvest.h \
+		../../../../UED/library/UED_tuple_datasrc.h \
+		../../../../UED/library/database_file.h \
+		../../../../UED/library/UED.h \
+		../../../../corn/format/binary/binary_types.h \
+		../../../../corn/format/binary/binary_record_file.h \
+		../../../../corn/format/binary/binary_file_interface.h \
+		../../../../corn/format/binary/binary_record.h \
+		../../../../UED/library/units_def.h \
+		../../../../UED/library/index.h \
+		../../../../corn/container/binary_tree.h \
+		../../../../UED/library/UED_options.h \
+		../../../../UED/library/datasetrec.h \
+		../../../../UED/library/record.h \
+		../../../../UED/library/datasetrec_creation.h \
+		../../../../UED/library/variable_format.h \
+		../../../../UED/library/varcodes.h \
+		../../../../corn/data_source/datasrc.h \
+		../../../../CropSyst/source/cs_vars.h \
+		../../../../CropSyst/source/cs_varderiv.h \
+		../../../../CropSyst/source/soil/soil_base.h \
+		../../../../CropSyst/source/soil/soil_properties_sublayers.h \
+		../../../../CropSyst/source/soil/hydraulic_properties.h \
+		../../../../CropSyst/source/soil/hydrology_I.h \
+		../../../../common/physics/standard_constants.h \
+		../../../../corn/math/statistical/stats.h \
+		../../../../corn/math/statistical/sample_cumulative_T.h \
+		../../../../CropSyst/source/soil/profile_texture.h \
+		../../../../CropSyst/source/soil/texture_I.h \
+		../../../../CropSyst/source/soil/sublayers.h \
+		../../../../CropSyst/source/soil/soil_I.h \
+		../../../../CropSyst/source/soil/layers_I.h \
+		../../../../CropSyst/source/soil/layers.h \
+		../../../../CropSyst/source/soil/soil_param_class.h \
+		../../../../CropSyst/source/soil/soil_param_with_STATSGO.h \
+		../../../../CropSyst/source/soil/soil_param.h \
+		../../../../CropSyst/source/soil/soil_param_V4.h \
+		../../../../CropSyst/source/soil/soil_param_V5.h \
+		../../../../common/soil/hydrology/pedotransfer_saxton_1986.h \
+		../../../../common/soil/hydrology/pedotransfer_abstract.h \
+		../../../../common/soil/txtrhydr.h \
+		../../../../CropSyst/source/soil/structure_common.h \
+		../../../../CropSyst/source/soil/structure_I.h \
+		../../../../common/recorder/recorder.h \
+		../../../../CropSyst/source/soil/infiltration_A.h \
+		../../../../CropSyst/source/soil/infiltration_I.h \
+		../../../../CropSyst/source/mgmt_types.h \
+		../../../../CropSyst/source/mgmt_param.h \
+		../../../../CropSyst/source/management/management_param_V5.h \
+		../../../../CropSyst/source/management/management_param_class.h \
+		../../../../CropSyst/source/management/management_param_struct.h \
+		../../../../CropSyst/source/N_sources.h \
+		../../../../common/biomatter/manure_form.h \
+		../../../../corn/OS/file_system_engine.h \
+		../../../../CropSyst/source/management/management_param_V4.h \
+		../../../../common/biomatter/biomass_decomposition_param.h \
+		../../../../CropSyst/source/cs_ET.h \
+		../../../../common/biometeorology/ET_reference_FAO.h \
+		../../../../common/biometeorology/ET_reference_interface.h \
+		../../../../common/biometeorology/ET_common.h \
+		../../../../common/weather/parameter/WC_ET_reference.h \
+		../../../../common/weather/parameter/WP_ET_reference.h \
+		../../../../common/biometeorology/parameter/slope_SVP_curve_psychrometric_resistance.h \
+		../../../../common/weather/parameter/WP_psychrometric_const.h \
+		../../../../common/weather/parameter/WP_vapor_pressure_saturation_slope.h \
+		../../../../common/biometeorology/aerodynamics.h \
+		../../../../common/weather/parameter/WP_wind_speed.h \
+		../../../../common/weather/parameter/WC_vapor_pressure_saturation_slope.h \
+		../../../../common/weather/parameter/WP_air_temperature.h \
+		../../../../common/weather/parameter/WC_psychrometric_const.h \
+		../../../../common/weather/parameter/WP_latent_heat_vaporization.h \
+		../../../../CropSyst/source/crop/crop_interface.h \
+		../../../../CropSyst/source/cs_scenario_directory.h \
+		../../../../common/simulation/scenario_directory.h \
+		../../../../corn/parameters/parameters_directory_OS_FS.h \
+		../../../../CropSyst/source/organic_matter/OM_residues_profile_abstract.h \
+		../../../../USDA/NRCS/RUSLE2/SDR_field_ops.h \
+		../../../../CS_suite/observation/CS_examination.h \
+		../../../../CS_suite/observation/CS_inspection.h \
+		../../../../CS_suite/observation/CS_inspector.h \
+		../../../../CS_suite/association/CS_associate.h \
+		../../../../CS_suite/simulation/CS_period.h \
+		../../../../CS_suite/simulation/CS_land_unit_meteorological.h \
+		../../../../common/weather/weather_provider.h \
+		../../../../common/weather/parameter/WP_precipitation.h \
+		../../../../common/weather/parameter/WC_relative_humidity.h \
+		../../../../common/weather/parameter/WP_relative_humidity.h \
+		../../../../common/weather/parameter/WC_air_temperature.h \
+		../../../../common/weather/parameter/WC_dew_point_temperature.h \
+		../../../../common/weather/parameter/WC_vapor_pressure_act.h \
+		../../../../common/weather/parameter/WC_solar_radiation.h \
+		../../../../common/weather/parameter/WP_solar_radiation.h \
+		../../../../common/weather/parameter/WP_atmospheric_pressure.h \
+		../../../../common/weather/parameter/WC_humidity_specific.h \
+		../../../../common/weather/parameter/WP_humidity_specific.h \
+		../../../../common/weather/seasons.h \
+		../../../../common/weather/sun.h \
+		../../../../corn/chronometry/time_conversion.h \
+		../../../../corn/chronometry/time_second.h \
+		../../../../common/biometeorology/parameter/CO2_atmospheric_conc.h \
+		../../../../common/solar/irradiance_extraterrestrial.h \
+		../../../../common/weather/day/sun_days.h \
+		../../../../common/weather/hour/sun_hours.h \
+		../../../../CS_suite/application/CS_arguments.h \
+		../../../../corn/data_source/vv_datasrc.h \
+		../../../../corn/application/arguments.h \
+		../../../../corn/application/verbosity.h \
+		../../../../corn/container/SDF_list.h \
+		../../../../corn/OS/FS/path_discovery.h \
+		../../../../corn/OS/FS/recursion.h \
+		../../../../corn/OS/FS/directory_entry.h \
+		../../../agronomic/VIC_soil.h \
+		../../../../CropSyst/source/soil.h \
+		../../../../CropSyst/source/soil/temperature_profile.h \
+		../../../../CropSyst/source/soil/temperature_I.h \
+		../../../../CropSyst/source/soil/surface_temperature.h \
+		../../../../CropSyst/source/soil/temperature_hourly_I.h \
+		../../../../CropSyst/source/soil/hydrology_A.h \
+		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
+		../../../LAKE.h \
+		../../../crop/VIC_crop_state_csv.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o VIC_crop_state_csv.o ../../../crop/VIC_crop_state_csv.c
+
+vic_state_csv.o: ../../../vic_state_csv.c ../../../vicNl.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_def.h \
+		../../../../VIC_CropSyst_common/VCS_Nl_def.h \
+		../../../irrigation_lib.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_physical_constants.h \
+		../../../vicNl_def.h \
+		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_driver_shared_all.h \
+		../../../vic_5_emulator/vic/vic_run/include/vic_run.h \
+		../../../vic_5_emulator/vic/drivers/shared_all/include/vic_version.h \
+		../../../../corn/primitive.h \
+		../../../user_def.h \
+		../../../../VIC_CropSyst_common/VCS_user_def.h \
+		../../../snow.h \
+		../../../pubtools.h \
+		../../../../corn/string \
+		../../../../corn/math/compare.hpp \
+		../../../global.h \
+		../../../../VIC_CropSyst_common/VCS_global.h \
+		../../../../corn/chronometry/date_32.h \
+		../../../../corn/chronometry/date_T.h \
+		../../../../corn/chronometry/date_A.h \
+		../../../../corn/chronometry/date_I.h \
+		../../../../corn/chronometry/temporal.h \
+		../../../../corn/chronometry/date_types.hpp \
+		../../../../corn/chronometry/date_types.hh \
+		../../../../corn/chronometry/time_types.hpp \
+		../../../../corn/chronometry/time_types.hh \
+		../../../../corn/const.h \
+		../../../../corn/chronometry/date_format.h \
+		../../../../VIC_CropSyst_common/VCS_Nl.h \
+		../../../crop/VIC_soil_hydrology.h \
+		../../../../CropSyst/source/crop/growth_stages.h \
+		../../../crop/VIC_crop_C_interface.h \
+		../../../../CropSyst/source/cs_scenario.h \
+		../../../../CropSyst/source/options.h \
+		../../../../CropSyst/source/CropSyst_version.h \
+		../../../../CropSyst/source/cmmnopts.h \
+		../../../../corn/condcomp.h \
+		../../../../CropSyst/source/organic_matter/OM_types.h \
+		../../../../corn/enum.h \
+		../../../../CropSyst/source/organic_matter/OM_params.h \
+		../../../../corn/parameters/parameter.h \
+		../../../../corn/measure/units.h \
+		../../../../corn/metrology/units_code.hpp \
+		../../../../corn/metrology/units_code.h \
+		../../../../corn/metrology/units_code_SI.h \
+		../../../../corn/metrology/units_code_common.h \
+		../../../../corn/metrology/units_code_temporal.h \
+		../../../../corn/metrology/units_code_CU.h \
+		../../../../corn/metrology/units_measure.h \
+		../../../../corn/metrology/units_clad.h \
+		../../../../corn/metrology/units_symbology.h \
+		../../../../corn/metrology/timestep.h \
+		../../../../corn/measure/units_deprecated.h \
+		../../../../corn/measure/units_enum.h \
+		../../../../corn/container/item.h \
+		../../../../corn/parameters/number_keyed.h \
+		../../../../corn/data_type_enum.h \
+		../../../../corn/format/field.h \
+		../../../../corn/chronometry/time_format.h \
+		../../../../common/soil/layering.h \
+		../../../../CS_suite/simulation/CS_simulation_unit.h \
+		../../../../CS_suite/simulation/CS_simulation_element.h \
+		../../../../corn/container/unilist.h \
+		../../../../corn/container/container.h \
+		../../../../corn/container/bilist.h \
+		../../../../CS_suite/observation/CS_observation.h \
+		../../../../corn/math/statistical/statistics_types.hpp \
+		../../../../corn/math/statistical/statistics_types.h \
+		../../../../CS_suite/observation/CS_emanator.h \
+		../../../../corn/container/enumlist.h \
+		../../../../corn/container/text_list.h \
+		../../../../corn/string/strconv.hpp \
+		../../../../corn/string/strconv.h \
+		../../../../corn/parameters/parameters_datarec.h \
+		../../../../corn/data_source/datarec.h \
+		../../../../corn/data_source/vv_entry.h \
+		../../../../corn/validate/validtyp.h \
+		../../../../corn/values_MSC.h \
+		../../../../corn/chronometry/date_time_64.h \
+		../../../../corn/chronometry/date_time_T.h \
+		../../../../corn/chronometry/date_time_A.h \
+		../../../../corn/chronometry/date_time_I.h \
+		../../../../corn/chronometry/time_I.h \
+		../../../../corn/chronometry/time_A.h \
+		../../../../corn/chronometry/time_fraction_T.h \
+		../../../../corn/OS/directory_entry_name.h \
+		../../../../corn/OS/file_system_types.h \
+		../../../../corn/dynamic_array/dynamic_array_T.h \
+		../../../../corn/math/moremath.h \
+		../../../../corn/std/std_iomanip.h \
+		../../../../corn/std/std_check.h \
+		../../../../corn/std/std_iostream.h \
+		../../../../corn/dataset/span.h \
+		../../../../corn/parameters/parameters.h \
+		../../../../corn/parameters/parameters_types.h \
+		../../../../CS_suite/simulation/CS_event_scheduler.h \
+		../../../../common/simulation/event_status.h \
+		../../../../common/simulation/event.h \
+		../../../../common/simulation/event_types.h \
+		../../../../common/simulation/synchronization.h \
+		../../../../CropSyst/source/crop/growth_stages.hpp \
+		../../../../corn/OS/directory_entry_name_concrete.h \
+		../../../../corn/OS/directory_entry_name_abstract.h \
+		../../../../CropSyst/source/crop/crop_param_V4.h \
+		../../../../CropSyst/source/crop/crop_param_class.h \
+		../../../../CropSyst/source/crop/crop_param_struct.h \
+		../../../../CropSyst/source/crop/crop_types.h \
+		../../../crop/options.h \
+		../../../../corn/measure/measures.h \
+		../../../../CropSyst/source/crop/crop_types.hpp \
+		../../../../common/soil/SCS/SCS.h \
+		../../../../USDA/NRCS/soil/survey/domains.h \
+		../../../../common/residue/residue_decomposition_param.h \
+		../../../../common/residue/residue_const.h \
+		../../../../corn/OS/filtered_filename.h \
+		../../../../corn/OS/file_type_description.h \
+		../../../../common/simulation/balancer.h \
+		../../../../UED/library/UED_types.h \
+		../../../../UED/library/codes.h \
+		../../../../corn/quality.hpp \
+		../../../../corn/quality.h \
+		../../../../corn/math/compare.h \
+		../../../../CS_suite/simulation/CS_simulation_control.h \
+		../../../../CS_suite/simulation/CS_identification.h \
+		../../../../common/simulation/log.h \
+		../../../../CS_suite/file_system/CS_databases.h \
+		../../../../CS_suite/file_system/CS_database_directory.h \
+		../../../../corn/OS/file_system_logical.h \
+		../../../../corn/OS/file_system.h \
+		../../../../corn/seclusion.h \
+		../../../../CropSyst/source/model_options.h \
+		../../../../common/weather/weather_types.h \
+		../../../../common/weather/parameter/WC_vapor_pressure_deficit.h \
+		../../../../common/weather/parameter/WP_vapor_pressure_deficit.h \
+		../../../../common/weather/parameter/WP_vapor_pressure.h \
+		../../../../common/CS_parameter_float64.h \
+		../../../../common/CS_parameter_cowl_T.h \
+		../../../../common/physics/property_cowl_T.h \
+		../../../../common/physics/property.h \
+		../../../../corn/measure/unitconv.h \
+		../../../../common/CS_parameter.h \
+		../../../../common/physics/property_complete.h \
+		../../../../common/physics/property/P_vapor_pressure.h \
+		../../../../common/physics/property/P_pressure.h \
+		../../../../common/weather/parameter/WC_vapor_pressure.h \
+		../../../../common/weather/parameter/WP_dew_point_temperature.h \
+		../../../../common/weather/parameter/WP_temperature.h \
+		../../../../common/physics/property/P_temperature.h \
+		../../../../common/weather/parameter/WP_vapor_pressure_act.h \
+		../../../../common/biometeorology/ET_model.h \
+		../../../../common/biometeorology/ET_reference_Priestley_Taylor.h \
+		../../../../CropSyst/source/cs_filenames.h \
+		../../../../CS_suite/file_system/CS_file_ext.hpp \
+		../../../../CS_suite/file_system/CS_file_ext.hh \
+		../../../../common/geodesy/geolocation.h \
+		../../../../common/geodesy/geocoordinate.h \
+		../../../../common/weather/loc_param.h \
+		../../../../UED/library/UED_fname.h \
+		../../../../common/weather/GEN_DAT_filename.h \
+		../../../../CropSyst/source/soil/soil_N_param.h \
+		../../../agronomic/VIC_land_unit_C_interface.h \
+		../../../crop/VIC_crop_output.h \
+		../../../../CropSyst/source/rot_param.h \
+		../../../../CropSyst/source/cs_operation.h \
+		../../../../common/simulation/operation.h \
+		../../../../CropSyst/source/cs_operation_codes.h \
+		../../../../corn/math/statistical/sample_dataset_T.h \
+		../../../../corn/math/statistical/sample_T.h \
+		../../../../corn/math/statistical/statistics_descriptive.h \
+		../../../../CropSyst/source/seeding_param.h \
+		../../../agronomic/VIC_land_unit_simulation.h \
+		../../../../CropSyst/source/land_unit_sim.h \
+		../../../../CropSyst/source/pond.h \
+		../../../../common/evaporator.h \
+		../../../../common/physics/water_depth.h \
+		../../../../CropSyst/source/soil/runoff_SCS.h \
+		../../../../CropSyst/source/soil/runoff.h \
+		../../../../CropSyst/source/cs_UED_harvest.h \
+		../../../../UED/library/UED_tuple_datasrc.h \
+		../../../../UED/library/database_file.h \
+		../../../../UED/library/UED.h \
+		../../../../corn/format/binary/binary_types.h \
+		../../../../corn/format/binary/binary_record_file.h \
+		../../../../corn/format/binary/binary_file_interface.h \
+		../../../../corn/format/binary/binary_record.h \
+		../../../../UED/library/units_def.h \
+		../../../../UED/library/index.h \
+		../../../../corn/container/binary_tree.h \
+		../../../../UED/library/UED_options.h \
+		../../../../UED/library/datasetrec.h \
+		../../../../UED/library/record.h \
+		../../../../UED/library/datasetrec_creation.h \
+		../../../../UED/library/variable_format.h \
+		../../../../UED/library/varcodes.h \
+		../../../../corn/data_source/datasrc.h \
+		../../../../CropSyst/source/cs_vars.h \
+		../../../../CropSyst/source/cs_varderiv.h \
+		../../../../CropSyst/source/soil/soil_base.h \
+		../../../../CropSyst/source/soil/soil_properties_sublayers.h \
+		../../../../CropSyst/source/soil/hydraulic_properties.h \
+		../../../../CropSyst/source/soil/hydrology_I.h \
+		../../../../common/physics/standard_constants.h \
+		../../../../corn/math/statistical/stats.h \
+		../../../../corn/math/statistical/sample_cumulative_T.h \
+		../../../../CropSyst/source/soil/profile_texture.h \
+		../../../../CropSyst/source/soil/texture_I.h \
+		../../../../CropSyst/source/soil/sublayers.h \
+		../../../../CropSyst/source/soil/soil_I.h \
+		../../../../CropSyst/source/soil/layers_I.h \
+		../../../../CropSyst/source/soil/layers.h \
+		../../../../CropSyst/source/soil/soil_param_class.h \
+		../../../../CropSyst/source/soil/soil_param_with_STATSGO.h \
+		../../../../CropSyst/source/soil/soil_param.h \
+		../../../../CropSyst/source/soil/soil_param_V4.h \
+		../../../../CropSyst/source/soil/soil_param_V5.h \
+		../../../../common/soil/hydrology/pedotransfer_saxton_1986.h \
+		../../../../common/soil/hydrology/pedotransfer_abstract.h \
+		../../../../common/soil/txtrhydr.h \
+		../../../../CropSyst/source/soil/structure_common.h \
+		../../../../CropSyst/source/soil/structure_I.h \
+		../../../../common/recorder/recorder.h \
+		../../../../CropSyst/source/soil/infiltration_A.h \
+		../../../../CropSyst/source/soil/infiltration_I.h \
+		../../../../CropSyst/source/mgmt_types.h \
+		../../../../CropSyst/source/mgmt_param.h \
+		../../../../CropSyst/source/management/management_param_V5.h \
+		../../../../CropSyst/source/management/management_param_class.h \
+		../../../../CropSyst/source/management/management_param_struct.h \
+		../../../../CropSyst/source/N_sources.h \
+		../../../../common/biomatter/manure_form.h \
+		../../../../corn/OS/file_system_engine.h \
+		../../../../CropSyst/source/management/management_param_V4.h \
+		../../../../common/biomatter/biomass_decomposition_param.h \
+		../../../../CropSyst/source/cs_ET.h \
+		../../../../common/biometeorology/ET_reference_FAO.h \
+		../../../../common/biometeorology/ET_reference_interface.h \
+		../../../../common/biometeorology/ET_common.h \
+		../../../../common/weather/parameter/WC_ET_reference.h \
+		../../../../common/weather/parameter/WP_ET_reference.h \
+		../../../../common/biometeorology/parameter/slope_SVP_curve_psychrometric_resistance.h \
+		../../../../common/weather/parameter/WP_psychrometric_const.h \
+		../../../../common/weather/parameter/WP_vapor_pressure_saturation_slope.h \
+		../../../../common/biometeorology/aerodynamics.h \
+		../../../../common/weather/parameter/WP_wind_speed.h \
+		../../../../common/weather/parameter/WC_vapor_pressure_saturation_slope.h \
+		../../../../common/weather/parameter/WP_air_temperature.h \
+		../../../../common/weather/parameter/WC_psychrometric_const.h \
+		../../../../common/weather/parameter/WP_latent_heat_vaporization.h \
+		../../../../CropSyst/source/crop/crop_interface.h \
+		../../../../CropSyst/source/cs_scenario_directory.h \
+		../../../../common/simulation/scenario_directory.h \
+		../../../../corn/parameters/parameters_directory_OS_FS.h \
+		../../../../CropSyst/source/organic_matter/OM_residues_profile_abstract.h \
+		../../../../USDA/NRCS/RUSLE2/SDR_field_ops.h \
+		../../../../CS_suite/observation/CS_examination.h \
+		../../../../CS_suite/observation/CS_inspection.h \
+		../../../../CS_suite/observation/CS_inspector.h \
+		../../../../CS_suite/association/CS_associate.h \
+		../../../../CS_suite/simulation/CS_period.h \
+		../../../../CS_suite/simulation/CS_land_unit_meteorological.h \
+		../../../../common/weather/weather_provider.h \
+		../../../../common/weather/parameter/WP_precipitation.h \
+		../../../../common/weather/parameter/WC_relative_humidity.h \
+		../../../../common/weather/parameter/WP_relative_humidity.h \
+		../../../../common/weather/parameter/WC_air_temperature.h \
+		../../../../common/weather/parameter/WC_dew_point_temperature.h \
+		../../../../common/weather/parameter/WC_vapor_pressure_act.h \
+		../../../../common/weather/parameter/WC_solar_radiation.h \
+		../../../../common/weather/parameter/WP_solar_radiation.h \
+		../../../../common/weather/parameter/WP_atmospheric_pressure.h \
+		../../../../common/weather/parameter/WC_humidity_specific.h \
+		../../../../common/weather/parameter/WP_humidity_specific.h \
+		../../../../common/weather/seasons.h \
+		../../../../common/weather/sun.h \
+		../../../../corn/chronometry/time_conversion.h \
+		../../../../corn/chronometry/time_second.h \
+		../../../../common/biometeorology/parameter/CO2_atmospheric_conc.h \
+		../../../../common/solar/irradiance_extraterrestrial.h \
+		../../../../common/weather/day/sun_days.h \
+		../../../../common/weather/hour/sun_hours.h \
+		../../../../CS_suite/application/CS_arguments.h \
+		../../../../corn/data_source/vv_datasrc.h \
+		../../../../corn/application/arguments.h \
+		../../../../corn/application/verbosity.h \
+		../../../../corn/container/SDF_list.h \
+		../../../../corn/OS/FS/path_discovery.h \
+		../../../../corn/OS/FS/recursion.h \
+		../../../../corn/OS/FS/directory_entry.h \
+		../../../agronomic/VIC_soil.h \
+		../../../../CropSyst/source/soil.h \
+		../../../../CropSyst/source/soil/temperature_profile.h \
+		../../../../CropSyst/source/soil/temperature_I.h \
+		../../../../CropSyst/source/soil/surface_temperature.h \
+		../../../../CropSyst/source/soil/temperature_hourly_I.h \
+		../../../../CropSyst/source/soil/hydrology_A.h \
+		../../../../common/weather/weather_interface.h \
+		../../../../common/weather/atmospheric_CO2_change.h \
+		../../../LAKE.h \
+		../../../vic_state_csv.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o vic_state_csv.o ../../../vic_state_csv.c
 
 ####### Install
 

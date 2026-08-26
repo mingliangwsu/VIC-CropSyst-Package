@@ -231,7 +231,9 @@ SOURCES +=      ../../../CalcAerodynamic.c \
     ../../../../CS_suite/observation/CS_optation.cpp \
     ../../../../corn/dataset/span.cpp \
     ../../../../corn/application/arguments.cpp \
-    ../../../../corn/OS/FS/path_discovery.cpp
+    ../../../../corn/OS/FS/path_discovery.cpp \
+    ../../../crop/VIC_crop_state_csv.c \
+    ../../../vic_state_csv.c
 
 
 contains(DEFINES,"VIC_CROPSYST_VERSION=3"){

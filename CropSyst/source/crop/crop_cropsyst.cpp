@@ -897,14 +897,29 @@ bool Crop_complete::restore_state
    // Canopy_leaf_growth::restart_with() is CropSyst's own, already-existing
    // hook for exactly this purpose (see CropSyst/source/crop/canopy_growth.h).
    // Run AFTER phenology activation -- see note above.
+   //
+   // 2026 CORRECTION (found via granular diagnostic output): activating a
+   // late phenology stage does NOT, by itself, create canopy_leaf_growth.
+   // canopy_leaf_growth is normally only created when the crop naturally
+   // progresses through its own sequential lifecycle (see
+   // Crop_complete::initiate_accrescence(), which is only reached by that
+   // natural progression, not by directly activating a later stage like
+   // yieldformation). Since restore_state() intentionally skips that
+   // natural progression, canopy_leaf_growth must be created explicitly
+   // here, using the same factory (provide_canopy()) the normal lifecycle
+   // itself uses. provide_canopy() safely deletes any existing canopy
+   // first, so this is safe to call unconditionally.
+   provide_canopy();
    if (canopy_leaf_growth) {
       bool canopy_ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true);
-      std::cerr << "RESTORE_STATE_MARKER_V2: canopy_leaf_growth non-null, "
-                << "restart_with returned " << canopy_ok << std::endl;
+      std::cerr << "RESTORE_STATE_MARKER_V2: canopy_leaf_growth non-null "
+                << "(after provide_canopy()), restart_with returned "
+                << canopy_ok << std::endl;
       ok = canopy_ok && ok;
    } else {
-      std::cerr << "RESTORE_STATE_MARKER_V2: canopy_leaf_growth is NULL "
-                << "-- cannot restore canopy/biomass/GAI" << std::endl;
+      std::cerr << "RESTORE_STATE_MARKER_V2: canopy_leaf_growth STILL NULL "
+                << "even after provide_canopy() -- cannot restore canopy/biomass/GAI"
+                << std::endl;
       ok = false;
    }
 
@@ -913,16 +928,30 @@ bool Crop_complete::restore_state
    // as: "Call once when crop is planted and at restart". Also run after
    // phenology activation for the same reason as canopy, in case any
    // stage-entry side effect also touches roots_current.
+   //
+   // 2026 CORRECTION: same issue as canopy above -- roots_current is
+   // normally created by Crop_complete::create_roots(), called as part of
+   // the crop's natural progression to root establishment, which
+   // restore_state() bypasses. Call create_roots() explicitly here if
+   // roots_current does not already exist. Only call it when null (unlike
+   // provide_canopy(), create_roots() does not delete an existing
+   // roots_current first, so calling it on an already-populated
+   // roots_current would leak the previous object).
+   if (!roots_current)
+      create_roots();
    if (roots_current) {
       bool roots_ok = roots_current->initialize(root_depth_m);
-      std::cerr << "RESTORE_STATE_MARKER_V2: roots_current non-null, "
-                << "initialize returned " << roots_ok << std::endl;
+      std::cerr << "RESTORE_STATE_MARKER_V2: roots_current non-null "
+                << "(after create_roots() if needed), initialize returned "
+                << roots_ok << std::endl;
       ok = roots_ok && ok;
    } else {
-      std::cerr << "RESTORE_STATE_MARKER_V2: roots_current is NULL "
-                << "-- cannot restore root depth" << std::endl;
+      std::cerr << "RESTORE_STATE_MARKER_V2: roots_current STILL NULL "
+                << "even after create_roots() -- cannot restore root depth"
+                << std::endl;
       ok = false;
    }
+
 
    // Exact within-stage degree-day accumulation (accum_thermal_time_deg_day)
    // still cannot be forced because Phenology_2018 keeps its GDD accumulator

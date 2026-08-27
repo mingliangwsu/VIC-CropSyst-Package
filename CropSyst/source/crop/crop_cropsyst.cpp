@@ -847,30 +847,22 @@ bool Crop_complete::restore_state
 {
    bool ok = true;
 
-   // --- Canopy / above-ground biomass ------------------------------------
-   // Canopy_leaf_growth::restart_with() is CropSyst's own, already-existing
-   // hook for exactly this purpose (see CropSyst/source/crop/canopy_growth.h).
-   if (canopy_leaf_growth)
-      ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true) && ok;
-   else
-      ok = false;
-
-   // --- Roots ---------------------------------------------------------
-   // Crop_root::initialize() is documented in CropSyst/source/crop/crop_root.h
-   // as: "Call once when crop is planted and at restart".
-   if (roots_current)
-      ok = roots_current->initialize(root_depth_m) && ok;
-   else
-      ok = false;
-
    // --- Phenology / growth stage ---------------------------------------
-   // Force the phenology state machine to the saved growth stage using the
-   // public activate_*() methods Phenology_2018 already exposes for this
-   // purpose (CropSyst/source/crop/phenology_2018.h). This restores the
-   // correct STAGE. Exact within-stage degree-day accumulation
-   // (accum_thermal_time_deg_day) cannot currently be forced because
-   // Phenology_2018 keeps its GDD accumulator private with no public
-   // setter; the value is accepted here for logging/validation only.
+   // Force the phenology state machine to the saved growth stage FIRST,
+   // using the public activate_*() methods Phenology_2018 already exposes
+   // for this purpose (CropSyst/source/crop/phenology_2018.h).
+   //
+   // IMPORTANT ORDERING NOTE (2026, found via compile+output testing):
+   // activating a stage such as yieldformation can internally cascade
+   // through earlier stages (e.g. accrescence) to get there, and stage
+   // entry has side effects -- notably Crop_complete::initiate_accrescence()
+   // calls provide_canopy().start(), which DELETES and recreates
+   // canopy_leaf_growth from scratch (see provide_canopy() above). If
+   // canopy/root restoration ran BEFORE this activation (as an earlier
+   // version of this function did), that cascade would silently wipe out
+   // the just-restored biomass/GAI, leaving the crop stuck at zero
+   // biomass despite being in the correct growth stage. Restoring
+   // canopy/roots AFTER phenology activation avoids this.
    switch (growth_stage)
    {
       case NGS_GERMINATION:
@@ -891,7 +883,30 @@ bool Crop_complete::restore_state
          break;
    }
 
-   (void)accum_thermal_time_deg_day; // see note above; currently informational only
+   // --- Canopy / above-ground biomass ------------------------------------
+   // Canopy_leaf_growth::restart_with() is CropSyst's own, already-existing
+   // hook for exactly this purpose (see CropSyst/source/crop/canopy_growth.h).
+   // Run AFTER phenology activation -- see note above.
+   if (canopy_leaf_growth)
+      ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true) && ok;
+   else
+      ok = false;
+
+   // --- Roots ---------------------------------------------------------
+   // Crop_root::initialize() is documented in CropSyst/source/crop/crop_root.h
+   // as: "Call once when crop is planted and at restart". Also run after
+   // phenology activation for the same reason as canopy, in case any
+   // stage-entry side effect also touches roots_current.
+   if (roots_current)
+      ok = roots_current->initialize(root_depth_m) && ok;
+   else
+      ok = false;
+
+   // Exact within-stage degree-day accumulation (accum_thermal_time_deg_day)
+   // still cannot be forced because Phenology_2018 keeps its GDD accumulator
+   // private with no public setter; the value is accepted here for
+   // logging/validation only.
+   (void)accum_thermal_time_deg_day;
 
    return ok;
 }

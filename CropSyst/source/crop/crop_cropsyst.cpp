@@ -890,25 +890,39 @@ bool Crop_complete::restore_state
          ok = phenology.activate_restart() && ok;
          break;
    }
+   std::cerr << "RESTORE_STATE_MARKER_V2: after phenology activation, ok="
+             << ok << " (phenology step result)" << std::endl;
 
    // --- Canopy / above-ground biomass ------------------------------------
    // Canopy_leaf_growth::restart_with() is CropSyst's own, already-existing
    // hook for exactly this purpose (see CropSyst/source/crop/canopy_growth.h).
    // Run AFTER phenology activation -- see note above.
-   if (canopy_leaf_growth)
-      ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true) && ok;
-   else
+   if (canopy_leaf_growth) {
+      bool canopy_ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true);
+      std::cerr << "RESTORE_STATE_MARKER_V2: canopy_leaf_growth non-null, "
+                << "restart_with returned " << canopy_ok << std::endl;
+      ok = canopy_ok && ok;
+   } else {
+      std::cerr << "RESTORE_STATE_MARKER_V2: canopy_leaf_growth is NULL "
+                << "-- cannot restore canopy/biomass/GAI" << std::endl;
       ok = false;
+   }
 
    // --- Roots ---------------------------------------------------------
    // Crop_root::initialize() is documented in CropSyst/source/crop/crop_root.h
    // as: "Call once when crop is planted and at restart". Also run after
    // phenology activation for the same reason as canopy, in case any
    // stage-entry side effect also touches roots_current.
-   if (roots_current)
-      ok = roots_current->initialize(root_depth_m) && ok;
-   else
+   if (roots_current) {
+      bool roots_ok = roots_current->initialize(root_depth_m);
+      std::cerr << "RESTORE_STATE_MARKER_V2: roots_current non-null, "
+                << "initialize returned " << roots_ok << std::endl;
+      ok = roots_ok && ok;
+   } else {
+      std::cerr << "RESTORE_STATE_MARKER_V2: roots_current is NULL "
+                << "-- cannot restore root depth" << std::endl;
       ok = false;
+   }
 
    // Exact within-stage degree-day accumulation (accum_thermal_time_deg_day)
    // still cannot be forced because Phenology_2018 keeps its GDD accumulator

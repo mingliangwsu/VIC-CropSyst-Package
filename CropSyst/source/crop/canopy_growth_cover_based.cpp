@@ -128,6 +128,29 @@ bool Canopy_growth_cover_based::restart_with
    canopy_vital.append(new Canopy_accumulation::Portion
       (restart_biomass,restart_cover,0.0/*thermal_time*/));           //130510
          // probably should have today's thermal_time
+
+   // 2026 FURTHER FIX: adding the portion to canopy_vital above is not
+   // sufficient by itself -- get_GAI() for this model does NOT read
+   // from canopy_vital at all; it computes
+   // cover_actual.calc_green_area_index(), which derives GAI from a
+   // SEPARATE state variable (interception_global_green, on
+   // Canopy_cover_actual/Canopy_cover_abstract) via the exact
+   // mathematical inverse of the formula used above:
+   //   calc_XXXX_area_index(fract) = -ln(1.0 - fract) / light_extinction_coef
+   // Without this, canopy_vital and cover_actual/cover_reference go out
+   // of sync -- biomass (tracked via canopy_vital) restores correctly,
+   // but GAI (read from cover_actual, untouched by the append() above)
+   // does not, exactly matching what was observed (GAI reading -0
+   // immediately after restart_with() reported success). This mirrors
+   // the existing, already-used pattern in respond_to_clipping() below,
+   // which keeps cover_reference/cover_actual in sync with canopy_vital
+   // the same way after a clipping event.
+   cover_reference.set_interception_insolation_global_green(restart_cover);
+   cover_actual   .set_interception_insolation_global_green(restart_cover);
+   std::cerr << "RESTORE_STATE_MARKER_V2 [canopy_growth_cover_based]: "
+             << "synced cover_actual/cover_reference, get_GAI() now = "
+             << get_GAI(include_vital|include_effete) << std::endl;
+
    return true;
 }
 //_restart_with_____________________________________________________2011-09-01_/

@@ -845,6 +845,14 @@ bool Crop_complete::restore_state
 ,float64                    accum_thermal_time_deg_day
 )                                                                   modification_
 {
+   // 2026 TEMP DIAGNOSTIC: unmissable marker to confirm this exact build
+   // of restore_state() is actually the one running. Remove once the
+   // stale-build question is settled. grep your run's stderr/log output
+   // for "RESTORE_STATE_MARKER_V2" to confirm.
+   std::cerr << "RESTORE_STATE_MARKER_V2 called with biomass=" << biomass_kg_m2
+             << " GAI=" << GAI << " root_depth_m=" << root_depth_m
+             << " growth_stage=" << (int)growth_stage << std::endl;
+
    bool ok = true;
 
    // --- Phenology / growth stage ---------------------------------------

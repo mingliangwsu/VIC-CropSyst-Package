@@ -144,6 +144,32 @@ interface_ Crop_model_interface
 
    virtual bool         set_no_more_clippings_this_season()     modification_=0; //040721
 
+   // 2026: added to support scenario-branching "initial state" warm-restart
+   // runs -- see VIC_CropSyst/crop/VIC_crop_state_csv.h and
+   // agronomic/VIC_land_unit_simulation.cpp (Land_unit_simulation::restore_state()).
+   // Pushes a previously-saved state snapshot (biomass, green area index,
+   // rooting depth, growth stage, accumulated thermal time) into this crop
+   // object immediately after it has been (freshly) created, so a run that
+   // starts mid-season can resume growth from where another run's saved
+   // state left off instead of starting from a fresh planting. Given an
+   // inline default body here (matching this file's own convention for
+   // safe base-class defaults) that does nothing and returns false, so
+   // existing concrete crop classes that do not override it are entirely
+   // unaffected -- no other class in this header needs to change. See
+   // Crop_complete::restore_state() (crop_cropsyst.h/.cpp) for the one
+   // override that actually does something, using that class's existing
+   // canopy_leaf_growth, roots_current, and phenology restart hooks.
+   inline virtual bool restore_state
+      (float64 biomass_kg_m2
+      ,float64 GAI
+      ,float64 root_depth_m
+      ,Normal_crop_event_sequence growth_stage
+      ,float64 accum_thermal_time_deg_day
+      )                                                         modification_
+      { (void)biomass_kg_m2; (void)GAI; (void)root_depth_m;
+        (void)growth_stage; (void)accum_thermal_time_deg_day;
+        return false; }
+
    virtual float64 update_evapotranspiration_max(float64 ET_ref_m) rectification_=0; //190812_010910
       //190812 update_pot_evapotranspiration
    virtual bool get_name(std::wstring &name)                            const=0; //200324

@@ -722,22 +722,20 @@ bool Land_unit_simulation::restore_state
 ,float64                    accum_thermal_time_deg_day
 )                                                                   modification_
 {
-    // 2026 TODO: no restore/setter mechanism currently exists on
-    // CropSyst::Crop_model_interface (crop/crop_interfaced.h), and the
-    // VIC_crop::CropSyst_proper_crop class this was originally written
-    // against is not part of the compiled build (its .cpp is not listed
-    // in any working Makefile_Kamiak, nor is its only other caller,
-    // VIC_crop_weather.cpp). Restoring saved crop state therefore
-    // requires adding a new virtual method to Crop_model_interface and
-    // implementing it in whichever concrete crop class is actually
-    // instantiated at runtime (see CropSyst/source, built as a separate
-    // library) -- not attempted here.
-    (void)biomass_kg_m2;
-    (void)GAI;
-    (void)root_depth_m;
-    (void)growth_stage;
-    (void)accum_thermal_time_deg_day;
-    return false;
+    // 2026: now calls straight through Crop_model_interface's own
+    // restore_state() (added to CropSyst/source/crop/crop_interfaced.h),
+    // which every concrete crop class implements -- with a safe no-op
+    // default on the interface itself and a real implementation on
+    // Crop_complete (crop_cropsyst.h/.cpp, the class this project's
+    // build/library/*/Makefile_Kamiak actually compiles and links for
+    // field crops). No dynamic_cast and no dependency on
+    // VIC_crop::CropSyst_proper_crop (which was never part of the
+    // compiled build) are needed with this approach.
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->restore_state
+            (biomass_kg_m2, GAI, root_depth_m, growth_stage,
+             accum_thermal_time_deg_day)
+       : false;
 }
 //_restore_state____________________________________________________2026_______/
 bool Land_unit_simulation::initialize()                            modification_

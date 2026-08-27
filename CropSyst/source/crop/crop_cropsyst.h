@@ -615,6 +615,22 @@ public: // State variable accessors that are actually used by CropSyst
    inline float64 get_root_length()                                        const { return roots_current ? roots_current-> get_length()       : 0.0;} //190102
    virtual inline float64 get_recorded_root_depth_m()                      const { return roots_current ? roots_current->get_apparent_depth() : 0.0;} //190617_061208
 
+   // 2026: overrides the safe no-op default on Crop_model_interface (see
+   // crop/crop_interfaced.h) with the real restore logic for
+   // scenario-branching "initial state" warm-restart runs. See
+   // crop_cropsyst.cpp for the implementation, which uses this class's
+   // own canopy_leaf_growth, roots_current, and phenology members --
+   // CropSyst's own designed-for-this restart hooks
+   // (Canopy_leaf_growth::restart_with(), Crop_root::initialize(),
+   // Phenology_2018::activate_*()).
+   virtual bool restore_state
+      (float64 biomass_kg_m2
+      ,float64 GAI
+      ,float64 root_depth_m
+      ,Normal_crop_event_sequence growth_stage
+      ,float64 accum_thermal_time_deg_day
+      )                                                         modification_;
+
    inline virtual float64     get_active_fract_root_length_m                     //050331
       (nat8 sublayer)                                                      const { return transpiration ? transpiration->get_active_fract_root_length(sublayer) : 0; }
    inline virtual const float64 *get_total_fract_root_length_m()           const

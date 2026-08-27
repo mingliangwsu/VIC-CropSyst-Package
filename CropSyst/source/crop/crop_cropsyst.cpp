@@ -837,6 +837,65 @@ bool Crop_complete::drop_leaves()                                               
    return true;
 }
 //_drop_leaves______________________________________________________2019-06-25_/
+bool Crop_complete::restore_state
+(float64                    biomass_kg_m2
+,float64                    GAI
+,float64                    root_depth_m
+,Normal_crop_event_sequence growth_stage
+,float64                    accum_thermal_time_deg_day
+)                                                                   modification_
+{
+   bool ok = true;
+
+   // --- Canopy / above-ground biomass ------------------------------------
+   // Canopy_leaf_growth::restart_with() is CropSyst's own, already-existing
+   // hook for exactly this purpose (see CropSyst/source/crop/canopy_growth.h).
+   if (canopy_leaf_growth)
+      ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true) && ok;
+   else
+      ok = false;
+
+   // --- Roots ---------------------------------------------------------
+   // Crop_root::initialize() is documented in CropSyst/source/crop/crop_root.h
+   // as: "Call once when crop is planted and at restart".
+   if (roots_current)
+      ok = roots_current->initialize(root_depth_m) && ok;
+   else
+      ok = false;
+
+   // --- Phenology / growth stage ---------------------------------------
+   // Force the phenology state machine to the saved growth stage using the
+   // public activate_*() methods Phenology_2018 already exposes for this
+   // purpose (CropSyst/source/crop/phenology_2018.h). This restores the
+   // correct STAGE. Exact within-stage degree-day accumulation
+   // (accum_thermal_time_deg_day) cannot currently be forced because
+   // Phenology_2018 keeps its GDD accumulator private with no public
+   // setter; the value is accepted here for logging/validation only.
+   switch (growth_stage)
+   {
+      case NGS_GERMINATION:
+      case NGS_PLANTING:        ok = phenology.activate_sowing()         && ok; break;
+      case NGS_EMERGENCE:       ok = phenology.activate_emergence()      && ok; break;
+      case NGS_ACCRESCENCE:     ok = phenology.activate_accrescence()    && ok; break;
+      case NGS_ANTHESIS:        ok = phenology.activate_anthesis()       && ok; break;
+      case NGS_FILLING:         ok = phenology.activate_yield_formation()&& ok; break;
+      case NGS_MATURITY:        ok = phenology.activate_maturity()       && ok; break;
+      case NGS_QUIESCENCE:      ok = phenology.activate_quiescence()     && ok; break;
+      default:
+         // NGS_NONE, NGS_RESTART, NGS_HARVESTABLE, NGS_HARVEST,
+         // NGS_POSTHARVEST, NGS_TERMINATED and any stage not handled
+         // above: fall back to the engine's own generic restart entry
+         // point rather than guessing at an activate_*() call that may
+         // not apply.
+         ok = phenology.activate_restart() && ok;
+         break;
+   }
+
+   (void)accum_thermal_time_deg_day; // see note above; currently informational only
+
+   return ok;
+}
+//_restore_state_____________________________________________________2026______/
 bool Crop_complete::create_roots()
 {
    if (soil)                                                                     //061208

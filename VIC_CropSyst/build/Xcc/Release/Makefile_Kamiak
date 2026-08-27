@@ -179,7 +179,9 @@ SOURCES       = ../../../CalcAerodynamic.c \
 		../../../../CS_suite/observation/CS_optation.cpp \
 		../../../../corn/dataset/span.cpp \
 		../../../../corn/application/arguments.cpp \
-		../../../../corn/OS/FS/path_discovery.cpp 
+		../../../../corn/OS/FS/path_discovery.cpp \
+		../../../crop/VIC_crop_state_csv.c \
+		../../../vic_state_csv.c
 OBJECTS       = CalcAerodynamic.o \
 		CalcBlowingSnow.o \
 		IceEnergyBalance.o \
@@ -327,7 +329,9 @@ OBJECTS       = CalcAerodynamic.o \
 		CS_optation.o \
 		span.o \
 		arguments.o \
-		path_discovery.o
+		path_discovery.o \
+		VIC_crop_state_csv.o \
+		vic_state_csv.o
 
 TARGET        = VIC_CropSyst
 
@@ -10214,7 +10218,9 @@ dist_prec.o: ../../../dist_prec.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
-		../../../LAKE.h
+		../../../LAKE.h \
+		../../../vic_state_csv.h \
+		../../../crop/VIC_crop_state_csv.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o dist_prec.o ../../../dist_prec.c
 
 estimate_T1.o: ../../../estimate_T1.c ../../../vicNl.h \
@@ -15599,7 +15605,8 @@ initialize_model_state.o: ../../../initialize_model_state.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/temperature_hourly_I.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
-		../../../LAKE.h
+		../../../LAKE.h \
+		../../../vic_state_csv.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o initialize_model_state.o ../../../initialize_model_state.c
 
 initialize_new_storm.o: ../../../initialize_new_storm.c ../../../vicNl.h \
@@ -38322,6 +38329,18 @@ path_discovery.o: ../../../../corn/OS/FS/path_discovery.cpp ../../../../corn/OS/
 		../../../../corn/container/SDF_list.h \
 		../../../../corn/OS/file_system_engine.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o path_discovery.o ../../../../corn/OS/FS/path_discovery.cpp
+
+VIC_crop_state_csv.o: ../../../crop/VIC_crop_state_csv.c ../../../vicNl.h \
+		../../../vicNl_def.h \
+		../../../crop/VIC_crop_state_csv.h \
+		../../../crop/VIC_crop_variable_codes.h \
+		../../../agronomic/VIC_land_unit_C_interface.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o VIC_crop_state_csv.o ../../../crop/VIC_crop_state_csv.c
+
+vic_state_csv.o: ../../../vic_state_csv.c ../../../vicNl.h \
+		../../../vicNl_def.h \
+		../../../vic_state_csv.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o vic_state_csv.o ../../../vic_state_csv.c
 
 ####### Install
 

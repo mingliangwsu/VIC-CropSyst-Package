@@ -1,5 +1,28 @@
 #ifndef VIC_CropSyst_proper_cropH
 #define VIC_CropSyst_proper_cropH
+/*********************************************************************
+  2026 NOTICE: this file is NOT part of the compiled build.
+
+  Verified against build/library/*/Makefile_Kamiak and
+  build/Xcc/Release/Makefile_Kamiak: neither VIC_CropSyst_proper_crop.cpp
+  nor its base class reference (CropSyst::Crop_CropSyst) actually exist
+  in the compiled/linked project -- "Crop_CropSyst" is not defined
+  anywhere in CropSyst/source (only forward-declared), so this file
+  cannot even compile as written. It appears to predate a CropSyst
+  engine refactor that renamed the base class to Crop_complete
+  (CropSyst/source/crop/crop_cropsyst.h/.cpp, which IS compiled).
+
+  The restore_state()/get() additions below were written against this
+  file under the (incorrect) assumption that it was the concrete class
+  instantiated for V3 crops at runtime. It is not. The real,
+  compiled-and-linked fix lives in:
+    - CropSyst/source/crop/crop_interfaced.h   (Crop_model_interface::restore_state(), default no-op)
+    - CropSyst/source/crop/crop_cropsyst.h/.cpp (Crop_complete::restore_state(), the real logic)
+    - VIC_CropSyst/agronomic/VIC_land_unit_simulation.cpp (calls crop_active_or_intercrop->restore_state() directly, no dynamic_cast)
+  See STATE_IO_README.md for the full explanation. The additions below
+  are left in place only for historical reference; they have no effect
+  on the running program.
+*********************************************************************/
 #include "VIC_crop_common.h"
 #include "crop/crop_cropsyst.h"
 #include "VIC_weather_provider.h"

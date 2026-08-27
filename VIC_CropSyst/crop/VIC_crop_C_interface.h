@@ -1,5 +1,14 @@
 #ifndef VIC_crop_C_interfaceH
 #define VIC_crop_C_interfaceH
+/* 2026 NOTICE: verified against build/Xcc/Release/Makefile_Kamiak --
+   crop/VIC_crop_C_interface.cpp has no build rule and is not linked
+   into the V3 executable (it is the legacy V2-style interface; the
+   real V3 driver interface is agronomic/VIC_land_unit_C_interface.h/.cpp,
+   which IS compiled). The VIC_CropSyst_restore_state() addition in this
+   file is therefore inert dead code, kept only for reference/consistency
+   with this file's existing style. The real, compiled entry point is
+   VIC_land_unit_restore_crop_state() in
+   agronomic/VIC_land_unit_C_interface.h/.cpp. See STATE_IO_README.md. */
 #ifdef VCS_V5
 #include "vic_def.h"
 #else

@@ -285,6 +285,77 @@ int  dist_prec(atmos_data_struct   *atmos,
               still_storm, dry_time, *lake_con);
 
   //************************************
+  //  2026: On the FIRST simulated day of a run that is warm-starting
+  //  from a saved crop-state snapshot, push that saved state into
+  //  whichever crop(s) are active for this cell today. See
+  //  crop/VIC_crop_state_csv.h.
+  //
+  //  IMPORTANT PREREQUISITE (not something this code can do on its
+  //  own): a crop object must already exist for this veg tile today.
+  //  In VIC-CropSyst V3, crops are created when the rotation/event
+  //  engine's calendar-scheduled sowing date is reached -- which,
+  //  for a run that starts mid-season (exactly the scenario this
+  //  feature is for), never happens on its own, because the days
+  //  before the restart are never simulated. The recommended
+  //  workaround (see STATE_IO_README.md) is to edit the *rotation/
+  //  management parameter file* for this run so that whichever crop
+  //  was active at the branch date is scheduled to be sown on the
+  //  branch date itself. That produces a freshly-planted crop object
+  //  on day 1 (starting from zero biomass/GAI/thermal time); the code
+  //  below then immediately overwrites that freshly-planted state
+  //  with the saved snapshot, so day 2 onward continues growing from
+  //  the correct point rather than from scratch.
+  //
+  //  This only ever runs once (rec == 0, the first record of this
+  //  run's own forcing/date range) and is a no-op unless both
+  //  INIT_STATE and CSV_STATE_FILE are set and a crop state file
+  //  exists.
+  //************************************
+#if VIC_CROPSYST_VERSION>=3
+  if ( options.INIT_STATE && options.CSV_STATE_FILE && rec == 0 ) {
+    static crop_state_record *crop_restore_table = NULL;
+    static int                crop_restore_count = 0;
+    static char               crop_restore_loaded = FALSE;
+    int veg;
+
+    if ( !crop_restore_loaded ) {
+      /* Reads the WHOLE file once (covers every cell), cached for the
+         life of the process -- read_crop_state_csv() is not re-run
+         per cell, unlike the per-cell soil-state reader. */
+      crop_restore_count = read_crop_state_csv(filep->init_crop_state_csv_path,
+                                                &crop_restore_table);
+      if ( crop_restore_count < 0 ) {
+        fprintf(stderr, "WARNING: could not open crop state file \"%s\"; "
+                         "crop state will not be restored.\n",
+                         filep->init_crop_state_csv_path);
+        crop_restore_count = 0;
+      }
+      crop_restore_loaded = TRUE;
+    }
+
+    for ( veg = 0; veg < veg_con[0].vegetat_type_num; veg++ ) {
+      crop_data_struct *this_veg_crop = prcp->veg_var[0][veg][0].crop_state;
+      if ( this_veg_crop != NULL && this_veg_crop->CropSystHandle != 0 ) {
+        const crop_state_record *saved =
+            find_crop_state(crop_restore_table, crop_restore_count,
+                             soil_con->gridcel, veg);
+        if ( saved != NULL ) {
+          VIC_land_unit_activate(this_veg_crop->CropSystHandle);
+          if ( !apply_crop_state(saved) )
+            fprintf(stderr, "WARNING: crop state restore reported failure "
+                             "for cell %d, veg %d.\n", soil_con->gridcel, veg);
+        }
+        /* If saved == NULL: either no crop was active for this veg
+           tile at the saved date (nothing to restore -- fine), or the
+           parameter-file sowing-date workaround above wasn't applied
+           for this veg tile's crop, in which case it will simply grow
+           from a normal fresh planting instead of continuing. */
+      }
+    }
+  }
+#endif
+
+  //************************************
   //  2026: Save CSV state at the same assigned date, in addition to
   //  (or instead of) the legacy binary/ASCII state above. See
   //  vic_state_csv.h / crop/VIC_crop_state_csv.h. Soil/snow state

@@ -94,8 +94,39 @@ bool Canopy_growth_cover_based::restart_with
 (float64 restart_biomass
 ,float64 restart_GAI_not_used_in_this_model
 ,bool clumping_unused)                                             modification_
-{  canopy_vital.append(new Canopy_accumulation::Portion
-      (restart_biomass,parameters.cover_initial,0.0/*thermal_time*/));           //130510
+{
+   // 2026 FIX: this model tracks canopy as a cover FRACTION, not GAI --
+   // the incoming restart_GAI parameter was previously accepted but
+   // completely ignored (see its own name: "restart_GAI_not_used_in_
+   // this_model"), and the Portion below was always constructed using
+   // parameters.cover_initial (a fixed, near-zero "just planted"
+   // default) regardless of what state was actually being restored.
+   // This meant a warm-restart of an already-substantially-grown crop
+   // using this canopy model always came back as an essentially bare,
+   // freshly-planted canopy -- explaining why GAI read back as ~0
+   // immediately after restart_with() reported success, even though
+   // biomass (which IS used below) restored correctly.
+   //
+   // Fix: convert the requested GAI to an equivalent cover fraction
+   // using the same Beer-Lambert-style formula already used elsewhere
+   // in this codebase for the LAI-based canopy model (see
+   // Canopy_growth_leaf_area_index_based::restart_with(), which computes
+   // fract_cover = 1.0 - exp(-kc * restart_GAI * clumping)). kc
+   // (light_extinction_coef) is available here via the crop_parameters
+   // member already inherited from the shared Canopy_growth_portioned
+   // base class -- no constructor or header change needed.
+   float64 kc = crop_parameters.morphology.light_extinction_coef;
+   float64 restart_cover =
+      1.0 - exp(-kc * restart_GAI_not_used_in_this_model);
+   std::cerr << "RESTORE_STATE_MARKER_V2 [canopy_growth_cover_based]: "
+             << "restart_biomass=" << restart_biomass
+             << " restart_GAI=" << restart_GAI_not_used_in_this_model
+             << " kc=" << kc
+             << " restart_cover=" << restart_cover
+             << " (previously would have used parameters.cover_initial="
+             << parameters.cover_initial << ")" << std::endl;
+   canopy_vital.append(new Canopy_accumulation::Portion
+      (restart_biomass,restart_cover,0.0/*thermal_time*/));           //130510
          // probably should have today's thermal_time
    return true;
 }

@@ -313,10 +313,31 @@ bool Canopy_growth_leaf_area_index_based::restart_with
    float64 GAI_to_add =
       CORN::must_be_0_or_greater<float64>
       (restart_GAI -  GAI_curr);                                                 //070321
+   // 2026 TEMP DIAGNOSTIC: print every intermediate value in this
+   // computation, to pin down exactly where GAI restoration is going
+   // wrong (biomass restores correctly via the same mechanism, GAI does
+   // not -- see restore_biomass_to_add/canopy_biomass_curr below for
+   // comparison).
+   std::cerr << "RESTORE_STATE_MARKER_V2 [canopy_growth_LAI_based]: "
+             << "restart_biomass=" << restart_biomass
+             << " canopy_biomass_curr=" << canopy_biomass_curr
+             << " canopy_biomass_to_add=" << canopy_biomass_to_add
+             << " | restart_GAI=" << restart_GAI
+             << " GAI_curr=" << GAI_curr
+             << " GAI_to_add=" << GAI_to_add
+             << std::endl;
    Canopy_growth_leaf_area_index_based::Canopy_accumulation::Portion *portion =  //060531
       new Canopy_growth_leaf_area_index_based::Canopy_accumulation::Portion
          (0,GAI_to_add,canopy_biomass_to_add,canopy_biomass_to_add);             //070321
-   take_portion(portion,true,true);                                              //180612_050823
+   std::cerr << "RESTORE_STATE_MARKER_V2 [canopy_growth_LAI_based]: "
+             << "portion constructed, portion->get_LAI()=" << portion->get_LAI()
+             << " portion->is_valid()=" << portion->is_valid()
+             << std::endl;
+   bool took = take_portion(portion,true,true);                                  //180612_050823
+   std::cerr << "RESTORE_STATE_MARKER_V2 [canopy_growth_LAI_based]: "
+             << "take_portion returned " << took
+             << ", get_GAI() now = " << get_GAI(include_vital|include_effete)
+             << std::endl;
    float64 _clumping = use_clump_factor ? clumping(restart_GAI ,0.35): 1.0;      //000630
    float64 kc = crop_parameters.morphology.light_extinction_coef;                //200115
    float64 fract_cover = 1.0 - exp(-kc * restart_GAI *_clumping );

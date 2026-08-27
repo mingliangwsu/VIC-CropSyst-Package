@@ -915,6 +915,15 @@ bool Crop_complete::restore_state
       std::cerr << "RESTORE_STATE_MARKER_V2: canopy_leaf_growth non-null "
                 << "(after provide_canopy()), restart_with returned "
                 << canopy_ok << std::endl;
+      // 2026 TEMP DIAGNOSTIC: check GAI immediately after restart_with(),
+      // to distinguish "restart_with() itself failed to set GAI" from
+      // "GAI was set correctly but something later in the same day's
+      // processing overwrites/recomputes it" (the same failure pattern
+      // already found and fixed for canopy_leaf_growth/roots_current
+      // creation above).
+      std::cerr << "RESTORE_STATE_MARKER_V2: GAI immediately after restart_with = "
+                << canopy_leaf_growth->get_GAI(include_vital|include_effete)
+                << " (requested " << GAI << ")" << std::endl;
       ok = canopy_ok && ok;
    } else {
       std::cerr << "RESTORE_STATE_MARKER_V2: canopy_leaf_growth STILL NULL "

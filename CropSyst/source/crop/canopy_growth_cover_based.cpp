@@ -118,13 +118,6 @@ bool Canopy_growth_cover_based::restart_with
    float64 kc = crop_parameters.morphology.light_extinction_coef;
    float64 restart_cover =
       1.0 - exp(-kc * restart_GAI_not_used_in_this_model);
-   std::cerr << "RESTORE_STATE_MARKER_V2 [canopy_growth_cover_based]: "
-             << "restart_biomass=" << restart_biomass
-             << " restart_GAI=" << restart_GAI_not_used_in_this_model
-             << " kc=" << kc
-             << " restart_cover=" << restart_cover
-             << " (previously would have used parameters.cover_initial="
-             << parameters.cover_initial << ")" << std::endl;
    canopy_vital.append(new Canopy_accumulation::Portion
       (restart_biomass,restart_cover,0.0/*thermal_time*/));           //130510
          // probably should have today's thermal_time
@@ -167,10 +160,6 @@ bool Canopy_growth_cover_based::restart_with
    // so direct member access is available only on cover_actual, which
    // is also the only one get_GAI() actually reads from.
    cover_actual.interception_global_green_yesterday = restart_cover;
-
-   std::cerr << "RESTORE_STATE_MARKER_V2 [canopy_growth_cover_based]: "
-             << "synced cover_actual/cover_reference, get_GAI() now = "
-             << get_GAI(include_vital|include_effete) << std::endl;
 
    return true;
 }

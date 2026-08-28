@@ -179,6 +179,46 @@ this gap, in order of how much they touch the proprietary engine:
    environment to validate against -- deliberately not attempted here
    without the ability to compile and test it.
 
+## Known limitation: the branch date's own output row is not continuous
+
+Because `restore_state()` must run *after* the crop object already
+exists for the restart day (see the mid-season crop creation problem
+above -- the crop only gets created via that same day's forced-sowing
+workaround), and the crop's daily diagnostic output row is computed
+and written as part of that same day's normal processing (inside
+`full_energy()`, before `restore_state()` runs), the branch date's own
+row in the warm-started run's `.asc` output reflects the crop's
+fresh-planting state (`GAI`/biomass = 0, `Grow_Stage` =
+`germination&planting`), not the restored values.
+
+For example, given a branch date of 1985-07-10 with a saved state of
+`GAI=3.886`, `Biomass=0.971`: the source run's own 1985-07-10 row shows
+those values, but the warm-started run's 1985-07-10 row shows
+`GAI=0`/`Biomass=0`. The very next day (1985-07-11) onward is fully
+continuous with the source run -- `GAI`, biomass, canopy cover, root
+depth, and accumulated thermal time all match the source run's branch-
+day values (within normal floating-point precision) and evolve
+sensibly from there.
+
+**Practical implication:** treat the branch date's row in a warm-
+started run as a bootstrap artifact, not real data. Any analysis,
+plotting, or comparison against the source run should start from
+`STATEDAY + 1`, not `STATEDAY` itself.
+
+This has the same root cause, and the same two possible fixes, as the
+mid-season crop creation problem above: it stems from `restore_state()`
+necessarily running after that day's crop creation and output writing,
+both of which happen inside the same `full_energy()` call. A genuine
+fix would mean locating and re-invoking whatever function inside
+`agronomic/VIC_land_unit_C_interface.cpp` populates that daily output
+row (the `CROP_DAILY_OUTPUT_MEMFIRST`-guarded code paths are the
+starting point) a second time, after `restore_state()` completes for
+that day -- not attempted here, since it would need its own
+compile/test cycle to confirm the output function is safely
+re-callable (e.g. that calling it twice for one day doesn't produce a
+duplicate row) in an environment where that could actually be
+verified.
+
 ## Known limitation: exact thermal-time restoration
 
 `restore_state()` restores growth **stage** exactly (via

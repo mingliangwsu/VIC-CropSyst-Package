@@ -218,15 +218,6 @@ bool Canopy_cover_reference::start_season()
 //_Canopy_cover_reference::start_season_____________________________2011-08-30_/
 bool Canopy_cover_actual::start_season()                           modification_
 {
-   // 2026 TEMP DIAGNOSTIC: this function zeroes interception_global_green
-   // and interception_global_green_yesterday -- exactly the two values a
-   // scenario-branching restore sets. This print catches every call to
-   // confirm whether/when it fires after a restore, since a call here
-   // (without also touching canopy_vital, where biomass lives) would
-   // explain a restored GAI reverting to 0 while biomass survives.
-   std::cerr << "RESTORE_STATE_MARKER_V2 [Canopy_cover_actual::start_season]: "
-             << "CALLED -- resetting interception_global_green from "
-             << interception_global_green << " to 0" << std::endl;
    cover_attained_max = 0.0;
    cover_to_lose_total= 0.0;
    interception_global_green = 0;
@@ -277,10 +268,6 @@ bool Canopy_cover_actual::know_N_leaf_stress_factor(float64 N_leaf_stress_factor
 //_know_N_leaf_stress_factor________________________________________2020-05-28_/
 bool Canopy_cover_actual::end_day()                                modification_
 {
-   std::cerr << "RESTORE_STATE_MARKER_V2 [Canopy_cover_actual::end_day]: "
-             << "copying interception_global_green_yesterday from "
-             << interception_global_green_yesterday << " to "
-             << interception_global_green << std::endl;
    interception_global_green_yesterday
         = interception_global_green;
    return Canopy_cover_abstract::end_day();
@@ -289,13 +276,6 @@ bool Canopy_cover_actual::end_day()                                modification_
 bool Canopy_cover_actual::update_cover
 (float64 leaf_water_potential_yesterday)                           modification_
 {  // Determine green canopy cover  // in VB is ActualCanopyCover
-   std::cerr << "RESTORE_STATE_MARKER_V2 [Canopy_cover_actual::update_cover]: "
-             << "ENTRY interception_global_green=" << interception_global_green
-             << " interception_global_green_yesterday=" << interception_global_green_yesterday
-             << " accrescence=" << (accrescence ? "non-null" : "NULL")
-             << " senescence=" << (senescence ? "non-null" : "NULL")
-             << " culminescence=" << (culminescence ? "non-null" : "NULL")
-             << std::endl;
    float64 reduce_canopy_expansion_LWP
       = canopy_growth_common_parameter.reduce_canopy_expansion_LWP;
    float64 actual_canopy_expansion_today = 0;
@@ -385,14 +365,6 @@ bool Canopy_cover_actual::update_cover
          actual_canopy_cover_green                                               //200306
             = interception_global_green_yesterday                                //200306
             + actual_canopy_expansion_today;                                     //200306
-         std::cerr << "RESTORE_STATE_MARKER_V2 [accrescence branch]: "
-                   << "expansion_potential_today=" << canopy_cover_reference.expansion_potential_today
-                   << " water_stress=" << water_stress
-                   << " min_N_water_stress=" << min_N_water_stress
-                   << " actual_canopy_expansion_today=" << actual_canopy_expansion_today
-                   << " interception_global_green_yesterday(reread)=" << interception_global_green_yesterday
-                   << " -> actual_canopy_cover_green=" << actual_canopy_cover_green
-                   << std::endl;
          /*200306
          actual_canopy_expansion_today =
             (canopy_cover_reference.expansion_potential_today > 0)
@@ -419,9 +391,6 @@ bool Canopy_cover_actual::update_cover
       //200213 ,0.001,0.9999
 
    interception_global_green = actual_canopy_cover_green;
-   std::cerr << "RESTORE_STATE_MARKER_V2 [Canopy_cover_actual::update_cover]: "
-             << "EXIT actual_canopy_cover_green=" << actual_canopy_cover_green
-             << " (now assigned to interception_global_green)" << std::endl;
    // PAR canopy interception assume that PAR extinction coefficient
    // is 1.4 times greater than solar extinction coefficient.
    interception_PAR_green     // output only

@@ -120,14 +120,6 @@ float64 Canopy_cover_curve_2017::calc_during_accrescence()                 const
        = cover_initial + (CCmax_asymptotic - cover_initial)
        / (1.0 + B1 * exp(-shape_coef_vegetative * relative_thermal_time));
    cover_current = calculated_cover;
-   std::cerr << "RESTORE_STATE_MARKER_V2 [calc_during_accrescence]: "
-             << "relative_thermal_time=" << relative_thermal_time
-             << " cover_initial=" << cover_initial
-             << " CCmax_asymptotic=" << CCmax_asymptotic
-             << " B1=" << B1
-             << " shape_coef_vegetative=" << shape_coef_vegetative
-             << " -> calculated_cover=" << calculated_cover
-             << std::endl;
    return calculated_cover;
 }
 //_calc_during_accrescence__________________________________________2017-12-20_/

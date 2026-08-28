@@ -147,6 +147,27 @@ bool Canopy_growth_cover_based::restart_with
    // the same way after a clipping event.
    cover_reference.set_interception_insolation_global_green(restart_cover);
    cover_actual   .set_interception_insolation_global_green(restart_cover);
+
+   // 2026 FURTHER FIX #2: setting "today"'s value alone is still not
+   // durable. Canopy_cover_actual::update_cover() -- called every day as
+   // normal crop processing, unconditionally, regardless of growth
+   // stage -- computes actual_canopy_cover_green from scratch each day
+   // and unconditionally overwrites interception_global_green with it
+   // at the end of the function. On the FIRST day after restart this
+   // still shows our correct value (since it hasn't run again yet), but
+   // by the following day, update_cover()'s incremental growth
+   // calculation (interception_global_green_yesterday + today's
+   // computed increment) uses interception_global_green_yesterday --
+   // which we never set, so it still reflects the canopy's pre-restore
+   // (near-zero) state, silently dragging the restored value back down.
+   // interception_global_green_yesterday has no public setter, but
+   // Canopy_growth_cover_based is already declared a friend class of
+   // Canopy_cover_actual (see canopy_cover_continuum.h) specifically --
+   // NOT of Canopy_cover_reference, which does not grant this access --
+   // so direct member access is available only on cover_actual, which
+   // is also the only one get_GAI() actually reads from.
+   cover_actual.interception_global_green_yesterday = restart_cover;
+
    std::cerr << "RESTORE_STATE_MARKER_V2 [canopy_growth_cover_based]: "
              << "synced cover_actual/cover_reference, get_GAI() now = "
              << get_GAI(include_vital|include_effete) << std::endl;

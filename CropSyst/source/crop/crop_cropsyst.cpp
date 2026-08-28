@@ -860,6 +860,33 @@ bool Crop_complete::restore_state
    // using the public activate_*() methods Phenology_2018 already exposes
    // for this purpose (CropSyst/source/crop/phenology_2018.h).
    //
+   // 2026 CASCADE FIX (found via update_cover() investigation): each
+   // activate_*() call only sets its OWN stage's Period_thermal pointer
+   // (e.g. activate_yield_formation() only sets yield_formation); it does
+   // NOT set the intermediate stage pointers (accrescence, anthesis,
+   // etc.) that a NATURALLY-progressed crop would already have non-null
+   // by the time it reaches a later stage. Downstream growth logic (e.g.
+   // Canopy_cover_actual::update_cover(), called every day as normal
+   // processing) checks these intermediate pointers directly
+   // ("if (accrescence) {...compute expansion...}"), and falls through
+   // to a zero-growth default when none of them are set -- silently
+   // overwriting whatever canopy state was just restored, on every
+   // subsequent day, regardless of the nominal "current stage". Jumping
+   // straight to a late stage (as the previous version of this switch
+   // did) left ALL intermediate pointers null, so no growth branch ever
+   // recognized the crop as active.
+   //
+   // Fix: cascade through every stage strictly before the target,
+   // activating each in turn, so all the intermediate Period_thermal
+   // pointers a naturally-progressed crop would have are non-null here
+   // too. Return value ok reflects only the FINAL (target) stage's
+   // activation, matching this function's original contract; failures
+   // in earlier, cascaded activations are tolerated (crop parameter
+   // files are not guaranteed to define every named period -- see the
+   // activate_yield_formation() failure mode already documented for
+   // Barley_spring_colder-style crops without an explicit
+   // "phenology/yield_formation" period).
+   //
    // IMPORTANT ORDERING NOTE (2026, found via compile+output testing):
    // activating a stage such as yieldformation can internally cascade
    // through earlier stages (e.g. accrescence) to get there, and stage
@@ -874,13 +901,45 @@ bool Crop_complete::restore_state
    switch (growth_stage)
    {
       case NGS_GERMINATION:
-      case NGS_PLANTING:        ok = phenology.activate_sowing()         && ok; break;
-      case NGS_EMERGENCE:       ok = phenology.activate_emergence()      && ok; break;
-      case NGS_ACCRESCENCE:     ok = phenology.activate_accrescence()    && ok; break;
-      case NGS_ANTHESIS:        ok = phenology.activate_anthesis()       && ok; break;
-      case NGS_FILLING:         ok = phenology.activate_yield_formation()&& ok; break;
-      case NGS_MATURITY:        ok = phenology.activate_maturity()       && ok; break;
-      case NGS_QUIESCENCE:      ok = phenology.activate_quiescence()     && ok; break;
+      case NGS_PLANTING:
+         ok = phenology.activate_sowing()          && ok;
+         break;
+      case NGS_EMERGENCE:
+         phenology.activate_sowing();
+         ok = phenology.activate_emergence()       && ok;
+         break;
+      case NGS_ACCRESCENCE:
+         phenology.activate_sowing();
+         phenology.activate_emergence();
+         ok = phenology.activate_accrescence()     && ok;
+         break;
+      case NGS_ANTHESIS:
+         phenology.activate_sowing();
+         phenology.activate_emergence();
+         phenology.activate_accrescence();
+         ok = phenology.activate_anthesis()        && ok;
+         break;
+      case NGS_FILLING:
+         phenology.activate_sowing();
+         phenology.activate_emergence();
+         phenology.activate_accrescence();
+         phenology.activate_anthesis();
+         ok = phenology.activate_yield_formation() && ok;
+         break;
+      case NGS_MATURITY:
+         phenology.activate_sowing();
+         phenology.activate_emergence();
+         phenology.activate_accrescence();
+         phenology.activate_anthesis();
+         phenology.activate_yield_formation();
+         ok = phenology.activate_maturity()        && ok;
+         break;
+      case NGS_QUIESCENCE:
+         // activate_quiescence() already clears accrescence/
+         // culminescence/senescence/maturity itself (see
+         // phenology_2018.cpp), so no cascade is needed here.
+         ok = phenology.activate_quiescence()      && ok;
+         break;
       default:
          // NGS_NONE, NGS_RESTART, NGS_HARVESTABLE, NGS_HARVEST,
          // NGS_POSTHARVEST, NGS_TERMINATED and any stage not handled
@@ -898,18 +957,30 @@ bool Crop_complete::restore_state
    // hook for exactly this purpose (see CropSyst/source/crop/canopy_growth.h).
    // Run AFTER phenology activation -- see note above.
    //
-   // 2026 CORRECTION (found via granular diagnostic output): activating a
-   // late phenology stage does NOT, by itself, create canopy_leaf_growth.
-   // canopy_leaf_growth is normally only created when the crop naturally
-   // progresses through its own sequential lifecycle (see
-   // Crop_complete::initiate_accrescence(), which is only reached by that
-   // natural progression, not by directly activating a later stage like
-   // yieldformation). Since restore_state() intentionally skips that
-   // natural progression, canopy_leaf_growth must be created explicitly
-   // here, using the same factory (provide_canopy()) the normal lifecycle
-   // itself uses. provide_canopy() safely deletes any existing canopy
-   // first, so this is safe to call unconditionally.
-   provide_canopy();
+   // 2026 CORRECTED AGAIN (found via day-by-day update_cover() tracing):
+   // the previous version of this block called provide_canopy()
+   // UNCONDITIONALLY, on the theory that canopy_leaf_growth is never
+   // created by directly activating a late stage. That is true when NO
+   // intermediate stage is activated -- but the cascade fix above now
+   // DOES activate accrescence on the way to later stages, and
+   // activating accrescence triggers Crop_complete::initiate_accrescence()
+   // as a side effect, which ALREADY creates a fresh, PROPERLY-SYNCED
+   // canopy of its own (via its own provide_canopy().start() call) --
+   // "properly synced" meaning downstream logic like
+   // Canopy_cover_actual::update_cover() correctly sees this canopy's
+   // accrescence pointer as active. Calling provide_canopy() again here,
+   // unconditionally, discarded that correctly-synced canopy and built a
+   // second, unsynced one -- so update_cover() never recognized the
+   // restored crop as actively growing, and the GAI/cover this function
+   // restores was silently overwritten by update_cover()'s zero-growth
+   // default on every subsequent call, even though this function's own
+   // restart_with() call reported success. Only call provide_canopy()
+   // here if the cascade above did NOT already create one (e.g. for
+   // growth stages at or before emergence, which never reach
+   // initiate_accrescence()) -- mirroring the same "only create if
+   // missing" pattern already used for roots_current below.
+   if (!canopy_leaf_growth)
+      provide_canopy();
    if (canopy_leaf_growth) {
       bool canopy_ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true);
       std::cerr << "RESTORE_STATE_MARKER_V2: canopy_leaf_growth non-null "

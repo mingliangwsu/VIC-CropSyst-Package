@@ -64,6 +64,21 @@ bool Crop_root_vital::initialize(float64 root_length_to_initialize_to) initializ
       total_fract_root_length [sublayer] = 0.0;                                  //010322
       root_lengths            [sublayer] = 0.0;                                  //061129
    }
+   // 2026 FIX: root_length_to_initialize_to was previously accepted but
+   // never actually used anywhere in this function -- a pre-existing bug
+   // (the parameter was silently dead code). This is what gives the
+   // function real restart semantics matching its own documented intent
+   // ("Call once when crop is planted and at restart" -- see
+   // crop_root.h). Also syncs the "unstressed yesterday/today" trackers
+   // used by update_length()'s day-over-day growth calculation
+   // (root_depth_gain = (unstressed_today - unstressed_yesterday) *
+   // stress_adjustment; root_length += root_depth_gain), so that the
+   // first day after a restart computes a near-zero initial gain from a
+   // consistent baseline instead of growing from whatever the
+   // construction-time defaults happened to be.
+   root_length                       = root_length_to_initialize_to;
+   root_length_unstressed_today      = root_length_to_initialize_to;
+   root_length_unstressed_yesterday  = root_length_to_initialize_to;
    return true;
 }
 //_initialize__________________________________________________________________/

@@ -957,34 +957,140 @@ bool Crop_complete::restore_state
    // hook for exactly this purpose (see CropSyst/source/crop/canopy_growth.h).
    // Run AFTER phenology activation -- see note above.
    //
-   // 2026 CORRECTED AGAIN (found via day-by-day update_cover() tracing):
-   // the previous version of this block called provide_canopy()
-   // UNCONDITIONALLY, on the theory that canopy_leaf_growth is never
-   // created by directly activating a late stage. That is true when NO
-   // intermediate stage is activated -- but the cascade fix above now
-   // DOES activate accrescence on the way to later stages, and
-   // activating accrescence triggers Crop_complete::initiate_accrescence()
-   // as a side effect, which ALREADY creates a fresh, PROPERLY-SYNCED
-   // canopy of its own (via its own provide_canopy().start() call) --
-   // "properly synced" meaning downstream logic like
-   // Canopy_cover_actual::update_cover() correctly sees this canopy's
-   // accrescence pointer as active. Calling provide_canopy() again here,
-   // unconditionally, discarded that correctly-synced canopy and built a
-   // second, unsynced one -- so update_cover() never recognized the
-   // restored crop as actively growing, and the GAI/cover this function
-   // restores was silently overwritten by update_cover()'s zero-growth
-   // default on every subsequent call, even though this function's own
-   // restart_with() call reported success. Only call provide_canopy()
-   // here if the cascade above did NOT already create one (e.g. for
-   // growth stages at or before emergence, which never reach
-   // initiate_accrescence()) -- mirroring the same "only create if
-   // missing" pattern already used for roots_current below.
+   // 2026 CONFIRMED ROOT CAUSE (found via direct trace of the actual
+   // active code path -- this build has no -DPHENOLOGY_VERSION=2018
+   // defined, so it uses the pre-2018 phenology code, NOT the 2018 code
+   // this comment previously (incorrectly) assumed): activating a
+   // phenology stage here does NOT synchronously trigger
+   // Crop_complete::initiate_accrescence(). That function is normally
+   // only reached via Crop_complete::thermal_time_event(), gated by
+   // thermal_time_matchs() -- a direct comparison against ACCUMULATED
+   // DEGREE DAYS. Since accumulated thermal time is the one piece of
+   // state this restore cannot set (Phenology_2018's private GDD
+   // accumulator has no public setter -- see the top-level restore_state
+   // documentation), that gate can take weeks to open naturally, if it
+   // opens within the observed window at all.
+   //
+   // initiate_accrescence() does three things when it does eventually
+   // run: creates canopy_leaf_growth, creates roots_current, and --
+   // critically -- calls
+   //    canopy_leaf_growth->know_accrescence(phenology.get_accrescence_period())
+   // to sync the canopy's own accrescence pointer, which is what
+   // Canopy_cover_actual::update_cover() actually checks to recognize
+   // the crop as actively growing. Earlier versions of this function
+   // created the canopy and roots (matching two of initiate_accrescence()'s
+   // three effects) but never called know_accrescence() -- so
+   // update_cover() always saw a NULL accrescence pointer regardless of
+   // canopy_leaf_growth existing, explaining why GAI/cover restored
+   // successfully for one instant and then reverted on every subsequent
+   // day. Call know_accrescence() explicitly here, directly reusing the
+   // engine's own existing sync mechanism, rather than waiting on (or
+   // trying to further work around) the thermal-time-gated trigger.
    if (!canopy_leaf_growth)
       provide_canopy();
    if (canopy_leaf_growth) {
+      canopy_leaf_growth->know_accrescence(phenology.get_accrescence_period());
+
+      // 2026 FURTHER FIX (confirmed via direct trace of
+      // Canopy_cover_curve_2017::calc_during_accrescence()): even with
+      // know_accrescence() correctly syncing the accrescence pointer,
+      // the reference (unstressed/potential) canopy cover is computed
+      // from accrescence->get_thermal_time_relative_elapsed() -- how
+      // far elapsed, as a 0..1 fraction, THIS SPECIFIC period is. Since
+      // the period was just created moments ago by the activation
+      // above, this reads as ~0 (freshly started), producing a
+      // near-initial reference cover value regardless of what this
+      // function restores -- which then gets subtracted from the
+      // (correctly restored) previous day's actual cover as a "daily
+      // expansion", swinging it sharply toward the reference's own
+      // near-zero state. Since our target growth_stage is at or beyond
+      // yield formation, the crop has definitionally already fully
+      // completed accrescence, so 1.0 (fully elapsed) is the physically
+      // correct value here, not an arbitrary guess. get_accrescence_period()
+      // returns const, but the member itself is public and genuinely
+      // mutable (Period_thermal::thermal_time_relative_elapsed, see
+      // phenology_A.h) -- it is only const-qualified on this read-only
+      // accessor, so const_cast here is a legitimate, narrowly-scoped
+      // exception rather than defeating const-correctness generally.
+      {
+         const Phenology::Period_thermal *accrescence_period_const
+            = phenology.get_accrescence_period();
+         if (accrescence_period_const) {
+            // dynamic_cast (not static_cast) is required here: Period_thermal
+            // implements Phenology::Period_thermal through virtual
+            // inheritance, so the base-to-derived offset is not statically
+            // determinable and static_cast is rejected by the compiler.
+            CropSyst::Phenology_abstract::Period_thermal *accrescence_period
+               = dynamic_cast<CropSyst::Phenology_abstract::Period_thermal *>
+                  (const_cast<Phenology::Period_thermal *>(accrescence_period_const));
+            if (accrescence_period) {
+               accrescence_period->thermal_time_relative_elapsed = 1.0;
+               std::cerr << "RESTORE_STATE_MARKER_V2: forced accrescence period's "
+                         << "thermal_time_relative_elapsed to 1.0 (fully elapsed)"
+                         << std::endl;
+
+               // 2026 FURTHER FIX (confirmed via your own diagnostic
+               // output: relative_thermal_time read back as ~0.03, not
+               // 1.0, on the very next day): setting
+               // thermal_time_relative_elapsed directly only lasts one
+               // day. Period_thermal::start_day() -- called once per
+               // day as normal processing -- UNCONDITIONALLY
+               // recomputes it via calc_thermal_time_relative_elapsed(),
+               // which reads get_thermal_time_accum() / duration_GDDs,
+               // where get_thermal_time_accum() delegates to THIS
+               // PERIOD's own separate thermal_time object (distinct
+               // from the crop's global one fixed elsewhere in this
+               // function) -- so the direct assignment above gets
+               // silently overwritten by the very next day's
+               // recomputation. Fix the underlying accumulator instead,
+               // so the recomputation itself naturally yields ~1.0:
+               // dynamic_cast to the concrete Thermal_time_common type
+               // (same class/same public GDDs/GDDs_yesterday members
+               // used for the crop-level fix above) and set it to
+               // (at least) the period's own configured duration, so
+               // accum/duration = 1.0 even after start_day() recomputes
+               // it from scratch.
+               if (accrescence_period->thermal_time && accrescence_period->parameters) {
+                  CropSyst::Thermal_time_common *period_thermal_time
+                     = dynamic_cast<CropSyst::Thermal_time_common *>
+                        (accrescence_period->thermal_time);
+                  if (period_thermal_time) {
+                     float64 target_GDDs = accrescence_period->parameters->duration_GDDs;
+                     period_thermal_time->GDDs           = target_GDDs;
+                     period_thermal_time->GDDs_yesterday = target_GDDs;
+                     std::cerr << "RESTORE_STATE_MARKER_V2: forced accrescence period's "
+                               << "own thermal_time->GDDs/GDDs_yesterday to "
+                               << target_GDDs << " (= its duration_GDDs, so "
+                               << "start_day()'s recomputation also yields ~1.0)"
+                               << std::endl;
+                  } else {
+                     std::cerr << "RESTORE_STATE_MARKER_V2: accrescence period's "
+                               << "thermal_time non-null but dynamic_cast to "
+                               << "Thermal_time_common FAILED -- relative_elapsed "
+                               << "will revert to a small value on the next day"
+                               << std::endl;
+                  }
+               } else {
+                  std::cerr << "RESTORE_STATE_MARKER_V2: accrescence period's "
+                            << "thermal_time or parameters is NULL -- cannot "
+                            << "durably fix relative_elapsed" << std::endl;
+               }
+            } else {
+               std::cerr << "RESTORE_STATE_MARKER_V2: accrescence period "
+                         << "non-null but dynamic_cast to concrete type FAILED "
+                         << "-- cannot force thermal_time_relative_elapsed"
+                         << std::endl;
+            }
+         } else {
+            std::cerr << "RESTORE_STATE_MARKER_V2: accrescence period is NULL "
+                      << "-- cannot force thermal_time_relative_elapsed"
+                      << std::endl;
+         }
+      }
+
       bool canopy_ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true);
       std::cerr << "RESTORE_STATE_MARKER_V2: canopy_leaf_growth non-null "
-                << "(after provide_canopy()), restart_with returned "
+                << "(after provide_canopy()), know_accrescence synced, restart_with returned "
                 << canopy_ok << std::endl;
       // 2026 TEMP DIAGNOSTIC: check GAI immediately after restart_with(),
       // to distinguish "restart_with() itself failed to set GAI" from
@@ -1033,11 +1139,44 @@ bool Crop_complete::restore_state
    }
 
 
-   // Exact within-stage degree-day accumulation (accum_thermal_time_deg_day)
-   // still cannot be forced because Phenology_2018 keeps its GDD accumulator
-   // private with no public setter; the value is accepted here for
-   // logging/validation only.
-   (void)accum_thermal_time_deg_day;
+   // 2026 FIX (confirmed via g++ -E against the exact build flags used
+   // by this project's Qt build): the crop's GLOBAL accumulated
+   // thermal time is directly settable. thermal_time_common.h's own
+   // version-guard comments are themselves disabled (commented out),
+   // so this build actually compiles the simpler GDDs/GDDs_yesterday
+   // pair rather than the accum_degree_days_normal[]/_clipped[] arrays
+   // the file's comments describe -- both are under the same "public:
+   // Temporarily public..." access label either way. `thermal_time` is
+   // already a directly-accessible member of Crop_complete. The
+   // previous comment here (claiming no public setter exists) was
+   // written against the wrong phenology version -- this build's active
+   // phenology class is Phenology_2013 (PHENOLOGY_VERSION is undefined
+   // in this build's compile flags), not Phenology_2018, and it is
+   // Thermal_time_common's accumulator -- not anything inside the
+   // phenology class itself -- that actually needs restoring.
+   //
+   // This does NOT, by itself, fix the period-local
+   // thermal_time_relative_elapsed used by
+   // Canopy_cover_curve_2017::calc_during_accrescence() (see the
+   // separate fix for that above) -- that is a SEPARATE, per-period
+   // tracker, not derived from this global accumulator. This fix
+   // instead addresses thermal_time_matchs() (which gates
+   // initiate_accrescence()/initiate_filling()/etc. via
+   // thermal_time_event(), used for this build's normal, non-forced
+   // day-to-day lifecycle triggers) and any other consumer of the
+   // crop's overall accumulated degree-days, so that the crop's own
+   // subsequent natural progression (maturity, harvest, etc.) is timed
+   // consistently with the restored point in the season rather than
+   // computing everything as if from day 1.
+   if (thermal_time) {
+      thermal_time->GDDs           = accum_thermal_time_deg_day; // today
+      thermal_time->GDDs_yesterday = accum_thermal_time_deg_day; // yesterday
+      std::cerr << "RESTORE_STATE_MARKER_V2: forced thermal_time->GDDs/GDDs_yesterday "
+                << "to " << accum_thermal_time_deg_day << std::endl;
+   } else {
+      std::cerr << "RESTORE_STATE_MARKER_V2: thermal_time is NULL "
+                << "-- cannot force accum_degree_days" << std::endl;
+   }
 
    return ok;
 }

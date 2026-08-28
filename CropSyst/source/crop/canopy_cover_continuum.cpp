@@ -385,6 +385,14 @@ bool Canopy_cover_actual::update_cover
          actual_canopy_cover_green                                               //200306
             = interception_global_green_yesterday                                //200306
             + actual_canopy_expansion_today;                                     //200306
+         std::cerr << "RESTORE_STATE_MARKER_V2 [accrescence branch]: "
+                   << "expansion_potential_today=" << canopy_cover_reference.expansion_potential_today
+                   << " water_stress=" << water_stress
+                   << " min_N_water_stress=" << min_N_water_stress
+                   << " actual_canopy_expansion_today=" << actual_canopy_expansion_today
+                   << " interception_global_green_yesterday(reread)=" << interception_global_green_yesterday
+                   << " -> actual_canopy_cover_green=" << actual_canopy_cover_green
+                   << std::endl;
          /*200306
          actual_canopy_expansion_today =
             (canopy_cover_reference.expansion_potential_today > 0)

@@ -81,6 +81,19 @@ typedef struct {
   double root_depth_m;
   double accum_thermal_time_deg_day;
   double water_stress_index;
+  /* 2026: which phenology "modifier" period (accrescence/culminescence/
+     senescence -- these track independently of growth_stage above, and
+     are what determine the crop's canopy-growth-curve behavior) was
+     active on this day, and how far through it, as a 0..1 fraction of
+     that period's own configured duration. 0=none, 1=accrescence,
+     2=culminescence, 3=senescence. Restoring these lets a later run
+     reproduce the correct remaining degree-day budget within the
+     crop's current phenological period, instead of assuming every
+     earlier period was already fully complete -- see
+     Crop_complete::restore_state()'s own documentation
+     (crop_cropsyst.h/.cpp) for the full rationale. */
+  int    active_phenology_modifier;
+  double modifier_relative_elapsed;
   unsigned long int CropSystHandle; /* 0 if not applicable/unknown */
 } crop_state_record;
 

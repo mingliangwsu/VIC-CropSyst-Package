@@ -159,16 +159,31 @@ interface_ Crop_model_interface
    // Crop_complete::restore_state() (crop_cropsyst.h/.cpp) for the one
    // override that actually does something, using that class's existing
    // canopy_leaf_growth, roots_current, and phenology restart hooks.
+   //
+   // 2026 EXTENDED: active_phenology_modifier/modifier_relative_elapsed
+   // -- see Crop_complete::restore_state()'s own comment for why these
+   // were added.
    inline virtual bool restore_state
       (float64 biomass_kg_m2
       ,float64 GAI
       ,float64 root_depth_m
       ,Normal_crop_event_sequence growth_stage
       ,float64 accum_thermal_time_deg_day
+      ,int     active_phenology_modifier
+      ,float64 modifier_relative_elapsed
       )                                                         modification_
       { (void)biomass_kg_m2; (void)GAI; (void)root_depth_m;
         (void)growth_stage; (void)accum_thermal_time_deg_day;
+        (void)active_phenology_modifier; (void)modifier_relative_elapsed;
         return false; }
+
+   // 2026: safe base-class defaults for the companion write-side
+   // accessors -- see Crop_complete::get_active_phenology_modifier()/
+   // get_modifier_relative_elapsed() for the real implementation.
+   inline virtual int     get_active_phenology_modifier()                  const
+      { return 0; }
+   inline virtual float64 get_modifier_relative_elapsed()                  const
+      { return 0.0; }
 
    virtual float64 update_evapotranspiration_max(float64 ET_ref_m) rectification_=0; //190812_010910
       //190812 update_pot_evapotranspiration

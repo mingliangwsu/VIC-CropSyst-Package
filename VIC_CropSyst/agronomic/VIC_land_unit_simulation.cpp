@@ -714,12 +714,28 @@ float64 Land_unit_simulation::get_water_stress_index_for_state()           const
        ? crop_active_or_intercrop->get_water_stress_index()
        : 0.0;
 }
+int Land_unit_simulation::get_active_phenology_modifier_for_state()        const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_active_phenology_modifier()
+       : 0;
+}
+//_get_active_phenology_modifier_for_state____________________________2026______/
+float64 Land_unit_simulation::get_modifier_relative_elapsed_for_state()    const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_modifier_relative_elapsed()
+       : 0.0;
+}
+//_get_modifier_relative_elapsed_for_state____________________________2026______/
 bool Land_unit_simulation::restore_state
 (float64                    biomass_kg_m2
 ,float64                    GAI
 ,float64                    root_depth_m
 ,Normal_crop_event_sequence growth_stage
 ,float64                    accum_thermal_time_deg_day
+,int                        active_phenology_modifier
+,float64                    modifier_relative_elapsed
 )                                                                   modification_
 {
     // 2026: now calls straight through Crop_model_interface's own
@@ -734,7 +750,8 @@ bool Land_unit_simulation::restore_state
     return crop_active_or_intercrop
        ? crop_active_or_intercrop->restore_state
             (biomass_kg_m2, GAI, root_depth_m, growth_stage,
-             accum_thermal_time_deg_day)
+             accum_thermal_time_deg_day, active_phenology_modifier,
+             modifier_relative_elapsed)
        : false;
 }
 //_restore_state____________________________________________________2026_______/

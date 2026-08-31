@@ -623,12 +623,62 @@ public: // State variable accessors that are actually used by CropSyst
    // CropSyst's own designed-for-this restart hooks
    // (Canopy_leaf_growth::restart_with(), Crop_root::initialize(),
    // Phenology_2018::activate_*()).
+   //
+   // 2026 EXTENDED: active_phenology_modifier and
+   // modifier_relative_elapsed are new parameters supporting a more
+   // faithful restore of which "modifier" period (accrescence/
+   // culminescence/senescence -- see get_active_phenology_modifier()
+   // below) was actually in progress in the source run, and how far
+   // through it, rather than always assuming the crop had already
+   // fully completed accrescence. See crop_cropsyst.cpp for why this
+   // matters: forcing every intermediate stage to "fully elapsed" on
+   // the same restart day was found to compress the crop's remaining
+   // senescence-to-maturity window far more than a continuously-grown
+   // crop would show, since maturity is gated by an absolute,
+   // since-planting degree-day threshold that doesn't know the
+   // intermediate stages were compressed into a single day.
    virtual bool restore_state
       (float64 biomass_kg_m2
       ,float64 GAI
       ,float64 root_depth_m
       ,Normal_crop_event_sequence growth_stage
       ,float64 accum_thermal_time_deg_day
+      ,int     active_phenology_modifier
+      ,float64 modifier_relative_elapsed
+      )                                                         modification_;
+
+   // 2026: companions to restore_state() above, used on the WRITE side
+   // to capture which "modifier" period (accrescence/culminescence/
+   // senescence -- these track independently of the primary growth_stage
+   // enum, and are what Canopy_cover_actual::update_cover() and
+   // Canopy_cover_curve_2017::calc_during_accrescence() actually check)
+   // is currently in progress, and how far through it (as a 0..1
+   // fraction of that period's own configured duration_GDDs) -- so a
+   // later restore can reproduce not just the crop's instantaneous
+   // biomass/GAI/growth-stage snapshot, but also the correct remaining
+   // budget within its current phenological period. Encoding:
+   // 0 = none/accrescence not yet reached, 1 = accrescence in progress,
+   // 2 = culminescence in progress, 3 = senescence in progress
+   // (checked in that priority order, matching how these periods are
+   // mutually exclusive in the engine -- see know_accrescence()/
+   // know_culminescence()/know_senescence() in canopy_cover_continuum.cpp,
+   // each of which clears the other two).
+   virtual int     get_active_phenology_modifier()                          const;
+   virtual float64 get_modifier_relative_elapsed()                         const;
+
+   // 2026: shared helper used by restore_state() to force a given
+   // phenology Period_thermal's relative-elapsed fraction (and, so it
+   // survives the next start_day() recomputation, the period-local
+   // thermal_time accumulator it's derived from) to a specific target,
+   // rather than always assuming "fully elapsed". See restore_state()'s
+   // own comment for the full rationale. Returns false (harmlessly) if
+   // period is null or its concrete type can't be determined via
+   // dynamic_cast -- callers should not treat this as fatal, since it
+   // only affects the smoothness of the crop's remaining senescence
+   // curve, not whether the restore as a whole succeeds.
+   bool force_period_relative_elapsed
+      (const Phenology::Period_thermal *period
+      ,float64                          target_relative_elapsed
       )                                                         modification_;
 
    inline virtual float64     get_active_fract_root_length_m                     //050331

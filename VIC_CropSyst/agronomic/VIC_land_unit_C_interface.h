@@ -164,6 +164,15 @@ double VIC_land_unit_get_canopy_biomass_kg_m2();
 double VIC_land_unit_get_GAI();
 double VIC_land_unit_get_root_depth_m();
 double VIC_land_unit_get_water_stress_index();
+/* 2026: companions to the above -- see VIC::Land_unit_simulation::
+   get_active_phenology_modifier_for_state()/get_modifier_relative_elapsed_
+   for_state() for the full rationale. active_phenology_modifier encodes
+   which phenology "modifier" period (accrescence/culminescence/senescence)
+   is currently active: 0=none, 1=accrescence, 2=culminescence,
+   3=senescence. modifier_relative_elapsed is how far through that period,
+   as a 0..1 fraction of its own configured duration. */
+int    VIC_land_unit_get_active_phenology_modifier();
+double VIC_land_unit_get_modifier_relative_elapsed();
 /*_2026________________________________________________________________________*/
 /** \brief Restores previously-saved prognostic crop state (biomass, green
    area index, root depth, growth stage) into whichever crop is currently
@@ -178,7 +187,9 @@ int VIC_land_unit_restore_crop_state
 ,double GAI
 ,double root_depth_m
 ,int    growth_stage_code /* Normal_crop_event_sequence value */
-,double accum_thermal_time_deg_day);
+,double accum_thermal_time_deg_day
+,int    active_phenology_modifier
+,double modifier_relative_elapsed);
 /*_2014-12-08_________________________________________________________________*/
 double VIC_CropSyst_get
 (unsigned long int variable_code

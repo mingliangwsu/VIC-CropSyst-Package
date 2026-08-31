@@ -837,12 +837,76 @@ bool Crop_complete::drop_leaves()                                               
    return true;
 }
 //_drop_leaves______________________________________________________2019-06-25_/
+// 2026: see the declaration in crop_cropsyst.h for the full rationale.
+// Priority order matches how these periods are mutually exclusive in
+// the engine (each know_X() clears the other two -- see
+// canopy_cover_continuum.cpp).
+int Crop_complete::get_active_phenology_modifier()                          const
+{
+   if (phenology.get_senescence_period())    return 3;
+   if (phenology.get_culminescence_period()) return 2;
+   if (phenology.get_accrescence_period())   return 1;
+   return 0;
+}
+//_get_active_phenology_modifier_______________________________________2026______/
+float64 Crop_complete::get_modifier_relative_elapsed()                     const
+{
+   const Phenology::Period_thermal *active
+      = phenology.get_senescence_period()    ? phenology.get_senescence_period()
+      : phenology.get_culminescence_period() ? phenology.get_culminescence_period()
+      : phenology.get_accrescence_period()   ? phenology.get_accrescence_period()
+      : 0;
+   return active ? active->get_thermal_time_relative_elapsed() : 0.0;
+}
+//_get_modifier_relative_elapsed_______________________________________2026______/
+bool Crop_complete::force_period_relative_elapsed
+(const Phenology::Period_thermal *period_const
+,float64                          target_relative_elapsed
+)                                                                   modification_
+{
+   if (!period_const) return false;
+   // dynamic_cast (not static_cast) is required here: Period_thermal
+   // implements Phenology::Period_thermal through virtual inheritance,
+   // so the base-to-derived offset is not statically determinable and
+   // static_cast is rejected by the compiler. const_cast is a
+   // legitimate, narrowly-scoped exception here (not a general
+   // const-correctness bypass): the underlying member is genuinely
+   // public and mutable (Period_thermal::thermal_time_relative_elapsed,
+   // see phenology_A.h) -- it is only const-qualified on the read-only
+   // get_X_period() accessors used to reach it.
+   CropSyst::Phenology_abstract::Period_thermal *period
+      = dynamic_cast<CropSyst::Phenology_abstract::Period_thermal *>
+         (const_cast<Phenology::Period_thermal *>(period_const));
+   if (!period) return false;
+   period->thermal_time_relative_elapsed = target_relative_elapsed;
+   // Setting the fraction alone only lasts until the next start_day()
+   // call, which unconditionally recomputes it from this period's own,
+   // separate, local thermal_time accumulator (get_thermal_time_accum()
+   // / duration_GDDs) -- see crop_root.cpp/phenology_A.cpp for the same
+   // pattern already relied on elsewhere. Fix the underlying
+   // accumulator too, so the recomputation itself reproduces the same
+   // fraction on subsequent days instead of reverting.
+   if (period->thermal_time && period->parameters) {
+      CropSyst::Thermal_time_common *period_thermal_time
+         = dynamic_cast<CropSyst::Thermal_time_common *>(period->thermal_time);
+      if (period_thermal_time) {
+         float64 target_GDDs = target_relative_elapsed * period->parameters->duration_GDDs;
+         period_thermal_time->GDDs           = target_GDDs;
+         period_thermal_time->GDDs_yesterday = target_GDDs;
+         return true;
+      }
+   }
+   return false;
+}
+//_force_period_relative_elapsed_______________________________________2026______/
 bool Crop_complete::restore_state
 (float64                    biomass_kg_m2
 ,float64                    GAI
 ,float64                    root_depth_m
 ,Normal_crop_event_sequence growth_stage
 ,float64                    accum_thermal_time_deg_day
+,int                        active_phenology_modifier
+,float64                    modifier_relative_elapsed
 )                                                                   modification_
 {
    bool ok = true;
@@ -979,78 +1043,84 @@ bool Crop_complete::restore_state
    if (!canopy_leaf_growth)
       provide_canopy();
    if (canopy_leaf_growth) {
+      // 2026 REORDERED (confirmed via direct comparison against Run 1's
+      // actual branch-date state -- which turned out to be "senescence"
+      // active, not "culminescence" as an earlier round of this fix had
+      // assumed): restart_with() now runs FIRST, before know_accrescence()
+      // and the modifier cascade below, rather than after. Reason:
+      // Canopy_cover_actual::know_senescence() (triggered by
+      // initiate_senescence() in the cascade below) captures
+      // cover_attained_max/cover_to_lose_total directly from
+      // interception_global_green_yesterday AT THE MOMENT IT IS CALLED --
+      // if that happens before restart_with() has set the real restored
+      // cover, it caches the canopy's still-fresh, near-zero baseline
+      // permanently, and GAI/cover then stay at (or decay from) that
+      // cached near-zero value for the rest of the senescence period
+      // regardless of what restart_with() sets moments later. Setting
+      // the real biomass/GAI/cover FIRST means any "snapshot the
+      // current cover" callback triggered by the modifier cascade
+      // captures the correct, already-restored value instead.
+      bool canopy_ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true);
+
       canopy_leaf_growth->know_accrescence(phenology.get_accrescence_period());
 
-      // 2026 FURTHER FIX (confirmed via direct trace of
-      // Canopy_cover_curve_2017::calc_during_accrescence()): even with
-      // know_accrescence() correctly syncing the accrescence pointer,
-      // the reference (unstressed/potential) canopy cover is computed
-      // from accrescence->get_thermal_time_relative_elapsed() -- how
-      // far elapsed, as a 0..1 fraction, THIS SPECIFIC period is. Since
-      // the period was just created moments ago by the activation
-      // above, this reads as ~0 (freshly started), producing a
-      // near-initial reference cover value regardless of what this
-      // function restores -- which then gets subtracted from the
-      // (correctly restored) previous day's actual cover as a "daily
-      // expansion", swinging it sharply toward the reference's own
-      // near-zero state. Since our target growth_stage is at or beyond
-      // yield formation, the crop has definitionally already fully
-      // completed accrescence, so 1.0 (fully elapsed) is the physically
-      // correct value here, not an arbitrary guess. get_accrescence_period()
-      // returns const, but the member itself is public and genuinely
-      // mutable (Period_thermal::thermal_time_relative_elapsed, see
-      // phenology_A.h) -- it is only const-qualified on this read-only
-      // accessor, so const_cast here is a legitimate, narrowly-scoped
-      // exception rather than defeating const-correctness generally.
-      {
-         const Phenology::Period_thermal *accrescence_period_const
-            = phenology.get_accrescence_period();
-         if (accrescence_period_const) {
-            // dynamic_cast (not static_cast) is required here: Period_thermal
-            // implements Phenology::Period_thermal through virtual
-            // inheritance, so the base-to-derived offset is not statically
-            // determinable and static_cast is rejected by the compiler.
-            CropSyst::Phenology_abstract::Period_thermal *accrescence_period
-               = dynamic_cast<CropSyst::Phenology_abstract::Period_thermal *>
-                  (const_cast<Phenology::Period_thermal *>(accrescence_period_const));
-            if (accrescence_period) {
-               accrescence_period->thermal_time_relative_elapsed = 1.0;
-
-               // 2026 FURTHER FIX (confirmed via diagnostic output:
-               // relative_thermal_time read back as ~0.03, not 1.0, on
-               // the very next day): setting thermal_time_relative_elapsed
-               // directly only lasts one day. Period_thermal::start_day()
-               // -- called once per day as normal processing --
-               // UNCONDITIONALLY recomputes it via
-               // calc_thermal_time_relative_elapsed(), which reads
-               // get_thermal_time_accum() / duration_GDDs, where
-               // get_thermal_time_accum() delegates to THIS PERIOD's own
-               // separate thermal_time object (distinct from the crop's
-               // global one fixed below) -- so the direct assignment
-               // above gets silently overwritten by the very next day's
-               // recomputation. Fix the underlying accumulator instead,
-               // so the recomputation itself naturally yields ~1.0:
-               // dynamic_cast to the concrete Thermal_time_common type
-               // (same class/same public GDDs/GDDs_yesterday members
-               // used for the crop-level fix below) and set it to (at
-               // least) the period's own configured duration, so
-               // accum/duration = 1.0 even after start_day() recomputes
-               // it from scratch.
-               if (accrescence_period->thermal_time && accrescence_period->parameters) {
-                  CropSyst::Thermal_time_common *period_thermal_time
-                     = dynamic_cast<CropSyst::Thermal_time_common *>
-                        (accrescence_period->thermal_time);
-                  if (period_thermal_time) {
-                     float64 target_GDDs = accrescence_period->parameters->duration_GDDs;
-                     period_thermal_time->GDDs           = target_GDDs;
-                     period_thermal_time->GDDs_yesterday = target_GDDs;
-                  }
-               }
-            }
-         }
+      // 2026 EXTENDED (supersedes the earlier "always force accrescence
+      // to fully elapsed" version): restore the correct "modifier"
+      // period -- accrescence, culminescence, or senescence, whichever
+      // was ACTUALLY active in the source run -- to the ACTUAL fraction
+      // it had reached there, rather than always assuming accrescence
+      // was already fully complete.
+      //
+      // Why this matters: forcing every intermediate stage to "fully
+      // elapsed" on the single restart day was found (via direct
+      // comparison against a fully-continuous run's own senescence
+      // trajectory) to leave the crop's post-restore senescence far
+      // more compressed than it should be. Maturity is gated by an
+      // absolute, since-planting degree-day threshold that is the same
+      // regardless of how the crop got there; but culminescence's own
+      // local "how far through this stage" tracker was always starting
+      // fresh, at the restore day's already-advanced global degree-day
+      // total, leaving far less of that absolute budget remaining for
+      // culminescence and senescence to unfold across than a
+      // continuously-grown crop -- whose culminescence would have begun
+      // at a much lower global degree-day total -- would have had.
+      // Restoring the actual saved modifier and its actual elapsed
+      // fraction (rather than a blanket assumption) fixes this at the
+      // source: earlier-than-active modifiers are forced fully elapsed
+      // (they are, definitionally, already complete), and the modifier
+      // that was actually active in the source run is set to its own
+      // real fraction, preserving the correct remaining degree-day
+      // budget for whatever comes next.
+      //
+      // active_phenology_modifier encoding: 0=none/not yet reached,
+      // 1=accrescence, 2=culminescence, 3=senescence (see
+      // get_active_phenology_modifier()'s declaration).
+      if (active_phenology_modifier >= 1)
+         force_period_relative_elapsed
+            (phenology.get_accrescence_period()
+            ,(active_phenology_modifier == 1) ? modifier_relative_elapsed : 1.0);
+      if (active_phenology_modifier >= 2) {
+         initiate_culminescence();
+         force_period_relative_elapsed
+            (phenology.get_culminescence_period()
+            ,(active_phenology_modifier == 2) ? modifier_relative_elapsed : 1.0);
+      }
+      if (active_phenology_modifier >= 3) {
+         initiate_senescence();
+         force_period_relative_elapsed
+            (phenology.get_senescence_period()
+            ,modifier_relative_elapsed);
       }
 
-      bool canopy_ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true);
+      // 2026: know_senescence()/initiate_culminescence()'s own snapshot
+      // callbacks (see the comment above the reorder) can themselves
+      // overwrite interception_global_green/interception_global_green_
+      // yesterday, so re-assert the actual restored cover one more time
+      // after the modifier cascade completes, to guarantee the final
+      // state matches what was actually saved regardless of what any
+      // individual initiate_X()/know_X() callback did internally.
+      canopy_ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true) && canopy_ok;
+
       ok = canopy_ok && ok;
    } else {
       ok = false;

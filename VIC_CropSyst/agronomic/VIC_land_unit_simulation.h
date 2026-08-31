@@ -258,6 +258,11 @@ class Land_unit_simulation
    virtual float64 get_GAI_for_state()                                     const;
    virtual float64 get_root_depth_m_for_state()                           const;
    virtual float64 get_water_stress_index_for_state()                      const;
+   // 2026: companions to the above -- see Crop_complete::
+   // get_active_phenology_modifier()/get_modifier_relative_elapsed() for
+   // the full rationale (crop_cropsyst.h/.cpp).
+   virtual int     get_active_phenology_modifier_for_state()               const;
+   virtual float64 get_modifier_relative_elapsed_for_state()               const;
    // 2026: forwards to VIC_crop::CropSyst_proper_crop::restore_state() for
    // whichever crop is currently active in this land unit's rotation (see
    // crop_active_or_intercrop, inherited from CropSyst::Land_unit_simulation).
@@ -271,6 +276,8 @@ class Land_unit_simulation
       ,float64                    root_depth_m
       ,Normal_crop_event_sequence growth_stage
       ,float64                    accum_thermal_time_deg_day
+      ,int                        active_phenology_modifier
+      ,float64                    modifier_relative_elapsed
       )                                                            modification_;
    //_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
    //141208 The following 'know' methods could be eliminated

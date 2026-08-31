@@ -40,6 +40,7 @@ void write_crop_state_csv_header(FILE *fp)
           "days_in_growing_season,biomass_current_kg_m2,"
           "root_biomass_kg_m2,GAI,root_depth_m,"
           "accum_thermal_time_deg_day,water_stress_index,"
+          "active_phenology_modifier,modifier_relative_elapsed,"
           "CropSystHandle\n");
 }
 /*_____________________________________________________________________*/
@@ -58,6 +59,8 @@ void write_crop_state_csv(FILE               *fp,
   double root_depth_m                = 0.0;
   double accum_thermal_time_deg_day  = 0.0;
   double water_stress_index          = 0.0;
+  int    active_phenology_modifier   = 0;
+  double modifier_relative_elapsed   = 0.0;
 
   if (fp == NULL) return;
   write_crop_state_csv_header(fp);
@@ -87,9 +90,16 @@ void write_crop_state_csv(FILE               *fp,
     root_depth_m                = VIC_land_unit_get_root_depth_m();
     accum_thermal_time_deg_day  = VIC_land_unit_get_accum_degree_days();
     water_stress_index          = VIC_land_unit_get_water_stress_index();
+    /* 2026: which phenology "modifier" period (accrescence/
+       culminescence/senescence) is active today, and how far through
+       it -- see VIC_crop_state_csv.h's struct comment and
+       Crop_complete::restore_state()'s documentation
+       (crop_cropsyst.h/.cpp) for the full rationale. */
+    active_phenology_modifier   = VIC_land_unit_get_active_phenology_modifier();
+    modifier_relative_elapsed   = VIC_land_unit_get_modifier_relative_elapsed();
   }
 
-  fprintf(fp, "%04d-%02d-%02d,%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%lu\n",
+  fprintf(fp, "%04d-%02d-%02d,%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%d,%f,%lu\n",
           current_date->year, current_date->month, current_date->day,
           cellnum, veg_index, crop_code, is_active,
           growth_stage,
@@ -101,6 +111,8 @@ void write_crop_state_csv(FILE               *fp,
           root_biomass_kg_m2, GAI, root_depth_m,
           accum_thermal_time_deg_day,
           water_stress_index,
+          active_phenology_modifier,
+          modifier_relative_elapsed,
           is_active ? crop->CropSystHandle : 0UL);
   fflush(fp);
 }
@@ -132,15 +144,18 @@ int read_crop_state_csv(char *filename, crop_state_record **out_records)
     crop_state_record rec;
     unsigned long handle;
     int n = sscanf(line,
-                    "%31[^,],%d,%d,%d,%d,%d,%d,%lf,%lf,%lf,%lf,%lf,%lf,%lu",
+                    "%31[^,],%d,%d,%d,%d,%d,%d,%lf,%lf,%lf,%lf,%lf,%lf,%d,%lf,%lu",
                     dummy_date, &rec.cellnum, &rec.veg_index,
                     &rec.crop_code, &rec.is_active, &rec.growth_stage,
                     &rec.days_in_growing_season,
                     &rec.biomass_current_kg_m2, &rec.root_biomass_kg_m2,
                     &rec.GAI, &rec.root_depth_m,
                     &rec.accum_thermal_time_deg_day,
-                    &rec.water_stress_index, &handle);
-    if (n != 14) continue; /* malformed / blank line; skip */
+                    &rec.water_stress_index,
+                    &rec.active_phenology_modifier,
+                    &rec.modifier_relative_elapsed,
+                    &handle);
+    if (n != 16) continue; /* malformed / blank line; skip */
     rec.CropSystHandle = handle;
 
     if (count == capacity) {
@@ -179,11 +194,19 @@ int apply_crop_state(const crop_state_record *saved)
 
   /* biomass_current_kg_m2 is already in kg/m2 (see write_crop_state_csv()),
      matching the units used by CropSyst's own Canopy_leaf_growth::
-     restart_with(). */
+     restart_with(). active_phenology_modifier/modifier_relative_elapsed
+     -- see VIC_crop_state_csv.h's struct comment and
+     Crop_complete::restore_state()'s documentation (crop_cropsyst.h/.cpp)
+     for why these matter: they let the crop's canopy-growth-curve state
+     resume from the correct remaining degree-day budget within its
+     actual current phenological period, instead of assuming every
+     earlier period was already fully complete. */
   return VIC_land_unit_restore_crop_state(
             saved->biomass_current_kg_m2,
             saved->GAI,
             saved->root_depth_m,
             saved->growth_stage,
-            saved->accum_thermal_time_deg_day);
+            saved->accum_thermal_time_deg_day,
+            saved->active_phenology_modifier,
+            saved->modifier_relative_elapsed);
 }

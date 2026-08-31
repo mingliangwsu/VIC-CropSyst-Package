@@ -806,7 +806,8 @@ int VIC_land_unit_restore_crop_state
 ,int    growth_stage_code
 ,double accum_thermal_time_deg_day
 ,int    active_phenology_modifier
-,double modifier_relative_elapsed)
+,double modifier_relative_elapsed
+,double cover_attained_max)
 {
    return (active_land_unit)
       ? (int)active_land_unit->restore_state
@@ -816,7 +817,8 @@ int VIC_land_unit_restore_crop_state
            ,(Normal_crop_event_sequence)growth_stage_code
            ,(float64)accum_thermal_time_deg_day
            ,active_phenology_modifier
-           ,(float64)modifier_relative_elapsed)
+           ,(float64)modifier_relative_elapsed
+           ,(float64)cover_attained_max)
       : 0;
 }
 /*_2026________________________________________________________________________*/
@@ -872,6 +874,12 @@ double VIC_land_unit_get_modifier_relative_elapsed()
 {
    return (active_land_unit)
       ? (double)active_land_unit->get_modifier_relative_elapsed_for_state()
+      : 0.0;
+}
+double VIC_land_unit_get_cover_attained_max()
+{
+   return (active_land_unit)
+      ? (double)active_land_unit->get_cover_attained_max_for_state()
       : 0.0;
 }
 /*_VIC_land_unit_get_______________________________________________2015-04-15_*/

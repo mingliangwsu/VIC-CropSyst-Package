@@ -899,6 +899,11 @@ bool Crop_complete::force_period_relative_elapsed
    return false;
 }
 //_force_period_relative_elapsed_______________________________________2026______/
+float64 Crop_complete::get_cover_attained_max_for_state()                  const
+{
+   return canopy_leaf_growth ? canopy_leaf_growth->get_cover_attained_max() : 0.0;
+}
+//_get_cover_attained_max_for_state____________________________________2026______/
 bool Crop_complete::restore_state
 (float64                    biomass_kg_m2
 ,float64                    GAI
@@ -907,6 +912,7 @@ bool Crop_complete::restore_state
 ,float64                    accum_thermal_time_deg_day
 ,int                        active_phenology_modifier
 ,float64                    modifier_relative_elapsed
+,float64                    cover_attained_max
 )                                                                   modification_
 {
    bool ok = true;
@@ -1107,6 +1113,47 @@ bool Crop_complete::restore_state
       }
       if (active_phenology_modifier >= 3) {
          initiate_senescence();
+         // 2026: initiate_senescence() -> know_senescence() captures
+         // cover_attained_max from whatever cover is CURRENT at this
+         // moment -- which, since restart_with() above already set the
+         // real, already-restored (already mid-senescence) branch-date
+         // cover, would incorrectly treat that as the crop's PEAK cover
+         // (reached before senescence began), applying a second,
+         // compounding decay in update_cover()'s senescence formula.
+         // Override it with the actual saved peak, if one was provided
+         // (source runs that predate this fix will save 0.0 here, in
+         // which case leave whatever know_senescence() just computed --
+         // less accurate than a proper peak, but no worse than the
+         // pre-fix behavior).
+         std::cerr << "RESTORE_STATE_MARKER_V3: cover_attained_max param="
+                   << cover_attained_max
+                   << " canopy_leaf_growth->get_cover_attained_max() BEFORE override="
+                   << canopy_leaf_growth->get_cover_attained_max()
+                   << std::endl;
+         if (cover_attained_max > 0.0) {
+            canopy_leaf_growth->set_cover_attained_max(cover_attained_max);
+            std::cerr << "RESTORE_STATE_MARKER_V3: override applied, "
+                      << "canopy_leaf_growth->get_cover_attained_max() AFTER override="
+                      << canopy_leaf_growth->get_cover_attained_max()
+                      << std::endl;
+            // 2026 FURTHER FIX: also fix the PARALLEL peak tracker on
+            // the reference canopy's own curve object
+            // (Canopy_cover_curve_2017::CCmax2_actual), which drives
+            // the ACTUALLY-reported senescence cover/GAI (see
+            // Canopy_cover_actual::update_cover()'s
+            // "actual_canopy_cover_green = canopy_cover_reference.
+            // get_interception_global_green();" for senescence) -- a
+            // separate object from cover_attained_max above, with the
+            // exact same "captures the already-decayed restored value"
+            // bug, only discovered by tracing actual .asc output that
+            // still showed the pre-fix GAI despite cover_attained_max
+            // itself being confirmed correct.
+            canopy_leaf_growth->fix_reference_peak_for_senescence
+               (cover_attained_max, phenology.get_senescence_period());
+         } else {
+            std::cerr << "RESTORE_STATE_MARKER_V3: cover_attained_max param was "
+                      << "0.0 or less -- override SKIPPED" << std::endl;
+         }
          force_period_relative_elapsed
             (phenology.get_senescence_period()
             ,modifier_relative_elapsed);
@@ -1174,6 +1221,11 @@ bool Crop_complete::restore_state
       thermal_time->GDDs           = accum_thermal_time_deg_day; // today
       thermal_time->GDDs_yesterday = accum_thermal_time_deg_day; // yesterday
    }
+
+   std::cerr << "RESTORE_STATE_MARKER_V3: restore_state() returning ok=" << ok
+             << ", canopy_leaf_growth->get_GAI(include_vital|include_effete)="
+             << (canopy_leaf_growth ? canopy_leaf_growth->get_GAI(include_vital|include_effete) : -999.0)
+             << std::endl;
 
    return ok;
 }

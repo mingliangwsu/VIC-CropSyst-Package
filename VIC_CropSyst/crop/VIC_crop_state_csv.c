@@ -41,6 +41,7 @@ void write_crop_state_csv_header(FILE *fp)
           "root_biomass_kg_m2,GAI,root_depth_m,"
           "accum_thermal_time_deg_day,water_stress_index,"
           "active_phenology_modifier,modifier_relative_elapsed,"
+          "cover_attained_max,"
           "CropSystHandle\n");
 }
 /*_____________________________________________________________________*/
@@ -61,6 +62,7 @@ void write_crop_state_csv(FILE               *fp,
   double water_stress_index          = 0.0;
   int    active_phenology_modifier   = 0;
   double modifier_relative_elapsed   = 0.0;
+  double cover_attained_max          = 0.0;
 
   if (fp == NULL) return;
   write_crop_state_csv_header(fp);
@@ -97,9 +99,13 @@ void write_crop_state_csv(FILE               *fp,
        (crop_cropsyst.h/.cpp) for the full rationale. */
     active_phenology_modifier   = VIC_land_unit_get_active_phenology_modifier();
     modifier_relative_elapsed   = VIC_land_unit_get_modifier_relative_elapsed();
+    /* 2026: the crop's peak green canopy cover fraction attained BEFORE
+       senescence began -- see VIC_crop_state_csv.h's struct comment for
+       the full rationale. */
+    cover_attained_max          = VIC_land_unit_get_cover_attained_max();
   }
 
-  fprintf(fp, "%04d-%02d-%02d,%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%d,%f,%lu\n",
+  fprintf(fp, "%04d-%02d-%02d,%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%d,%f,%f,%lu\n",
           current_date->year, current_date->month, current_date->day,
           cellnum, veg_index, crop_code, is_active,
           growth_stage,
@@ -113,6 +119,7 @@ void write_crop_state_csv(FILE               *fp,
           water_stress_index,
           active_phenology_modifier,
           modifier_relative_elapsed,
+          cover_attained_max,
           is_active ? crop->CropSystHandle : 0UL);
   fflush(fp);
 }
@@ -144,7 +151,7 @@ int read_crop_state_csv(char *filename, crop_state_record **out_records)
     crop_state_record rec;
     unsigned long handle;
     int n = sscanf(line,
-                    "%31[^,],%d,%d,%d,%d,%d,%d,%lf,%lf,%lf,%lf,%lf,%lf,%d,%lf,%lu",
+                    "%31[^,],%d,%d,%d,%d,%d,%d,%lf,%lf,%lf,%lf,%lf,%lf,%d,%lf,%lf,%lu",
                     dummy_date, &rec.cellnum, &rec.veg_index,
                     &rec.crop_code, &rec.is_active, &rec.growth_stage,
                     &rec.days_in_growing_season,
@@ -154,8 +161,9 @@ int read_crop_state_csv(char *filename, crop_state_record **out_records)
                     &rec.water_stress_index,
                     &rec.active_phenology_modifier,
                     &rec.modifier_relative_elapsed,
+                    &rec.cover_attained_max,
                     &handle);
-    if (n != 16) continue; /* malformed / blank line; skip */
+    if (n != 17) continue; /* malformed / blank line; skip */
     rec.CropSystHandle = handle;
 
     if (count == capacity) {
@@ -200,7 +208,11 @@ int apply_crop_state(const crop_state_record *saved)
      for why these matter: they let the crop's canopy-growth-curve state
      resume from the correct remaining degree-day budget within its
      actual current phenological period, instead of assuming every
-     earlier period was already fully complete. */
+     earlier period was already fully complete. cover_attained_max is a
+     further companion: the crop's peak green canopy cover reached
+     before senescence began, needed to avoid double-applying the
+     senescence-decay formula's degree-day-based decline on top of an
+     already-restored, already-decayed cover value. */
   return VIC_land_unit_restore_crop_state(
             saved->biomass_current_kg_m2,
             saved->GAI,
@@ -208,5 +220,6 @@ int apply_crop_state(const crop_state_record *saved)
             saved->growth_stage,
             saved->accum_thermal_time_deg_day,
             saved->active_phenology_modifier,
-            saved->modifier_relative_elapsed);
+            saved->modifier_relative_elapsed,
+            saved->cover_attained_max);
 }

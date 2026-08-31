@@ -171,10 +171,12 @@ interface_ Crop_model_interface
       ,float64 accum_thermal_time_deg_day
       ,int     active_phenology_modifier
       ,float64 modifier_relative_elapsed
+      ,float64 cover_attained_max
       )                                                         modification_
       { (void)biomass_kg_m2; (void)GAI; (void)root_depth_m;
         (void)growth_stage; (void)accum_thermal_time_deg_day;
         (void)active_phenology_modifier; (void)modifier_relative_elapsed;
+        (void)cover_attained_max;
         return false; }
 
    // 2026: safe base-class defaults for the companion write-side
@@ -183,6 +185,10 @@ interface_ Crop_model_interface
    inline virtual int     get_active_phenology_modifier()                  const
       { return 0; }
    inline virtual float64 get_modifier_relative_elapsed()                  const
+      { return 0.0; }
+   // 2026: safe base-class default -- see Crop_complete::
+   // get_cover_attained_max_for_state() for the real implementation.
+   inline virtual float64 get_cover_attained_max_for_state()               const
       { return 0.0; }
 
    virtual float64 update_evapotranspiration_max(float64 ET_ref_m) rectification_=0; //190812_010910

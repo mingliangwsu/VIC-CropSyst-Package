@@ -645,6 +645,7 @@ public: // State variable accessors that are actually used by CropSyst
       ,float64 accum_thermal_time_deg_day
       ,int     active_phenology_modifier
       ,float64 modifier_relative_elapsed
+      ,float64 cover_attained_max
       )                                                         modification_;
 
    // 2026: companions to restore_state() above, used on the WRITE side
@@ -665,6 +666,21 @@ public: // State variable accessors that are actually used by CropSyst
    // each of which clears the other two).
    virtual int     get_active_phenology_modifier()                          const;
    virtual float64 get_modifier_relative_elapsed()                         const;
+
+   // 2026: companion to restore_state() -- the crop's peak green canopy
+   // cover fraction attained BEFORE senescence began. Needed because
+   // Canopy_cover_actual::know_senescence() (triggered when this class's
+   // own initiate_senescence() runs, as part of the modifier cascade in
+   // restore_state()) captures this value from whatever cover is CURRENT
+   // at the moment it is called -- if that is the already-restored,
+   // already-mid-senescence branch-date cover rather than the crop's
+   // true earlier peak, the senescence-decay formula in update_cover()
+   // (cover_attained_max - cover_to_lose_total * relative_elapsed)
+   // applies a second, compounding decay on top of the first, producing
+   // GAI/cover noticeably below the correct restored value. See
+   // canopy_growth.h's get_cover_attained_max()/set_cover_attained_max()
+   // for where this is actually stored.
+   virtual float64 get_cover_attained_max_for_state()                       const;
 
    // 2026: shared helper used by restore_state() to force a given
    // phenology Period_thermal's relative-elapsed fraction (and, so it

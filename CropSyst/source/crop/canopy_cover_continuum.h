@@ -163,6 +163,16 @@ class Canopy_cover_actual
    virtual bool end_day()                                         modification_; //190821
    virtual bool start_season();
    virtual bool know_senescence(const Phenology::Period_thermal *senescence_);   //200125
+   // 2026: see the interface declaration in canopy_growth.h for the full
+   // rationale. set_cover_attained_max() also recomputes cover_to_lose_total
+   // consistently, using the same formula know_senescence() itself uses,
+   // so callers only need to set one value.
+   inline float64 get_cover_attained_max()                                const
+      { return cover_attained_max; }
+   inline bool set_cover_attained_max(float64 cover_attained_max_)  modification_
+      { cover_attained_max  = cover_attained_max_;
+        cover_to_lose_total = cover_attained_max_ - canopy_parameter.cover_total_season_end;
+        return true; }
    virtual bool update_cover(float64 LWP_yesterday)               modification_;
    virtual float64 adjust_interception_insolation_global_total                   //190611
       (float64 adjustment)                                        modification_;

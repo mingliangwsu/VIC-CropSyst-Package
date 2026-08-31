@@ -728,6 +728,13 @@ float64 Land_unit_simulation::get_modifier_relative_elapsed_for_state()    const
        : 0.0;
 }
 //_get_modifier_relative_elapsed_for_state____________________________2026______/
+float64 Land_unit_simulation::get_cover_attained_max_for_state()           const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_cover_attained_max_for_state()
+       : 0.0;
+}
+//_get_cover_attained_max_for_state____________________________________2026______/
 bool Land_unit_simulation::restore_state
 (float64                    biomass_kg_m2
 ,float64                    GAI
@@ -736,6 +743,7 @@ bool Land_unit_simulation::restore_state
 ,float64                    accum_thermal_time_deg_day
 ,int                        active_phenology_modifier
 ,float64                    modifier_relative_elapsed
+,float64                    cover_attained_max
 )                                                                   modification_
 {
     // 2026: now calls straight through Crop_model_interface's own
@@ -751,7 +759,7 @@ bool Land_unit_simulation::restore_state
        ? crop_active_or_intercrop->restore_state
             (biomass_kg_m2, GAI, root_depth_m, growth_stage,
              accum_thermal_time_deg_day, active_phenology_modifier,
-             modifier_relative_elapsed)
+             modifier_relative_elapsed, cover_attained_max)
        : false;
 }
 //_restore_state____________________________________________________2026_______/

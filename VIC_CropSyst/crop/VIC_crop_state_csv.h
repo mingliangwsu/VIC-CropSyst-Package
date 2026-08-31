@@ -94,6 +94,20 @@ typedef struct {
      (crop_cropsyst.h/.cpp) for the full rationale. */
   int    active_phenology_modifier;
   double modifier_relative_elapsed;
+  /* 2026: the crop's peak green canopy cover fraction attained BEFORE
+     senescence began (Canopy_cover_actual::cover_attained_max). Only
+     meaningful when active_phenology_modifier==3 (senescence); needed
+     because the engine's own know_senescence() callback captures this
+     value from whatever cover is current AT THE MOMENT senescence is
+     (re-)activated -- which, on a warm-started restore, is already the
+     restored, already-decayed branch-date cover rather than the crop's
+     true earlier peak. Without restoring this separately, the
+     senescence-decay formula in Canopy_cover_actual::update_cover()
+     (cover_attained_max - cover_to_lose_total * relative_elapsed)
+     applies a second, compounding decay on top of the first. See
+     Crop_complete::restore_state()'s own documentation
+     (crop_cropsyst.h/.cpp) for the full rationale. */
+  double cover_attained_max;
   unsigned long int CropSystHandle; /* 0 if not applicable/unknown */
 } crop_state_record;
 

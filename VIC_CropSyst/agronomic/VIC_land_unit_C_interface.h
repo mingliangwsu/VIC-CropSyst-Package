@@ -173,6 +173,10 @@ double VIC_land_unit_get_water_stress_index();
    as a 0..1 fraction of its own configured duration. */
 int    VIC_land_unit_get_active_phenology_modifier();
 double VIC_land_unit_get_modifier_relative_elapsed();
+/* 2026: companion to the above -- see VIC::Land_unit_simulation::
+   get_cover_attained_max_for_state() for the full rationale: the crop's
+   peak green canopy cover fraction attained BEFORE senescence began. */
+double VIC_land_unit_get_cover_attained_max();
 /*_2026________________________________________________________________________*/
 /** \brief Restores previously-saved prognostic crop state (biomass, green
    area index, root depth, growth stage) into whichever crop is currently
@@ -189,7 +193,8 @@ int VIC_land_unit_restore_crop_state
 ,int    growth_stage_code /* Normal_crop_event_sequence value */
 ,double accum_thermal_time_deg_day
 ,int    active_phenology_modifier
-,double modifier_relative_elapsed);
+,double modifier_relative_elapsed
+,double cover_attained_max);
 /*_2014-12-08_________________________________________________________________*/
 double VIC_CropSyst_get
 (unsigned long int variable_code

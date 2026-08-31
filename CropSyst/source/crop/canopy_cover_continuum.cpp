@@ -425,6 +425,16 @@ bool Canopy_cover_actual::update_cover
             // a day.  So probably only need to calculate in start day
             // and use get idiom here.  200304
 
+         std::cerr << "RESTORE_STATE_MARKER_V3 [senescence branch]: "
+                   << "cover_attained_max=" << cover_attained_max
+                   << " cover_to_lose_total=" << cover_to_lose_total
+                   << " senescence->get_thermal_time_relative_elapsed()="
+                   << senescence->get_thermal_time_relative_elapsed()
+                   << " X=" << X
+                   << " -> global_solar_rad_intercepted_total="
+                   << (cover_attained_max - X)
+                   << std::endl;
+
          global_solar_rad_intercepted_total = cover_attained_max - X;
       }
    } else // before senescence

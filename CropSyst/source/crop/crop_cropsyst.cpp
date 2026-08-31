@@ -1112,15 +1112,6 @@ bool Crop_complete::restore_state
             ,modifier_relative_elapsed);
       }
 
-      // 2026: know_senescence()/initiate_culminescence()'s own snapshot
-      // callbacks (see the comment above the reorder) can themselves
-      // overwrite interception_global_green/interception_global_green_
-      // yesterday, so re-assert the actual restored cover one more time
-      // after the modifier cascade completes, to guarantee the final
-      // state matches what was actually saved regardless of what any
-      // individual initiate_X()/know_X() callback did internally.
-      canopy_ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true) && canopy_ok;
-
       ok = canopy_ok && ok;
    } else {
       ok = false;

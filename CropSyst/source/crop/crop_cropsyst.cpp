@@ -1048,6 +1048,30 @@ bool Crop_complete::restore_state
    // trying to further work around) the thermal-time-gated trigger.
    if (!canopy_leaf_growth)
       provide_canopy();
+   // 2026 FURTHER FIX (confirmed by comparing Run 2's post-restore
+   // biomass against Run 1's own natural trajectory over the same
+   // growth-stage window: Run 1's biomass continues increasing
+   // throughout senescence, right up to harvest, while a restored
+   // crop's biomass stayed perfectly flat for the entire post-restore
+   // period): initiate_accrescence() ALSO calls
+   // provide_biomass_growth().start() alongside provide_canopy().start()
+   // -- the lazy-create factory for the Biomass_growth_RUE_TUE object
+   // that drives day-to-day biomass accumulation (radiation-use-
+   // efficiency/transpiration-driven growth). Since initiate_accrescence()
+   // never fires synchronously here (the same reason know_accrescence()
+   // has to be called explicitly above), biomass_growth was never
+   // created at all -- so nothing computed any new growth on subsequent
+   // days, even though the canopy/root/phenology state was otherwise
+   // correctly restored. provide_biomass_growth()'s own start() is a
+   // no-op (Biomass_growth_RUE_TUE::start() just returns true); the
+   // real initialization happens in its constructor, called here for
+   // the first time, which reads canopy_leaf_growth (already
+   // guaranteed non-null immediately above) and thermal_time (a
+   // reference to the same object restored elsewhere in this function,
+   // not a copy, so restoring it before or after this call is
+   // equivalent).
+   if (!biomass_growth)
+      provide_biomass_growth();
    if (canopy_leaf_growth) {
       // 2026 REORDERED (confirmed via direct comparison against Run 1's
       // actual branch-date state -- which turned out to be "senescence"
@@ -1125,17 +1149,8 @@ bool Crop_complete::restore_state
          // which case leave whatever know_senescence() just computed --
          // less accurate than a proper peak, but no worse than the
          // pre-fix behavior).
-         std::cerr << "RESTORE_STATE_MARKER_V3: cover_attained_max param="
-                   << cover_attained_max
-                   << " canopy_leaf_growth->get_cover_attained_max() BEFORE override="
-                   << canopy_leaf_growth->get_cover_attained_max()
-                   << std::endl;
          if (cover_attained_max > 0.0) {
             canopy_leaf_growth->set_cover_attained_max(cover_attained_max);
-            std::cerr << "RESTORE_STATE_MARKER_V3: override applied, "
-                      << "canopy_leaf_growth->get_cover_attained_max() AFTER override="
-                      << canopy_leaf_growth->get_cover_attained_max()
-                      << std::endl;
             // 2026 FURTHER FIX: also fix the PARALLEL peak tracker on
             // the reference canopy's own curve object
             // (Canopy_cover_curve_2017::CCmax2_actual), which drives
@@ -1150,9 +1165,6 @@ bool Crop_complete::restore_state
             // itself being confirmed correct.
             canopy_leaf_growth->fix_reference_peak_for_senescence
                (cover_attained_max, phenology.get_senescence_period());
-         } else {
-            std::cerr << "RESTORE_STATE_MARKER_V3: cover_attained_max param was "
-                      << "0.0 or less -- override SKIPPED" << std::endl;
          }
          force_period_relative_elapsed
             (phenology.get_senescence_period()
@@ -1221,11 +1233,6 @@ bool Crop_complete::restore_state
       thermal_time->GDDs           = accum_thermal_time_deg_day; // today
       thermal_time->GDDs_yesterday = accum_thermal_time_deg_day; // yesterday
    }
-
-   std::cerr << "RESTORE_STATE_MARKER_V3: restore_state() returning ok=" << ok
-             << ", canopy_leaf_growth->get_GAI(include_vital|include_effete)="
-             << (canopy_leaf_growth ? canopy_leaf_growth->get_GAI(include_vital|include_effete) : -999.0)
-             << std::endl;
 
    return ok;
 }

@@ -1075,6 +1075,35 @@ bool Crop_complete::restore_state
    std::cerr << "RESTORE_STATE_MARKER_V4: biomass_growth pointer after fix="
              << (void*)biomass_growth << " (non-null means the fix ran)"
              << std::endl;
+   // 2026 FURTHER FIX (confirmed by tracing Crop_complete::
+   // calc_act_biomass_growth() directly: it unconditionally forces
+   // act_biomass_growth to 0.0 unless limited_pot_transpiration_m > 0.0
+   // -- "if (limited_pot_transpiration_m > 0.0) {...} else
+   // act_biomass_growth = 0.0;" -- meaning creating biomass_growth
+   // above, by itself, was not sufficient: the daily growth amount it
+   // computes is discarded entirely unless transpiration is also
+   // present and contributing). limited_pot_transpiration_m is
+   // computed from the transpiration object -- and initiate_accrescence()
+   // ALSO unconditionally creates that object (a third thing it does
+   // alongside provide_canopy()/provide_biomass_growth(), all as part
+   // of the same "crop enters active growth" lifecycle event this
+   // build's restore path never fires synchronously). Without this,
+   // transpiration stays null for a restored crop, limited_pot_
+   // transpiration_m never becomes positive, and daily biomass growth
+   // is discarded every single day regardless of canopy/GAI state.
+   // Mirrors initiate_accrescence()'s own construction exactly, since
+   // there is no separate provide_transpiration()-style lazy-create
+   // function for this object to reuse.
+   if (!transpiration)
+      transpiration = new Crop_transpiration_2
+         (parameters->transpiration
+         ,soil
+         ,parameters->salinity.osmotic_pot_50
+         ,parameters->salinity.salt_tolerance_P
+         ,param_dry_soil_root_activity_coef
+         ,param_saturated_soil_root_activity_coef);
+   std::cerr << "RESTORE_STATE_MARKER_V5: transpiration pointer after fix="
+             << (void*)transpiration << std::endl;
    if (canopy_leaf_growth) {
       // 2026 REORDERED (confirmed via direct comparison against Run 1's
       // actual branch-date state -- which turned out to be "senescence"
@@ -2588,6 +2617,11 @@ float64  Crop_complete::calc_act_biomass_growth
 
       canopy_leaf_growth->know_N_leaf_stress_factor(N_leaf_stress_factor);       //200528
    }
+   std::cerr << "RESTORE_STATE_MARKER_V5 [calc_act_biomass_growth]: "
+             << "limited_pot_transpiration_m=" << limited_pot_transpiration_m
+             << " attainable_top_growth=" << attainable_top_growth
+             << " transpiration=" << (void*)transpiration
+             << std::endl;
    if (limited_pot_transpiration_m > 0.0)                                        //160321
    {
       #if (defined(NITROGEN))

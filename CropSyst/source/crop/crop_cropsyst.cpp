@@ -960,47 +960,94 @@ bool Crop_complete::restore_state
    // the just-restored biomass/GAI, leaving the crop stuck at zero
    // biomass despite being in the correct growth stage. Restoring
    // canopy/roots AFTER phenology activation avoids this.
+   // 2026 FURTHER FIX (confirmed via direct trace of common/simulation/
+   // event.cpp and event.h): forcing phenology.growth_stage directly,
+   // as the cascade below does, sets the crop's OWN internal state
+   // correctly, but never notifies the SEPARATE management-event
+   // scheduler (Crop_complete::as_event_scheduler_crop) that any of
+   // these stage transitions occurred. Management-file events
+   // synchronized "relative to a phenologic stage" (e.g. an
+   // [automatic_irrigation] section's "begin_synchronization=
+   // after_normal_crop_growth_stage, begin_phenologic=emergence,
+   // begin_offset=2" -- confirmed via a real .mgt file used with this
+   // restore feature) are only ever scheduled when
+   // Crop_complete::trigger_synchronization(event) is explicitly
+   // called for that specific event -- normally a side effect of the
+   // crop's own natural initiate_X()/harvest-related lifecycle
+   // functions (e.g. initiate_culminescence() already calls
+   // trigger_synchronization(NGS_END_CANOPY_GROWTH)), none of which
+   // this restore path exercises. Without this, any management event
+   // timed relative to a phenologic stage the restored crop has
+   // already passed (most commonly: automatic irrigation) never gets
+   // scheduled at all for the remainder of that crop's restored
+   // season, regardless of how much water stress genuinely develops --
+   // confirmed by comparing actual .asc irrig_total_mm/irrig_netdemand_mm
+   // output: consistently 0.0 for the entire post-restore period in a
+   // warm-started run, versus frequent, substantial irrigation in the
+   // same crop's own continuously-simulated season.
    switch (growth_stage)
    {
       case NGS_GERMINATION:
       case NGS_PLANTING:
          ok = phenology.activate_sowing()          && ok;
+         trigger_synchronization(growth_stage);
          break;
       case NGS_EMERGENCE:
          phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
          ok = phenology.activate_emergence()       && ok;
+         trigger_synchronization(growth_stage);
          break;
       case NGS_ACCRESCENCE:
          phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
          phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
          ok = phenology.activate_accrescence()     && ok;
+         trigger_synchronization(growth_stage);
          break;
       case NGS_ANTHESIS:
          phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
          phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
          phenology.activate_accrescence();
+         trigger_synchronization(NGS_ACCRESCENCE);
          ok = phenology.activate_anthesis()        && ok;
+         trigger_synchronization(growth_stage);
          break;
       case NGS_FILLING:
          phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
          phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
          phenology.activate_accrescence();
+         trigger_synchronization(NGS_ACCRESCENCE);
          phenology.activate_anthesis();
+         trigger_synchronization(NGS_ANTHESIS);
          ok = phenology.activate_yield_formation() && ok;
+         trigger_synchronization(growth_stage);
          break;
       case NGS_MATURITY:
          phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
          phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
          phenology.activate_accrescence();
+         trigger_synchronization(NGS_ACCRESCENCE);
          phenology.activate_anthesis();
+         trigger_synchronization(NGS_ANTHESIS);
          phenology.activate_yield_formation();
+         trigger_synchronization(NGS_FILLING);
          ok = phenology.activate_maturity()        && ok;
+         trigger_synchronization(growth_stage);
          break;
       case NGS_QUIESCENCE:
          // activate_quiescence() already clears accrescence/
          // culminescence/senescence/maturity itself (see
          // phenology_2018.cpp), so no cascade is needed here.
          ok = phenology.activate_quiescence()      && ok;
+         trigger_synchronization(growth_stage);
          break;
       default:
          // NGS_NONE, NGS_RESTART, NGS_HARVESTABLE, NGS_HARVEST,
@@ -1072,9 +1119,6 @@ bool Crop_complete::restore_state
    // equivalent).
    if (!biomass_growth)
       provide_biomass_growth();
-   std::cerr << "RESTORE_STATE_MARKER_V4: biomass_growth pointer after fix="
-             << (void*)biomass_growth << " (non-null means the fix ran)"
-             << std::endl;
    // 2026 FURTHER FIX (confirmed by tracing Crop_complete::
    // calc_act_biomass_growth() directly: it unconditionally forces
    // act_biomass_growth to 0.0 unless limited_pot_transpiration_m > 0.0
@@ -1102,8 +1146,6 @@ bool Crop_complete::restore_state
          ,parameters->salinity.salt_tolerance_P
          ,param_dry_soil_root_activity_coef
          ,param_saturated_soil_root_activity_coef);
-   std::cerr << "RESTORE_STATE_MARKER_V5: transpiration pointer after fix="
-             << (void*)transpiration << std::endl;
    if (canopy_leaf_growth) {
       // 2026 REORDERED (confirmed via direct comparison against Run 1's
       // actual branch-date state -- which turned out to be "senescence"
@@ -2617,11 +2659,6 @@ float64  Crop_complete::calc_act_biomass_growth
 
       canopy_leaf_growth->know_N_leaf_stress_factor(N_leaf_stress_factor);       //200528
    }
-   std::cerr << "RESTORE_STATE_MARKER_V5 [calc_act_biomass_growth]: "
-             << "limited_pot_transpiration_m=" << limited_pot_transpiration_m
-             << " attainable_top_growth=" << attainable_top_growth
-             << " transpiration=" << (void*)transpiration
-             << std::endl;
    if (limited_pot_transpiration_m > 0.0)                                        //160321
    {
       #if (defined(NITROGEN))

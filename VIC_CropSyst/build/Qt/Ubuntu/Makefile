@@ -12719,7 +12719,8 @@ full_energy.o: ../../../full_energy.c ../../../vicNl.h \
 		../../../../CropSyst/source/soil/hydrology_A.h \
 		../../../../common/weather/weather_interface.h \
 		../../../../common/weather/atmospheric_CO2_change.h \
-		../../../LAKE.h
+		../../../LAKE.h \
+		../../../crop/VIC_crop_state_csv.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o full_energy.o ../../../full_energy.c
 
 func_atmos_energy_bal.o: ../../../func_atmos_energy_bal.c ../../../vicNl.h \

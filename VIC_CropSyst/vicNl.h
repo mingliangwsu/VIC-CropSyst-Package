@@ -550,6 +550,9 @@ void   free_out_data(out_data_struct **);
 int    full_energy(char, int, int, atmos_data_struct *, dist_prcp_struct *,
                    dmy_struct *, global_param_struct *, const lake_con_struct *,
                    soil_con_struct *, veg_con_struct *
+                   ,filep_struct *          /* 2026: needed for the crop-state
+                      restore hook moved here from dist_prec.c -- see
+                      full_energy.c's own comment at the call site for why. */
 #ifdef VIC_CROPSYST_VERSION
             #if VIC_CROPSYST_VERSION==2
             ,crop_data_struct * //keyvan added crop_data_struct

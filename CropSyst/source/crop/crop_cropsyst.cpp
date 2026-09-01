@@ -1308,6 +1308,79 @@ bool Crop_complete::restore_state
       thermal_time->GDDs_yesterday = accum_thermal_time_deg_day; // yesterday
    }
 
+   // 2026 CATCH-UP FIX: the saved state (biomass/GAI/growth_stage/
+   // accum_thermal_time_deg_day, all set above) represents the crop's
+   // condition at the END of the source run's STATEDAY -- but this
+   // build's own INIT_STATE/rec==0 mechanics (see check_state_file.c's
+   // own design comment: "this allows VIC to... start the simulation
+   // at the same time step as the state file") expect the NEW run's
+   // own first processed day (rec==0) to be the day AFTER STATEDAY,
+   // not STATEDAY itself -- confirmed by direct comparison: shifting
+   // this build's own STARTDAY to STATEDAY+1 measurably improved
+   // agreement against a fully continuous reference run for soil
+   // moisture (max discrepancy roughly halved), which only this build's
+   // water-balance processing (full_energy(), entirely outside
+   // Crop_complete) is responsible for and is not something restore_state()
+   // itself can or should influence.
+   //
+   // But shifting STARTDAY by itself left the RESTORED crop state one
+   // calendar day "behind" where it needs to be: rec==0 (now STATEDAY+1)
+   // still receives the raw, un-advanced STATEDAY state above, and the
+   // bootstrap-artifact mechanics already documented elsewhere in this
+   // codebase (see STATE_IO_README.md's "branch date's own output row"
+   // limitation) mean that day's own reported output is discarded
+   // regardless -- so the crop's own visible trajectory, from the
+   // NEXT real day of output onward, was effectively missing exactly
+   // one day of natural progression relative to a fully continuous run,
+   // confirmed directly: GAI/canopy-cover agreement against the
+   // reference run, which was previously exact to within floating-point
+   // precision, degraded measurably once STARTDAY was shifted.
+   //
+   // 2026 NOTE: an earlier attempt to fix this by MOVING this entire
+   // restore hook into full_energy.c (to run between that day's own
+   // VIC_land_unit_start_day() and VIC_land_unit_process_day() calls,
+   // letting that normal, already-existing process_day() call do this
+   // "one day of growth" work on its own) was tried and reverted --
+   // confirmed via direct test that it broke the restore entirely: the
+   // rotation engine's own sowing-event dispatch turned out to fire
+   // INSIDE VIC_land_unit_process_day() itself, not before it, so a
+   // restore hook positioned before that call gets immediately
+   // discarded the moment the sowing event fires and resets the crop
+   // to a fresh planting. This is why this hook still lives in
+   // dist_prec.c, unchanged, running once for every veg tile together
+   // after that day's entire full_energy() call (including its own
+   // process_day() and that day's sowing-event dispatch) has already
+   // completed -- exactly as it always has.
+   //
+   // Fix: since restore_state() itself runs during rec==0's own
+   // processing (after that day's own, now-superseded crop-growth
+   // computation already ran on the wrong, freshly-planted crop, but
+   // before that day's own reported output gets written), call
+   // process_day() here, once, explicitly -- CropSyst's own existing,
+   // comprehensive "advance this crop by one simulated day" entry
+   // point (already covers canopy, roots, biomass, and transpiration
+   // together in one call; see its own implementation for the full
+   // list). This simulates the one day of natural growth that would
+   // otherwise be missing between STATEDAY (what was actually saved)
+   // and STATEDAY+1 (rec==0's own actual calendar date, post-shift),
+   // using the now-correctly-restored state set above as its starting
+   // point rather than the wrong, pre-restore one process_day() was
+   // already called against earlier in this same day's processing.
+   // This should be safe against double-counting specifically because
+   // every value set above (canopy_leaf_growth->restart_with(),
+   // roots_current->initialize(), thermal_time->GDDs, etc.) is an
+   // ABSOLUTE assignment, not a delta -- matching the same reasoning
+   // already relied on for provide_canopy()/provide_biomass_growth()/
+   // transpiration being safely (re-)creatable earlier in this same
+   // function, regardless of what that day's own, now-superseded
+   // processing already did with the wrong starting crop.
+   bool caught_up = process_day();
+   std::cerr << "RESTORE_STATE_MARKER_V6: process_day() catch-up call "
+             << "returned " << caught_up
+             << ", GAI now=" << (canopy_leaf_growth ? canopy_leaf_growth->get_GAI(include_vital|include_effete) : -999.0)
+             << ", biomass now=" << (canopy_leaf_growth ? canopy_leaf_growth->get_biomass_current(include_vital|include_effete) : -999.0)
+             << std::endl;
+
    return ok;
 }
 //_restore_state_____________________________________________________2026______/

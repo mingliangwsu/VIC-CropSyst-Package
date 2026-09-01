@@ -15,6 +15,12 @@ int set_average_veglib_for_crop(veg_lib_struct &veglib,
                                 const int current_month);                        //150929LML
 #endif
 */
+/* 2026: crop/vegetation CSV state I/O -- needed here now that the
+   restore hook itself lives in this file rather than dist_prec.c (see
+   the VIC_land_unit_start_day() call site below for the full
+   rationale). Deliberately outside the dead 170413LML comment block
+   above -- this needs to actually be compiled in. */
+#include "crop/VIC_crop_state_csv.h"
 #include <iostream>
 static char vcid[] = "$Id: full_energy.c,v 5.8.2.30 2012/08/29 00:10:56 vicadmin Exp $";
 //double **accessable_aero_resistance; ///121129 keyvan
@@ -28,6 +34,9 @@ int  full_energy(char                 NEWCELL,
                  const lake_con_struct     *lake_con,
                  soil_con_struct     *soil_con,
                  veg_con_struct      *veg_con
+                 ,filep_struct       *filep   /* 2026: see call-site comment
+                    below for why this crop-state restore hook lives here
+                    now, instead of in dist_prec.c as it originally did. */
 #ifdef VIC_CROPSYST_VERSION
                  #if VIC_CROPSYST_VERSION==2
                  ,crop_data_struct   *crops
@@ -639,6 +648,74 @@ int  full_energy(char                 NEWCELL,
               VIC_land_unit_activate(current_crop->CropSystHandle);
 
               VIC_land_unit_start_day();                                         //171201LML
+              // 2026: crop-state restore hook, MOVED HERE from dist_prec.c
+              // (where it used to run once, for every veg tile at once,
+              // AFTER this entire day's full_energy() call -- including
+              // this same VIC_land_unit_start_day()/process_day()/end_day()
+              // sequence -- had already completed). That original timing
+              // meant the day's own, now-superseded process_day() call
+              // always ran against the wrong, freshly-planted crop (see
+              // the mid-season crop creation problem documented in
+              // STATE_IO_README.md) BEFORE the saved state got applied,
+              // and the saved state itself was never actually acted on by
+              // that day's own growth computation at all.
+              //
+              // Confirmed via direct comparison against a fully continuous
+              // reference run: this build's own INIT_STATE/rec==0 design
+              // (see check_state_file.c's own comment) expects a
+              // warm-started run's STARTDAY to be one calendar day AFTER
+              // the saved state's own date, so that day's own water-balance
+              // processing (full_energy() itself, entirely separate from
+              // anything CropSyst-specific) isn't double-counted -- but
+              // that same day is still the crop's own first day back, and
+              // its VIC_land_unit_process_day() call below -- which
+              // already, always runs once per day as perfectly normal
+              // processing -- should compute that day's growth STARTING
+              // FROM the restored state, not from the wrong, freshly-
+              // planted one. Moving this hook to run here, between
+              // start_day() and process_day(), makes that happen using
+              // the code's own existing, ordinary daily-processing
+              // sequence -- rather than needing any extra, explicit
+              // "catch-up" call to simulate the missing day separately.
+              #if VIC_CROPSYST_VERSION>=3
+              if ( options.INIT_STATE && options.CSV_STATE_FILE && rec == 0
+                   && current_crop->CropSystHandle != 0 ) {
+                static crop_state_record *crop_restore_table = NULL;
+                static int                crop_restore_count = 0;
+                static char               crop_restore_loaded = FALSE;
+
+                if ( !crop_restore_loaded ) {
+                  /* Reads the WHOLE file once (covers every cell/veg),
+                     cached for the life of the process -- matches the
+                     caching this hook's dist_prec.c predecessor already
+                     used, just moved here since full_energy() is now
+                     where the restore itself happens. */
+                  crop_restore_count = read_crop_state_csv(filep->init_crop_state_csv_path,
+                                                            &crop_restore_table);
+                  if ( crop_restore_count < 0 ) {
+                    fprintf(stderr, "WARNING: could not open crop state file \"%s\"; "
+                                     "crop state will not be restored.\n",
+                                     filep->init_crop_state_csv_path);
+                    crop_restore_count = 0;
+                  }
+                  crop_restore_loaded = TRUE;
+                }
+
+                const crop_state_record *saved =
+                    find_crop_state(crop_restore_table, crop_restore_count,
+                                     soil_con->gridcel, iveg);
+                if ( saved != NULL ) {
+                  if ( !apply_crop_state(saved) )
+                    fprintf(stderr, "WARNING: crop state restore reported failure "
+                                     "for cell %d, veg %d.\n", soil_con->gridcel, iveg);
+                }
+                /* If saved == NULL: either no crop was active for this veg
+                   tile at the saved date (nothing to restore -- fine), or
+                   the parameter-file sowing-date workaround wasn't applied
+                   for this crop (also fine -- this cell just runs a normal
+                   cold start). */
+              }
+              #endif
               VIC_land_unit_process_day();                                       //LML 150325
               VIC_land_unit_end_day(area_fraction,dist,band);                                             //LML 150325
               VIC_land_unit_deactivate();                                          //150714LML

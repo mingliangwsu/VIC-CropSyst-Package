@@ -1072,6 +1072,9 @@ bool Crop_complete::restore_state
    // equivalent).
    if (!biomass_growth)
       provide_biomass_growth();
+   std::cerr << "RESTORE_STATE_MARKER_V4: biomass_growth pointer after fix="
+             << (void*)biomass_growth << " (non-null means the fix ran)"
+             << std::endl;
    if (canopy_leaf_growth) {
       // 2026 REORDERED (confirmed via direct comparison against Run 1's
       // actual branch-date state -- which turned out to be "senescence"

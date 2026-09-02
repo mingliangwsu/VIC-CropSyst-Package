@@ -1374,9 +1374,37 @@ bool Crop_complete::restore_state
    // transpiration being safely (re-)creatable earlier in this same
    // function, regardless of what that day's own, now-superseded
    // processing already did with the wrong starting crop.
+   //
+   // 2026 FURTHER FIX: process_day() ALONE turned out not to be enough
+   // -- confirmed via direct test: GAI/biomass after the catch-up call
+   // came back essentially IDENTICAL to the raw, just-restored values
+   // (e.g. 3.885935 -> 3.88594, not the ~1-day senescence decline this
+   // crop's own trajectory shows elsewhere). Root cause, traced
+   // directly: process_day() itself does not advance
+   // thermal_time_relative_elapsed for the active phenology period --
+   // that happens in start_day(), specifically via phenology.start_day()
+   // recomputing it fresh each call (the same period-local thermal-time
+   // mechanic already documented and relied on elsewhere in this
+   // function, via force_period_relative_elapsed()). Calling
+   // process_day() without first calling start_day() again means
+   // update_cover()/canopy_leaf_growth->process_day() run against the
+   // SAME relative_elapsed this function already set above, producing
+   // no meaningful additional progression. Call start_day() immediately
+   // before process_day() here, matching the normal, two-call daily
+   // sequence (VIC_land_unit_start_day() then VIC_land_unit_process_day()
+   // in the engine's own normal per-day loop) -- same reasoning as
+   // process_day() itself applies to why a second call here is safe:
+   // start_day() recomputes fresh values from current state
+   // (clear_day(), update_temperatures(), phenology.start_day(),
+   // thermal_time_event(), etc.) rather than accumulating deltas
+   // unsafely, so calling it again, now that the correct state is in
+   // place, should correctly recompute this day's own inputs from the
+   // right starting point.
+   bool started_again = start_day();
    bool caught_up = process_day();
-   std::cerr << "RESTORE_STATE_MARKER_V6: process_day() catch-up call "
-             << "returned " << caught_up
+   std::cerr << "RESTORE_STATE_MARKER_V7: start_day()+process_day() catch-up "
+             << "returned start_day=" << started_again
+             << " process_day=" << caught_up
              << ", GAI now=" << (canopy_leaf_growth ? canopy_leaf_growth->get_GAI(include_vital|include_effete) : -999.0)
              << ", biomass now=" << (canopy_leaf_growth ? canopy_leaf_growth->get_biomass_current(include_vital|include_effete) : -999.0)
              << std::endl;

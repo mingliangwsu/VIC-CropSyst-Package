@@ -1400,14 +1400,8 @@ bool Crop_complete::restore_state
    // unsafely, so calling it again, now that the correct state is in
    // place, should correctly recompute this day's own inputs from the
    // right starting point.
-   bool started_again = start_day();
-   bool caught_up = process_day();
-   std::cerr << "RESTORE_STATE_MARKER_V7: start_day()+process_day() catch-up "
-             << "returned start_day=" << started_again
-             << " process_day=" << caught_up
-             << ", GAI now=" << (canopy_leaf_growth ? canopy_leaf_growth->get_GAI(include_vital|include_effete) : -999.0)
-             << ", biomass now=" << (canopy_leaf_growth ? canopy_leaf_growth->get_biomass_current(include_vital|include_effete) : -999.0)
-             << std::endl;
+   start_day();
+   process_day();
 
    return ok;
 }

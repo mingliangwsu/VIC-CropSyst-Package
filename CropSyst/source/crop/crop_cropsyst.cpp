@@ -1007,6 +1007,24 @@ bool Crop_complete::restore_state
    // already checks get_parameters()->is_fruit_tree() before doing
    // anything fruit-tree-specific with this notification.
    trigger_synchronization(NGS_RESTART);
+   {
+      // 2026 TARGETED DIAGNOSTIC: trigger_synchronization() itself
+      // discards Common_event_list::synchronize()'s own return value
+      // (sync_count -- how many scheduled events actually matched and
+      // got a date assigned). Confirmed via direct test that neither
+      // the NGS_RESTART/bud-break fix nor the FGS_RAPID_FRUIT_
+      // DEVELOPMENT cascade fix resolved rotation 1401's missing
+      // irrigation -- replicate trigger_synchronization()'s own exact
+      // logic here, once, just for this one call, to see directly
+      // whether it's matching anything at all.
+      bool fruit_crop_model_diag = get_parameters()->is_fruit_tree();
+      Synchronization sync_diag(fruit_crop_model_diag, NGS_RESTART);
+      nat16 sync_count_diag = as_event_scheduler_crop->synchronize(sync_diag, simdate);
+      std::cerr << "RESTORE_STATE_MARKER_V9: trigger_synchronization(NGS_RESTART) "
+                << "fruit_crop_model=" << fruit_crop_model_diag
+                << " sync_count=" << sync_count_diag
+                << std::endl;
+   }
    std::cerr << "RESTORE_STATE_MARKER_V8_BUDBREAK: trigger_synchronization(NGS_RESTART) "
              << "called for growth_stage=" << growth_stage
              << " is_fruit_tree=" << get_parameters()->is_fruit_tree()
@@ -1089,6 +1107,16 @@ bool Crop_complete::restore_state
          trigger_synchronization(NGS_FILLING);
          ok = phenology.activate_rapid_fruit_development() && ok;
          trigger_synchronization(growth_stage);
+         {
+            bool fruit_crop_model_diag2 = get_parameters()->is_fruit_tree();
+            Synchronization sync_diag2(fruit_crop_model_diag2, growth_stage);
+            nat16 sync_count_diag2 = as_event_scheduler_crop->synchronize(sync_diag2, simdate);
+            std::cerr << "RESTORE_STATE_MARKER_V9: trigger_synchronization(growth_stage="
+                      << growth_stage << " i.e. FGS_RAPID_FRUIT_DEVELOPMENT) "
+                      << "fruit_crop_model=" << fruit_crop_model_diag2
+                      << " sync_count=" << sync_count_diag2
+                      << std::endl;
+         }
          break;
       case NGS_MATURITY:
          phenology.activate_sowing();

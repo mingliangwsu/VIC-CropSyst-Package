@@ -985,6 +985,28 @@ bool Crop_complete::restore_state
    // output: consistently 0.0 for the entire post-restore period in a
    // warm-started run, versus frequent, substantial irrigation in the
    // same crop's own continuously-simulated season.
+   //
+   // 2026 FURTHER FIX (perennial/fruit-tree crops specifically):
+   // confirmed via a real .mgt file for a perennial (apple) crop that
+   // the SAME irrigation-never-fires bug also affects fruit trees, via
+   // a completely different, previously-unaddressed trigger --
+   // "begin_synchronization=after_fruit_tree_growth_stage,
+   // begin_phenologic(fruit)=bud_break" (as opposed to
+   // "after_normal_crop_growth_stage, begin_phenologic=emergence" for
+   // annual crops, already handled by the cascade below). Per
+   // growth_stages.h's own aliasing, FGS_BUD_BREAK is defined as
+   // NGS_RESTART -- a distinct enum value the cascade below never
+   // passes to trigger_synchronization() for any growth_stage, since
+   // it has no equivalent in the annual-crop planting/emergence
+   // sequence this cascade was originally built around. A restored,
+   // actively-growing perennial crop has, by definition, already
+   // passed bud-break for its current season, so notify the scheduler
+   // unconditionally, once, here -- for non-fruit-tree crops this is a
+   // harmless no-op (nothing schedules relative to bud-break/
+   // NGS_RESTART for them), since trigger_synchronization() itself
+   // already checks get_parameters()->is_fruit_tree() before doing
+   // anything fruit-tree-specific with this notification.
+   trigger_synchronization(NGS_RESTART);
    switch (growth_stage)
    {
       case NGS_GERMINATION:

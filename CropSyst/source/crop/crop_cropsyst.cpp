@@ -985,6 +985,28 @@ bool Crop_complete::restore_state
    // output: consistently 0.0 for the entire post-restore period in a
    // warm-started run, versus frequent, substantial irrigation in the
    // same crop's own continuously-simulated season.
+   //
+   // 2026 FURTHER FIX (perennial/fruit-tree crops specifically):
+   // confirmed via a real .mgt file for a perennial (apple) crop that
+   // the SAME irrigation-never-fires bug also affects fruit trees, via
+   // a completely different, previously-unaddressed trigger --
+   // "begin_synchronization=after_fruit_tree_growth_stage,
+   // begin_phenologic(fruit)=bud_break" (as opposed to
+   // "after_normal_crop_growth_stage, begin_phenologic=emergence" for
+   // annual crops, already handled by the cascade below). Per
+   // growth_stages.h's own aliasing, FGS_BUD_BREAK is defined as
+   // NGS_RESTART -- a distinct enum value the cascade below never
+   // passes to trigger_synchronization() for any growth_stage, since
+   // it has no equivalent in the annual-crop planting/emergence
+   // sequence this cascade was originally built around. A restored,
+   // actively-growing perennial crop has, by definition, already
+   // passed bud-break for its current season, so notify the scheduler
+   // unconditionally, once, here -- for non-fruit-tree crops this is a
+   // harmless no-op (nothing schedules relative to bud-break/
+   // NGS_RESTART for them), since trigger_synchronization() itself
+   // already checks get_parameters()->is_fruit_tree() before doing
+   // anything fruit-tree-specific with this notification.
+   trigger_synchronization(NGS_RESTART);
    switch (growth_stage)
    {
       case NGS_GERMINATION:
@@ -1028,6 +1050,42 @@ bool Crop_complete::restore_state
          ok = phenology.activate_yield_formation() && ok;
          trigger_synchronization(growth_stage);
          break;
+      case FGS_RAPID_FRUIT_DEVELOPMENT:
+         // 2026 FURTHER FIX (perennial/fruit-tree crops): confirmed
+         // via a real restore of an apple crop branching mid-season
+         // in this specific stage (its own Grow_Stage text:
+         // "fructescence(rapid)&culminescence") that this switch had
+         // no case at all for this value, falling into the generic
+         // default: branch below instead -- which never cascades
+         // through ANY of the intermediate trigger_synchronization()
+         // calls (NGS_PLANTING through NGS_FILLING), leaving every
+         // management event synchronized relative to one of those
+         // earlier stages (not just bud-break) unscheduled for the
+         // remainder of the restored season. crop_fruit.cpp's own
+         // natural sequence for this stage
+         // (phenology.activate_rapid_fruit_development() then
+         // trigger_synchronization(FGS_RAPID_FRUIT_DEVELOPMENT), used
+         // when this stage is reached normally) confirms both the
+         // correct activation call and that this is the stage's own,
+         // real trigger_synchronization() target -- FGS_RAPID_FRUIT_
+         // DEVELOPMENT is a distinct Normal_crop_event_sequence value
+         // (not an alias of NGS_FILLING or any other stage already
+         // handled above), immediately after NGS_FILLING/NGS_RIPENING
+         // in growth_stages.h's own ordering, "currently applies only
+         // to orchard fruit" per that file's own comment.
+         phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
+         phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
+         phenology.activate_accrescence();
+         trigger_synchronization(NGS_ACCRESCENCE);
+         phenology.activate_anthesis();
+         trigger_synchronization(NGS_ANTHESIS);
+         phenology.activate_yield_formation();
+         trigger_synchronization(NGS_FILLING);
+         ok = phenology.activate_rapid_fruit_development() && ok;
+         trigger_synchronization(growth_stage);
+         break;
       case NGS_MATURITY:
          phenology.activate_sowing();
          trigger_synchronization(NGS_PLANTING);
@@ -1039,6 +1097,14 @@ bool Crop_complete::restore_state
          trigger_synchronization(NGS_ANTHESIS);
          phenology.activate_yield_formation();
          trigger_synchronization(NGS_FILLING);
+         // Harmless for annual crops (immediately overwritten by
+         // activate_maturity() below); needed for fruit-tree crops
+         // restored directly at maturity, so their own management
+         // events synchronized relative to FGS_RAPID_FRUIT_DEVELOPMENT
+         // still get scheduled -- see that case above for the full
+         // rationale.
+         phenology.activate_rapid_fruit_development();
+         trigger_synchronization(FGS_RAPID_FRUIT_DEVELOPMENT);
          ok = phenology.activate_maturity()        && ok;
          trigger_synchronization(growth_stage);
          break;
@@ -1269,6 +1335,45 @@ bool Crop_complete::restore_state
    if (roots_current) {
       bool roots_ok = roots_current->initialize(root_depth_m);
       ok = roots_ok && ok;
+      // 2026 FURTHER FIX: initialize() sets root_length (the overall,
+      // single-number root length) correctly, but ALSO unconditionally
+      // zeros total_fract_root_length[sublayer] for every layer (see
+      // Crop_root_vital::initialize()'s own body) -- the array
+      // describing what fraction of total root length exists in each
+      // individual soil layer. Nothing else recomputes that per-layer
+      // distribution from the newly-restored root_length on its own.
+      // Confirmed via direct trace (a real restored perennial crop,
+      // whose root_depth_m/GAI/canopy were already correctly restored):
+      // this leaves Crop_transpiration_2::process_transpiration_m()'s
+      // own root_cond_adj accumulator at exactly 0 (built from
+      // fract_root_length_[sublayer] -- see transpiration.cpp), which
+      // means plant_hydraulic_cond is never computed and
+      // leaf_water_pot stays stuck at 0 -- silently defeating any
+      // LWP-based automatic irrigation trigger
+      // (consideration_mode==consider_leaf_water_potential in a .mgt
+      // file) for the rest of the restored season, regardless of
+      // actual water stress. Confirmed this specifically affects
+      // perennial/fruit-tree crops in practice -- an annual crop
+      // restored mid-season, still within its own natural root-growth
+      // period, has this same array correctly rebuilt as a side effect
+      // of that period's own normal day-to-day growth; an established
+      // perennial crop, whose root growth has already completed for
+      // the season (or for its lifetime), never gets that same
+      // opportunity.
+      //
+      // Fix: call update(), Crop_root_vital's own public, normal daily
+      // entry point, once, explicitly -- it correctly sequences
+      // update_length() (safely a no-op here if root_growth_period has
+      // already expired, which is the common case for an established
+      // perennial crop, since it returns root_length unchanged rather
+      // than recomputing it -- so this does not disturb the just-
+      // restored value) followed by update_root_densities() and
+      // update_fractions() (both private; update() is the only public
+      // entry point that reaches them), which together rebuild
+      // total_fract_root_length[] from the crop's root parameters and
+      // the now-correctly-restored root_length.
+      if (roots_vital)
+         roots_vital->update(1.0,false);
    } else {
       ok = false;
    }

@@ -2528,13 +2528,6 @@ Dynamic_water_entering_soil *Land_unit_simulation_VX::create_irrigation_in_inter
 #ifdef AUTOMATIC_IRRIGATION
 bool Land_unit_simulation_VX::process_any_automatic_irrigation()   modification_
 {  bool irrigation_added = false;
-   if (curr_automatic_irrigation_mode) {
-      std::cerr << "RESTORE_STATE_MARKER_V11_ENTRY: process_any_automatic_irrigation() "
-                << "curr_management=" << (void*)curr_management
-                << " curr_automatic_irrigation_mode=" << (void*)curr_automatic_irrigation_mode
-                << " fixed_irrigation_scheduled_today=" << fixed_irrigation_scheduled_today
-                << std::endl;
-   }
    if (curr_management)
    {  if (curr_automatic_irrigation_mode
           && !fixed_irrigation_scheduled_today)                                  //090722
@@ -2555,16 +2548,6 @@ bool Land_unit_simulation_VX::process_any_automatic_irrigation()   modification_
                if (crop_LWP <= /* more negative */ curr_automatic_irrigation_mode->leaf_water_potential) //091208
                   apply_irrigation = true;                                                               //091208
                 // Note, probably could do soil recharge but currently only setup for a fixed amount.    //091208
-               std::cerr << "RESTORE_STATE_MARKER_V12_LWP: crop_LWP=" << crop_LWP
-                         << " threshold_leaf_water_potential=" << curr_automatic_irrigation_mode->leaf_water_potential
-                         << " apply_irrigation=" << apply_irrigation
-                         << std::endl;
-            }
-            else
-            {
-               std::cerr << "RESTORE_STATE_MARKER_V12_LWP: crop_active is NULL -- "
-                         << "LWP-based irrigation check entirely skipped."
-                         << std::endl;
             }
          }                                                                                               //091208
          else // consider_soil_water_depletion                                                           //091208
@@ -2594,14 +2577,6 @@ bool Land_unit_simulation_VX::process_any_automatic_irrigation()   modification_
                   (curr_automatic_irrigation_mode->get_max_allowable_depletion()
                   ,depletion_observe_depth ))
             apply_irrigation = true;                                             //091208
-         std::cerr << "RESTORE_STATE_MARKER_V11_DEPLETION: "
-                   << "crop_active_or_intercrop=" << (void*)crop_active_or_intercrop
-                   << " root_depth_m=" << (crop_active_or_intercrop ? crop_active_or_intercrop->get_recorded_root_depth_m() : -999.0)
-                   << " depletion_mode=" << curr_automatic_irrigation_mode->get_depletion_observation_depth_mode()
-                   << " depletion_observe_depth=" << depletion_observe_depth
-                   << " max_allowable_depletion=" << curr_automatic_irrigation_mode->get_max_allowable_depletion()
-                   << " apply_irrigation=" << apply_irrigation
-                   << std::endl;
          }
          management_irrigation_duration_hours
             = curr_automatic_irrigation_mode->get_duration_hours();              //070109

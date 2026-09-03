@@ -231,14 +231,6 @@ max_crop_water_uptake_mm = 6;
    uptake_act_m = 0;                                                             //160414 was total_water_uptake_m
    soil_sublayer_array_64(layer_plant_hydraulic_cond);  // Units ???
      clear_sublayer_array(layer_plant_hydraulic_cond);  // clear to 0
-   if (root_cond_adj <= 0.00001) {
-      std::cerr << "RESTORE_STATE_MARKER_V13_ROOTCOND: root_cond_adj=" << root_cond_adj
-                << " (<=0.00001 -- plant_hydraulic_cond/leaf_water_pot will NOT be recomputed this call)"
-                << " root_hydraulic_cond=" << root_hydraulic_cond
-                << " top_hydraulic_cond=" << top_hydraulic_cond
-                << " soil_num_sublayers=" << (int)soil_num_sublayers
-                << std::endl;
-   }
    if (root_cond_adj > 0.00001)                                                  //050331
    {  for (nat8  sublayer = 1 ; sublayer <= soil_num_sublayers ; sublayer++)     //050331
       {  float64 top_hydraulic_cond_sublayer  // VB Layer_Top_Hydraulic_Conductance
@@ -273,12 +265,6 @@ max_crop_water_uptake_mm = 6;
       float64 soil_WP_layer = soil_water_pot[sublayer];                          //051022
       soil_avg_water_pot += (soil_WP_layer + soil_osmotic_pot_sol_sl )
          * layer_root_cond_adj[sublayer] / root_cond_adj;
-   }
-   if (plant_hydraulic_cond <= 0.0) {
-      std::cerr << "RESTORE_STATE_MARKER_V13_PHC: plant_hydraulic_cond=" << plant_hydraulic_cond
-                << " (<=0.0 -- leaf_water_pot stays stuck at its existing/default value this call)"
-                << " root_cond_adj=" << root_cond_adj
-                << std::endl;
    }
    if (plant_hydraulic_cond > 0.0)
    {  leaf_water_pot              // VB Leaf_Water_Pot   (actually local, but recorded for output)

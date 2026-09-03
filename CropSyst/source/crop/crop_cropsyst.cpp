@@ -1367,6 +1367,54 @@ bool Crop_complete::restore_state
    if (roots_current) {
       bool roots_ok = roots_current->initialize(root_depth_m);
       ok = roots_ok && ok;
+      // 2026 FURTHER FIX: initialize() sets root_length (the overall,
+      // single-number root length) correctly, but ALSO unconditionally
+      // zeros total_fract_root_length[sublayer] for every layer (see
+      // Crop_root_vital::initialize()'s own body) -- the array
+      // describing what fraction of total root length exists in each
+      // individual soil layer. Nothing else recomputes that per-layer
+      // distribution from the newly-restored root_length on its own.
+      // Confirmed via direct trace (a real restored perennial crop,
+      // whose root_depth_m/GAI/canopy were already correctly restored):
+      // this leaves Crop_transpiration_2::process_transpiration_m()'s
+      // own root_cond_adj accumulator at exactly 0 (built from
+      // fract_root_length_[sublayer] -- see transpiration.cpp), which
+      // means plant_hydraulic_cond is never computed and
+      // leaf_water_pot stays stuck at 0 -- silently defeating any
+      // LWP-based automatic irrigation trigger
+      // (consideration_mode==consider_leaf_water_potential in a .mgt
+      // file) for the rest of the restored season, regardless of
+      // actual water stress. Confirmed this specifically affects
+      // perennial/fruit-tree crops in practice -- an annual crop
+      // restored mid-season, still within its own natural root-growth
+      // period, has this same array correctly rebuilt as a side effect
+      // of that period's own normal day-to-day growth; an established
+      // perennial crop, whose root growth has already completed for
+      // the season (or for its lifetime), never gets that same
+      // opportunity.
+      //
+      // Fix: call update(), Crop_root_vital's own public, normal daily
+      // entry point, once, explicitly -- it correctly sequences
+      // update_length() (safely a no-op here if root_growth_period has
+      // already expired, which is the common case for an established
+      // perennial crop, since it returns root_length unchanged rather
+      // than recomputing it -- so this does not disturb the just-
+      // restored value) followed by update_root_densities() and
+      // update_fractions() (both private; update() is the only public
+      // entry point that reaches them), which together rebuild
+      // total_fract_root_length[] from the crop's root parameters and
+      // the now-correctly-restored root_length.
+      if (roots_vital) {
+         roots_vital->update(1.0,false);
+         const float64 *fract_lengths = roots_vital->get_total_fract_length_m();
+         float64 fract_sum = 0.0;
+         if (fract_lengths)
+            for (int sublayer = 0; sublayer < 18; sublayer++)
+               fract_sum += fract_lengths[sublayer];
+         std::cerr << "RESTORE_STATE_MARKER_V14_ROOTDIST: roots_vital->update() called, "
+                   << "total_fract_root_length sum (first 18 sublayers)=" << fract_sum
+                   << std::endl;
+      }
    } else {
       ok = false;
    }

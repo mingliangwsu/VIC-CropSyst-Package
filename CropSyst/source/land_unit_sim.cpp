@@ -2555,6 +2555,16 @@ bool Land_unit_simulation_VX::process_any_automatic_irrigation()   modification_
                if (crop_LWP <= /* more negative */ curr_automatic_irrigation_mode->leaf_water_potential) //091208
                   apply_irrigation = true;                                                               //091208
                 // Note, probably could do soil recharge but currently only setup for a fixed amount.    //091208
+               std::cerr << "RESTORE_STATE_MARKER_V12_LWP: crop_LWP=" << crop_LWP
+                         << " threshold_leaf_water_potential=" << curr_automatic_irrigation_mode->leaf_water_potential
+                         << " apply_irrigation=" << apply_irrigation
+                         << std::endl;
+            }
+            else
+            {
+               std::cerr << "RESTORE_STATE_MARKER_V12_LWP: crop_active is NULL -- "
+                         << "LWP-based irrigation check entirely skipped."
+                         << std::endl;
             }
          }                                                                                               //091208
          else // consider_soil_water_depletion                                                           //091208

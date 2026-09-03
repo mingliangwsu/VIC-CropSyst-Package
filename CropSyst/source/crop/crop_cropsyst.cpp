@@ -1007,6 +1007,10 @@ bool Crop_complete::restore_state
    // already checks get_parameters()->is_fruit_tree() before doing
    // anything fruit-tree-specific with this notification.
    trigger_synchronization(NGS_RESTART);
+   std::cerr << "RESTORE_STATE_MARKER_V8_BUDBREAK: trigger_synchronization(NGS_RESTART) "
+             << "called for growth_stage=" << growth_stage
+             << " is_fruit_tree=" << get_parameters()->is_fruit_tree()
+             << std::endl;
    switch (growth_stage)
    {
       case NGS_GERMINATION:
@@ -1050,6 +1054,42 @@ bool Crop_complete::restore_state
          ok = phenology.activate_yield_formation() && ok;
          trigger_synchronization(growth_stage);
          break;
+      case FGS_RAPID_FRUIT_DEVELOPMENT:
+         // 2026 FURTHER FIX (perennial/fruit-tree crops): confirmed
+         // via a real restore of an apple crop branching mid-season
+         // in this specific stage (its own Grow_Stage text:
+         // "fructescence(rapid)&culminescence") that this switch had
+         // no case at all for this value, falling into the generic
+         // default: branch below instead -- which never cascades
+         // through ANY of the intermediate trigger_synchronization()
+         // calls (NGS_PLANTING through NGS_FILLING), leaving every
+         // management event synchronized relative to one of those
+         // earlier stages (not just bud-break) unscheduled for the
+         // remainder of the restored season. crop_fruit.cpp's own
+         // natural sequence for this stage
+         // (phenology.activate_rapid_fruit_development() then
+         // trigger_synchronization(FGS_RAPID_FRUIT_DEVELOPMENT), used
+         // when this stage is reached normally) confirms both the
+         // correct activation call and that this is the stage's own,
+         // real trigger_synchronization() target -- FGS_RAPID_FRUIT_
+         // DEVELOPMENT is a distinct Normal_crop_event_sequence value
+         // (not an alias of NGS_FILLING or any other stage already
+         // handled above), immediately after NGS_FILLING/NGS_RIPENING
+         // in growth_stages.h's own ordering, "currently applies only
+         // to orchard fruit" per that file's own comment.
+         phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
+         phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
+         phenology.activate_accrescence();
+         trigger_synchronization(NGS_ACCRESCENCE);
+         phenology.activate_anthesis();
+         trigger_synchronization(NGS_ANTHESIS);
+         phenology.activate_yield_formation();
+         trigger_synchronization(NGS_FILLING);
+         ok = phenology.activate_rapid_fruit_development() && ok;
+         trigger_synchronization(growth_stage);
+         break;
       case NGS_MATURITY:
          phenology.activate_sowing();
          trigger_synchronization(NGS_PLANTING);
@@ -1061,6 +1101,14 @@ bool Crop_complete::restore_state
          trigger_synchronization(NGS_ANTHESIS);
          phenology.activate_yield_formation();
          trigger_synchronization(NGS_FILLING);
+         // Harmless for annual crops (immediately overwritten by
+         // activate_maturity() below); needed for fruit-tree crops
+         // restored directly at maturity, so their own management
+         // events synchronized relative to FGS_RAPID_FRUIT_DEVELOPMENT
+         // still get scheduled -- see that case above for the full
+         // rationale.
+         phenology.activate_rapid_fruit_development();
+         trigger_synchronization(FGS_RAPID_FRUIT_DEVELOPMENT);
          ok = phenology.activate_maturity()        && ok;
          trigger_synchronization(growth_stage);
          break;

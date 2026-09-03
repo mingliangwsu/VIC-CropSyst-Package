@@ -1272,6 +1272,9 @@ Event_status_indicator Land_unit_simulation_VX
 {  // Note, we dont need to delete current_automatic_irrigation_mode it is not owned by
    curr_automatic_irrigation_mode = &auto_irrig_mode_op;
    //printf("curr_automatic_irrigation_mode is SET!\n");
+   std::cerr << "RESTORE_STATE_MARKER_V10_AUTOIRRIG: perform_start_automatic_irrigation_mode() "
+             << "CALLED -- curr_automatic_irrigation_mode now set."
+             << std::endl;
    if (infiltration_submodel)                                                    //200226
        infiltration_submodel->know_directed_irrigation                           //200226
          (auto_irrig_mode_op.wetting_area_surface_fraction);                     //200226

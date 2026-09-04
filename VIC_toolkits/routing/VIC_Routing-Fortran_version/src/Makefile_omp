@@ -1,0 +1,45 @@
+########################################################################
+### rout.f makefile ####################################################
+########################################################################
+#
+# Routing algorithm written D. Lohmann
+#
+# This is a slightly modified code (main algotrithms unchanged -IO and
+# array dimensions simplified).
+# Maintained by G. O'Donnell (tempgd@hydro.washington.edu) and Andy Wood
+#
+
+#This program uses the non-standard Fortran argument GETARG
+#Different compilers require different flags to link with this function
+#Comment out one of the following depending on your compiler
+
+#If compiling on SUN and LINUX use  (remember -O)
+FFLAGS = -O -C -ffixed-line-length-none -fopenmp
+#If compiling on HP use
+#FFLAGS = -C -O +U77 -ffixed-line-length-none
+#for debugging
+#FFLAGS = -C -g -lm -ffixed-line-length-none
+
+FC=gfortran
+
+HFILES=    	parameter.h
+
+OBJECTS=	rout_omp.o 			\
+		make_convolution_omp.o	\
+                init_routines_omp.o		\
+                read_routines_omp.o		\
+                write_routines_omp.o	\
+                unit_hyd_routines_omp.o
+
+exe:		$(OBJECTS)
+	$(FC) $(FFLAGS) $(OBJECTS) -o rout_omp
+
+rout_omp.o:				rout_omp.f
+make_convolution_omp.o:		make_convolution_omp.f
+init_routines_omp.o:		init_routines_omp.f
+read_routines_omp.o:		read_routines_omp.f
+write_routines_omp.o:		write_routines_omp.f
+unit_hyd_routines_omp.o:		unit_hyd_routines_omp.f
+
+clean:
+	/bin/rm *.o

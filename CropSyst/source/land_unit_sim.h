@@ -30,7 +30,7 @@
 #endif
 
 #ifndef CAMO_VERSION
-#include "crop/crop_param_V4.h"
+#  include "crop/crop_param_V4.h"
 #endif
 
 #include "corn/math/statistical/sample_dataset_T.h"

@@ -1,7 +1,6 @@
 ﻿#ifdef VIC_CROPSYST_VERSION
 #include "VIC_land_unit_simulation.h"
 #include "VIC_land_unit_C_interface.h"
-
 #include "corn/measure/measures.h"
 #include "corn/data_source/vv_file.h"
 #include "corn/chronometry/date_32.h"
@@ -663,6 +662,107 @@ float64 Land_unit_simulation::get(nat32 variable_code) const
     return outvalue;
 }
 //_get______________________________________________________________2014-10-23_/
+float64 Land_unit_simulation::get_accum_degree_days_for_state()            const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_accum_degree_days()
+       : 0.0;
+}
+//_get_accum_degree_days_for_state___________________________________2026______/
+int Land_unit_simulation::get_growth_stage_code_for_state()                const
+{
+    return crop_active_or_intercrop
+       ? (int)crop_active_or_intercrop->ref_phenology().get_growth_stage_sequence()
+       : (int)NGS_NONE;
+}
+//_get_growth_stage_code_for_state___________________________________2026______/
+float64 Land_unit_simulation::get_root_biomass_kg_m2_for_state()           const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_act_root_biomass_kg_m2()
+       : 0.0;
+}
+//_get_root_biomass_kg_m2_for_state__________________________________2026______/
+float64 Land_unit_simulation::get_canopy_biomass_kg_m2_for_state()         const
+{
+    // Note: crop_data_struct::biomass_current (see vicNl_def.h) is only
+    // ever populated in the legacy V2 driver path (call_crop_model.c);
+    // for V3 it is queried directly from the crop object here instead,
+    // exactly as get_root_biomass_kg_m2_for_state() does above.
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_canopy_biomass_kg_m2()
+       : 0.0;
+}
+//_get_canopy_biomass_kg_m2_for_state________________________________2026______/
+float64 Land_unit_simulation::get_GAI_for_state()                          const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_GAI(true)
+       : 0.0;
+}
+//_get_GAI_for_state__________________________________________________2026______/
+float64 Land_unit_simulation::get_root_depth_m_for_state()                const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_recorded_root_depth_m()
+       : 0.0;
+}
+//_get_root_depth_m_for_state_________________________________________2026______/
+float64 Land_unit_simulation::get_water_stress_index_for_state()           const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_water_stress_index()
+       : 0.0;
+}
+int Land_unit_simulation::get_active_phenology_modifier_for_state()        const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_active_phenology_modifier()
+       : 0;
+}
+//_get_active_phenology_modifier_for_state____________________________2026______/
+float64 Land_unit_simulation::get_modifier_relative_elapsed_for_state()    const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_modifier_relative_elapsed()
+       : 0.0;
+}
+//_get_modifier_relative_elapsed_for_state____________________________2026______/
+float64 Land_unit_simulation::get_cover_attained_max_for_state()           const
+{
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->get_cover_attained_max_for_state()
+       : 0.0;
+}
+//_get_cover_attained_max_for_state____________________________________2026______/
+bool Land_unit_simulation::restore_state
+(float64                    biomass_kg_m2
+,float64                    GAI
+,float64                    root_depth_m
+,Normal_crop_event_sequence growth_stage
+,float64                    accum_thermal_time_deg_day
+,int                        active_phenology_modifier
+,float64                    modifier_relative_elapsed
+,float64                    cover_attained_max
+)                                                                   modification_
+{
+    // 2026: now calls straight through Crop_model_interface's own
+    // restore_state() (added to CropSyst/source/crop/crop_interfaced.h),
+    // which every concrete crop class implements -- with a safe no-op
+    // default on the interface itself and a real implementation on
+    // Crop_complete (crop_cropsyst.h/.cpp, the class this project's
+    // build/library/*/Makefile_Kamiak actually compiles and links for
+    // field crops). No dynamic_cast and no dependency on
+    // VIC_crop::CropSyst_proper_crop (which was never part of the
+    // compiled build) are needed with this approach.
+    return crop_active_or_intercrop
+       ? crop_active_or_intercrop->restore_state
+            (biomass_kg_m2, GAI, root_depth_m, growth_stage,
+             accum_thermal_time_deg_day, active_phenology_modifier,
+             modifier_relative_elapsed, cover_attained_max)
+       : false;
+}
+//_restore_state____________________________________________________2026_______/
 bool Land_unit_simulation::initialize()                            modification_
 {
    //std::clog << "Scenario file name:" << arguments->provide_scenario_file_name().c_str() << std::endl;

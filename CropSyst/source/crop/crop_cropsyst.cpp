@@ -837,6 +837,680 @@ bool Crop_complete::drop_leaves()                                               
    return true;
 }
 //_drop_leaves______________________________________________________2019-06-25_/
+// 2026: see the declaration in crop_cropsyst.h for the full rationale.
+// Priority order matches how these periods are mutually exclusive in
+// the engine (each know_X() clears the other two -- see
+// canopy_cover_continuum.cpp).
+int Crop_complete::get_active_phenology_modifier()                          const
+{
+   if (phenology.get_senescence_period())    return 3;
+   if (phenology.get_culminescence_period()) return 2;
+   if (phenology.get_accrescence_period())   return 1;
+   return 0;
+}
+//_get_active_phenology_modifier_______________________________________2026______/
+float64 Crop_complete::get_modifier_relative_elapsed()                     const
+{
+   const Phenology::Period_thermal *active
+      = phenology.get_senescence_period()    ? phenology.get_senescence_period()
+      : phenology.get_culminescence_period() ? phenology.get_culminescence_period()
+      : phenology.get_accrescence_period()   ? phenology.get_accrescence_period()
+      : 0;
+   return active ? active->get_thermal_time_relative_elapsed() : 0.0;
+}
+//_get_modifier_relative_elapsed_______________________________________2026______/
+bool Crop_complete::force_period_relative_elapsed
+(const Phenology::Period_thermal *period_const
+,float64                          target_relative_elapsed
+)                                                                   modification_
+{
+   if (!period_const) return false;
+   // dynamic_cast (not static_cast) is required here: Period_thermal
+   // implements Phenology::Period_thermal through virtual inheritance,
+   // so the base-to-derived offset is not statically determinable and
+   // static_cast is rejected by the compiler. const_cast is a
+   // legitimate, narrowly-scoped exception here (not a general
+   // const-correctness bypass): the underlying member is genuinely
+   // public and mutable (Period_thermal::thermal_time_relative_elapsed,
+   // see phenology_A.h) -- it is only const-qualified on the read-only
+   // get_X_period() accessors used to reach it.
+   CropSyst::Phenology_abstract::Period_thermal *period
+      = dynamic_cast<CropSyst::Phenology_abstract::Period_thermal *>
+         (const_cast<Phenology::Period_thermal *>(period_const));
+   if (!period) return false;
+   period->thermal_time_relative_elapsed = target_relative_elapsed;
+   // Setting the fraction alone only lasts until the next start_day()
+   // call, which unconditionally recomputes it from this period's own,
+   // separate, local thermal_time accumulator (get_thermal_time_accum()
+   // / duration_GDDs) -- see crop_root.cpp/phenology_A.cpp for the same
+   // pattern already relied on elsewhere. Fix the underlying
+   // accumulator too, so the recomputation itself reproduces the same
+   // fraction on subsequent days instead of reverting.
+   if (period->thermal_time && period->parameters) {
+      CropSyst::Thermal_time_common *period_thermal_time
+         = dynamic_cast<CropSyst::Thermal_time_common *>(period->thermal_time);
+      if (period_thermal_time) {
+         float64 target_GDDs = target_relative_elapsed * period->parameters->duration_GDDs;
+         period_thermal_time->GDDs           = target_GDDs;
+         period_thermal_time->GDDs_yesterday = target_GDDs;
+         return true;
+      }
+   }
+   return false;
+}
+//_force_period_relative_elapsed_______________________________________2026______/
+float64 Crop_complete::get_cover_attained_max_for_state()                  const
+{
+   return canopy_leaf_growth ? canopy_leaf_growth->get_cover_attained_max() : 0.0;
+}
+//_get_cover_attained_max_for_state____________________________________2026______/
+bool Crop_complete::restore_state
+(float64                    biomass_kg_m2
+,float64                    GAI
+,float64                    root_depth_m
+,Normal_crop_event_sequence growth_stage
+,float64                    accum_thermal_time_deg_day
+,int                        active_phenology_modifier
+,float64                    modifier_relative_elapsed
+,float64                    cover_attained_max
+)                                                                   modification_
+{
+   bool ok = true;
+
+   // --- Phenology / growth stage ---------------------------------------
+   // Force the phenology state machine to the saved growth stage FIRST,
+   // using the public activate_*() methods Phenology_2018 already exposes
+   // for this purpose (CropSyst/source/crop/phenology_2018.h).
+   //
+   // 2026 CASCADE FIX (found via update_cover() investigation): each
+   // activate_*() call only sets its OWN stage's Period_thermal pointer
+   // (e.g. activate_yield_formation() only sets yield_formation); it does
+   // NOT set the intermediate stage pointers (accrescence, anthesis,
+   // etc.) that a NATURALLY-progressed crop would already have non-null
+   // by the time it reaches a later stage. Downstream growth logic (e.g.
+   // Canopy_cover_actual::update_cover(), called every day as normal
+   // processing) checks these intermediate pointers directly
+   // ("if (accrescence) {...compute expansion...}"), and falls through
+   // to a zero-growth default when none of them are set -- silently
+   // overwriting whatever canopy state was just restored, on every
+   // subsequent day, regardless of the nominal "current stage". Jumping
+   // straight to a late stage (as the previous version of this switch
+   // did) left ALL intermediate pointers null, so no growth branch ever
+   // recognized the crop as active.
+   //
+   // Fix: cascade through every stage strictly before the target,
+   // activating each in turn, so all the intermediate Period_thermal
+   // pointers a naturally-progressed crop would have are non-null here
+   // too. Return value ok reflects only the FINAL (target) stage's
+   // activation, matching this function's original contract; failures
+   // in earlier, cascaded activations are tolerated (crop parameter
+   // files are not guaranteed to define every named period -- see the
+   // activate_yield_formation() failure mode already documented for
+   // Barley_spring_colder-style crops without an explicit
+   // "phenology/yield_formation" period).
+   //
+   // IMPORTANT ORDERING NOTE (2026, found via compile+output testing):
+   // activating a stage such as yieldformation can internally cascade
+   // through earlier stages (e.g. accrescence) to get there, and stage
+   // entry has side effects -- notably Crop_complete::initiate_accrescence()
+   // calls provide_canopy().start(), which DELETES and recreates
+   // canopy_leaf_growth from scratch (see provide_canopy() above). If
+   // canopy/root restoration ran BEFORE this activation (as an earlier
+   // version of this function did), that cascade would silently wipe out
+   // the just-restored biomass/GAI, leaving the crop stuck at zero
+   // biomass despite being in the correct growth stage. Restoring
+   // canopy/roots AFTER phenology activation avoids this.
+   // 2026 FURTHER FIX (confirmed via direct trace of common/simulation/
+   // event.cpp and event.h): forcing phenology.growth_stage directly,
+   // as the cascade below does, sets the crop's OWN internal state
+   // correctly, but never notifies the SEPARATE management-event
+   // scheduler (Crop_complete::as_event_scheduler_crop) that any of
+   // these stage transitions occurred. Management-file events
+   // synchronized "relative to a phenologic stage" (e.g. an
+   // [automatic_irrigation] section's "begin_synchronization=
+   // after_normal_crop_growth_stage, begin_phenologic=emergence,
+   // begin_offset=2" -- confirmed via a real .mgt file used with this
+   // restore feature) are only ever scheduled when
+   // Crop_complete::trigger_synchronization(event) is explicitly
+   // called for that specific event -- normally a side effect of the
+   // crop's own natural initiate_X()/harvest-related lifecycle
+   // functions (e.g. initiate_culminescence() already calls
+   // trigger_synchronization(NGS_END_CANOPY_GROWTH)), none of which
+   // this restore path exercises. Without this, any management event
+   // timed relative to a phenologic stage the restored crop has
+   // already passed (most commonly: automatic irrigation) never gets
+   // scheduled at all for the remainder of that crop's restored
+   // season, regardless of how much water stress genuinely develops --
+   // confirmed by comparing actual .asc irrig_total_mm/irrig_netdemand_mm
+   // output: consistently 0.0 for the entire post-restore period in a
+   // warm-started run, versus frequent, substantial irrigation in the
+   // same crop's own continuously-simulated season.
+   //
+   // 2026 FURTHER FIX (perennial/fruit-tree crops specifically):
+   // confirmed via a real .mgt file for a perennial (apple) crop that
+   // the SAME irrigation-never-fires bug also affects fruit trees, via
+   // a completely different, previously-unaddressed trigger --
+   // "begin_synchronization=after_fruit_tree_growth_stage,
+   // begin_phenologic(fruit)=bud_break" (as opposed to
+   // "after_normal_crop_growth_stage, begin_phenologic=emergence" for
+   // annual crops, already handled by the cascade below). Per
+   // growth_stages.h's own aliasing, FGS_BUD_BREAK is defined as
+   // NGS_RESTART -- a distinct enum value the cascade below never
+   // passes to trigger_synchronization() for any growth_stage, since
+   // it has no equivalent in the annual-crop planting/emergence
+   // sequence this cascade was originally built around. A restored,
+   // actively-growing perennial crop has, by definition, already
+   // passed bud-break for its current season, so notify the scheduler
+   // unconditionally, once, here -- for non-fruit-tree crops this is a
+   // harmless no-op (nothing schedules relative to bud-break/
+   // NGS_RESTART for them), since trigger_synchronization() itself
+   // already checks get_parameters()->is_fruit_tree() before doing
+   // anything fruit-tree-specific with this notification.
+   trigger_synchronization(NGS_RESTART);
+   switch (growth_stage)
+   {
+      case NGS_GERMINATION:
+      case NGS_PLANTING:
+         ok = phenology.activate_sowing()          && ok;
+         trigger_synchronization(growth_stage);
+         break;
+      case NGS_EMERGENCE:
+         phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
+         ok = phenology.activate_emergence()       && ok;
+         trigger_synchronization(growth_stage);
+         break;
+      case NGS_ACCRESCENCE:
+         phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
+         phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
+         ok = phenology.activate_accrescence()     && ok;
+         trigger_synchronization(growth_stage);
+         break;
+      case NGS_ANTHESIS:
+         phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
+         phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
+         phenology.activate_accrescence();
+         trigger_synchronization(NGS_ACCRESCENCE);
+         ok = phenology.activate_anthesis()        && ok;
+         trigger_synchronization(growth_stage);
+         break;
+      case NGS_FILLING:
+         phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
+         phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
+         phenology.activate_accrescence();
+         trigger_synchronization(NGS_ACCRESCENCE);
+         phenology.activate_anthesis();
+         trigger_synchronization(NGS_ANTHESIS);
+         ok = phenology.activate_yield_formation() && ok;
+         trigger_synchronization(growth_stage);
+         break;
+      case FGS_RAPID_FRUIT_DEVELOPMENT:
+         // 2026 FURTHER FIX (perennial/fruit-tree crops): confirmed
+         // via a real restore of an apple crop branching mid-season
+         // in this specific stage (its own Grow_Stage text:
+         // "fructescence(rapid)&culminescence") that this switch had
+         // no case at all for this value, falling into the generic
+         // default: branch below instead -- which never cascades
+         // through ANY of the intermediate trigger_synchronization()
+         // calls (NGS_PLANTING through NGS_FILLING), leaving every
+         // management event synchronized relative to one of those
+         // earlier stages (not just bud-break) unscheduled for the
+         // remainder of the restored season. crop_fruit.cpp's own
+         // natural sequence for this stage
+         // (phenology.activate_rapid_fruit_development() then
+         // trigger_synchronization(FGS_RAPID_FRUIT_DEVELOPMENT), used
+         // when this stage is reached normally) confirms both the
+         // correct activation call and that this is the stage's own,
+         // real trigger_synchronization() target -- FGS_RAPID_FRUIT_
+         // DEVELOPMENT is a distinct Normal_crop_event_sequence value
+         // (not an alias of NGS_FILLING or any other stage already
+         // handled above), immediately after NGS_FILLING/NGS_RIPENING
+         // in growth_stages.h's own ordering, "currently applies only
+         // to orchard fruit" per that file's own comment.
+         phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
+         phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
+         phenology.activate_accrescence();
+         trigger_synchronization(NGS_ACCRESCENCE);
+         phenology.activate_anthesis();
+         trigger_synchronization(NGS_ANTHESIS);
+         phenology.activate_yield_formation();
+         trigger_synchronization(NGS_FILLING);
+         ok = phenology.activate_rapid_fruit_development() && ok;
+         trigger_synchronization(growth_stage);
+         break;
+      case NGS_MATURITY:
+         phenology.activate_sowing();
+         trigger_synchronization(NGS_PLANTING);
+         phenology.activate_emergence();
+         trigger_synchronization(NGS_EMERGENCE);
+         phenology.activate_accrescence();
+         trigger_synchronization(NGS_ACCRESCENCE);
+         phenology.activate_anthesis();
+         trigger_synchronization(NGS_ANTHESIS);
+         phenology.activate_yield_formation();
+         trigger_synchronization(NGS_FILLING);
+         // Harmless for annual crops (immediately overwritten by
+         // activate_maturity() below); needed for fruit-tree crops
+         // restored directly at maturity, so their own management
+         // events synchronized relative to FGS_RAPID_FRUIT_DEVELOPMENT
+         // still get scheduled -- see that case above for the full
+         // rationale.
+         phenology.activate_rapid_fruit_development();
+         trigger_synchronization(FGS_RAPID_FRUIT_DEVELOPMENT);
+         ok = phenology.activate_maturity()        && ok;
+         trigger_synchronization(growth_stage);
+         break;
+      case NGS_QUIESCENCE:
+         // activate_quiescence() already clears accrescence/
+         // culminescence/senescence/maturity itself (see
+         // phenology_2018.cpp), so no cascade is needed here.
+         ok = phenology.activate_quiescence()      && ok;
+         trigger_synchronization(growth_stage);
+         break;
+      default:
+         // NGS_NONE, NGS_RESTART, NGS_HARVESTABLE, NGS_HARVEST,
+         // NGS_POSTHARVEST, NGS_TERMINATED and any stage not handled
+         // above: fall back to the engine's own generic restart entry
+         // point rather than guessing at an activate_*() call that may
+         // not apply.
+         ok = phenology.activate_restart() && ok;
+         break;
+   }
+
+   // --- Canopy / above-ground biomass ------------------------------------
+   // Canopy_leaf_growth::restart_with() is CropSyst's own, already-existing
+   // hook for exactly this purpose (see CropSyst/source/crop/canopy_growth.h).
+   // Run AFTER phenology activation -- see note above.
+   //
+   // 2026 CONFIRMED ROOT CAUSE (found via direct trace of the actual
+   // active code path -- this build has no -DPHENOLOGY_VERSION=2018
+   // defined, so it uses the pre-2018 phenology code, NOT the 2018 code
+   // this comment previously (incorrectly) assumed): activating a
+   // phenology stage here does NOT synchronously trigger
+   // Crop_complete::initiate_accrescence(). That function is normally
+   // only reached via Crop_complete::thermal_time_event(), gated by
+   // thermal_time_matchs() -- a direct comparison against ACCUMULATED
+   // DEGREE DAYS. Since accumulated thermal time is the one piece of
+   // state this restore cannot set (Phenology_2018's private GDD
+   // accumulator has no public setter -- see the top-level restore_state
+   // documentation), that gate can take weeks to open naturally, if it
+   // opens within the observed window at all.
+   //
+   // initiate_accrescence() does three things when it does eventually
+   // run: creates canopy_leaf_growth, creates roots_current, and --
+   // critically -- calls
+   //    canopy_leaf_growth->know_accrescence(phenology.get_accrescence_period())
+   // to sync the canopy's own accrescence pointer, which is what
+   // Canopy_cover_actual::update_cover() actually checks to recognize
+   // the crop as actively growing. Earlier versions of this function
+   // created the canopy and roots (matching two of initiate_accrescence()'s
+   // three effects) but never called know_accrescence() -- so
+   // update_cover() always saw a NULL accrescence pointer regardless of
+   // canopy_leaf_growth existing, explaining why GAI/cover restored
+   // successfully for one instant and then reverted on every subsequent
+   // day. Call know_accrescence() explicitly here, directly reusing the
+   // engine's own existing sync mechanism, rather than waiting on (or
+   // trying to further work around) the thermal-time-gated trigger.
+   if (!canopy_leaf_growth)
+      provide_canopy();
+   // 2026 FURTHER FIX (confirmed by comparing Run 2's post-restore
+   // biomass against Run 1's own natural trajectory over the same
+   // growth-stage window: Run 1's biomass continues increasing
+   // throughout senescence, right up to harvest, while a restored
+   // crop's biomass stayed perfectly flat for the entire post-restore
+   // period): initiate_accrescence() ALSO calls
+   // provide_biomass_growth().start() alongside provide_canopy().start()
+   // -- the lazy-create factory for the Biomass_growth_RUE_TUE object
+   // that drives day-to-day biomass accumulation (radiation-use-
+   // efficiency/transpiration-driven growth). Since initiate_accrescence()
+   // never fires synchronously here (the same reason know_accrescence()
+   // has to be called explicitly above), biomass_growth was never
+   // created at all -- so nothing computed any new growth on subsequent
+   // days, even though the canopy/root/phenology state was otherwise
+   // correctly restored. provide_biomass_growth()'s own start() is a
+   // no-op (Biomass_growth_RUE_TUE::start() just returns true); the
+   // real initialization happens in its constructor, called here for
+   // the first time, which reads canopy_leaf_growth (already
+   // guaranteed non-null immediately above) and thermal_time (a
+   // reference to the same object restored elsewhere in this function,
+   // not a copy, so restoring it before or after this call is
+   // equivalent).
+   if (!biomass_growth)
+      provide_biomass_growth();
+   // 2026 FURTHER FIX (confirmed by tracing Crop_complete::
+   // calc_act_biomass_growth() directly: it unconditionally forces
+   // act_biomass_growth to 0.0 unless limited_pot_transpiration_m > 0.0
+   // -- "if (limited_pot_transpiration_m > 0.0) {...} else
+   // act_biomass_growth = 0.0;" -- meaning creating biomass_growth
+   // above, by itself, was not sufficient: the daily growth amount it
+   // computes is discarded entirely unless transpiration is also
+   // present and contributing). limited_pot_transpiration_m is
+   // computed from the transpiration object -- and initiate_accrescence()
+   // ALSO unconditionally creates that object (a third thing it does
+   // alongside provide_canopy()/provide_biomass_growth(), all as part
+   // of the same "crop enters active growth" lifecycle event this
+   // build's restore path never fires synchronously). Without this,
+   // transpiration stays null for a restored crop, limited_pot_
+   // transpiration_m never becomes positive, and daily biomass growth
+   // is discarded every single day regardless of canopy/GAI state.
+   // Mirrors initiate_accrescence()'s own construction exactly, since
+   // there is no separate provide_transpiration()-style lazy-create
+   // function for this object to reuse.
+   if (!transpiration)
+      transpiration = new Crop_transpiration_2
+         (parameters->transpiration
+         ,soil
+         ,parameters->salinity.osmotic_pot_50
+         ,parameters->salinity.salt_tolerance_P
+         ,param_dry_soil_root_activity_coef
+         ,param_saturated_soil_root_activity_coef);
+   if (canopy_leaf_growth) {
+      // 2026 REORDERED (confirmed via direct comparison against Run 1's
+      // actual branch-date state -- which turned out to be "senescence"
+      // active, not "culminescence" as an earlier round of this fix had
+      // assumed): restart_with() now runs FIRST, before know_accrescence()
+      // and the modifier cascade below, rather than after. Reason:
+      // Canopy_cover_actual::know_senescence() (triggered by
+      // initiate_senescence() in the cascade below) captures
+      // cover_attained_max/cover_to_lose_total directly from
+      // interception_global_green_yesterday AT THE MOMENT IT IS CALLED --
+      // if that happens before restart_with() has set the real restored
+      // cover, it caches the canopy's still-fresh, near-zero baseline
+      // permanently, and GAI/cover then stay at (or decay from) that
+      // cached near-zero value for the rest of the senescence period
+      // regardless of what restart_with() sets moments later. Setting
+      // the real biomass/GAI/cover FIRST means any "snapshot the
+      // current cover" callback triggered by the modifier cascade
+      // captures the correct, already-restored value instead.
+      bool canopy_ok = canopy_leaf_growth->restart_with(biomass_kg_m2, GAI, true);
+
+      canopy_leaf_growth->know_accrescence(phenology.get_accrescence_period());
+
+      // 2026 EXTENDED (supersedes the earlier "always force accrescence
+      // to fully elapsed" version): restore the correct "modifier"
+      // period -- accrescence, culminescence, or senescence, whichever
+      // was ACTUALLY active in the source run -- to the ACTUAL fraction
+      // it had reached there, rather than always assuming accrescence
+      // was already fully complete.
+      //
+      // Why this matters: forcing every intermediate stage to "fully
+      // elapsed" on the single restart day was found (via direct
+      // comparison against a fully-continuous run's own senescence
+      // trajectory) to leave the crop's post-restore senescence far
+      // more compressed than it should be. Maturity is gated by an
+      // absolute, since-planting degree-day threshold that is the same
+      // regardless of how the crop got there; but culminescence's own
+      // local "how far through this stage" tracker was always starting
+      // fresh, at the restore day's already-advanced global degree-day
+      // total, leaving far less of that absolute budget remaining for
+      // culminescence and senescence to unfold across than a
+      // continuously-grown crop -- whose culminescence would have begun
+      // at a much lower global degree-day total -- would have had.
+      // Restoring the actual saved modifier and its actual elapsed
+      // fraction (rather than a blanket assumption) fixes this at the
+      // source: earlier-than-active modifiers are forced fully elapsed
+      // (they are, definitionally, already complete), and the modifier
+      // that was actually active in the source run is set to its own
+      // real fraction, preserving the correct remaining degree-day
+      // budget for whatever comes next.
+      //
+      // active_phenology_modifier encoding: 0=none/not yet reached,
+      // 1=accrescence, 2=culminescence, 3=senescence (see
+      // get_active_phenology_modifier()'s declaration).
+      if (active_phenology_modifier >= 1)
+         force_period_relative_elapsed
+            (phenology.get_accrescence_period()
+            ,(active_phenology_modifier == 1) ? modifier_relative_elapsed : 1.0);
+      if (active_phenology_modifier >= 2) {
+         initiate_culminescence();
+         force_period_relative_elapsed
+            (phenology.get_culminescence_period()
+            ,(active_phenology_modifier == 2) ? modifier_relative_elapsed : 1.0);
+      }
+      if (active_phenology_modifier >= 3) {
+         initiate_senescence();
+         // 2026: initiate_senescence() -> know_senescence() captures
+         // cover_attained_max from whatever cover is CURRENT at this
+         // moment -- which, since restart_with() above already set the
+         // real, already-restored (already mid-senescence) branch-date
+         // cover, would incorrectly treat that as the crop's PEAK cover
+         // (reached before senescence began), applying a second,
+         // compounding decay in update_cover()'s senescence formula.
+         // Override it with the actual saved peak, if one was provided
+         // (source runs that predate this fix will save 0.0 here, in
+         // which case leave whatever know_senescence() just computed --
+         // less accurate than a proper peak, but no worse than the
+         // pre-fix behavior).
+         if (cover_attained_max > 0.0) {
+            canopy_leaf_growth->set_cover_attained_max(cover_attained_max);
+            // 2026 FURTHER FIX: also fix the PARALLEL peak tracker on
+            // the reference canopy's own curve object
+            // (Canopy_cover_curve_2017::CCmax2_actual), which drives
+            // the ACTUALLY-reported senescence cover/GAI (see
+            // Canopy_cover_actual::update_cover()'s
+            // "actual_canopy_cover_green = canopy_cover_reference.
+            // get_interception_global_green();" for senescence) -- a
+            // separate object from cover_attained_max above, with the
+            // exact same "captures the already-decayed restored value"
+            // bug, only discovered by tracing actual .asc output that
+            // still showed the pre-fix GAI despite cover_attained_max
+            // itself being confirmed correct.
+            canopy_leaf_growth->fix_reference_peak_for_senescence
+               (cover_attained_max, phenology.get_senescence_period());
+         }
+         force_period_relative_elapsed
+            (phenology.get_senescence_period()
+            ,modifier_relative_elapsed);
+      }
+
+      ok = canopy_ok && ok;
+   } else {
+      ok = false;
+   }
+
+   // --- Roots ---------------------------------------------------------
+   // Crop_root::initialize() is documented in CropSyst/source/crop/crop_root.h
+   // as: "Call once when crop is planted and at restart". Also run after
+   // phenology activation for the same reason as canopy, in case any
+   // stage-entry side effect also touches roots_current.
+   //
+   // 2026 CORRECTION: same issue as canopy above -- roots_current is
+   // normally created by Crop_complete::create_roots(), called as part of
+   // the crop's natural progression to root establishment, which
+   // restore_state() bypasses. Call create_roots() explicitly here if
+   // roots_current does not already exist. Only call it when null (unlike
+   // provide_canopy(), create_roots() does not delete an existing
+   // roots_current first, so calling it on an already-populated
+   // roots_current would leak the previous object).
+   if (!roots_current)
+      create_roots();
+   if (roots_current) {
+      bool roots_ok = roots_current->initialize(root_depth_m);
+      ok = roots_ok && ok;
+      // 2026 FURTHER FIX: initialize() sets root_length (the overall,
+      // single-number root length) correctly, but ALSO unconditionally
+      // zeros total_fract_root_length[sublayer] for every layer (see
+      // Crop_root_vital::initialize()'s own body) -- the array
+      // describing what fraction of total root length exists in each
+      // individual soil layer. Nothing else recomputes that per-layer
+      // distribution from the newly-restored root_length on its own.
+      // Confirmed via direct trace (a real restored perennial crop,
+      // whose root_depth_m/GAI/canopy were already correctly restored):
+      // this leaves Crop_transpiration_2::process_transpiration_m()'s
+      // own root_cond_adj accumulator at exactly 0 (built from
+      // fract_root_length_[sublayer] -- see transpiration.cpp), which
+      // means plant_hydraulic_cond is never computed and
+      // leaf_water_pot stays stuck at 0 -- silently defeating any
+      // LWP-based automatic irrigation trigger
+      // (consideration_mode==consider_leaf_water_potential in a .mgt
+      // file) for the rest of the restored season, regardless of
+      // actual water stress. Confirmed this specifically affects
+      // perennial/fruit-tree crops in practice -- an annual crop
+      // restored mid-season, still within its own natural root-growth
+      // period, has this same array correctly rebuilt as a side effect
+      // of that period's own normal day-to-day growth; an established
+      // perennial crop, whose root growth has already completed for
+      // the season (or for its lifetime), never gets that same
+      // opportunity.
+      //
+      // Fix: call update(), Crop_root_vital's own public, normal daily
+      // entry point, once, explicitly -- it correctly sequences
+      // update_length() (safely a no-op here if root_growth_period has
+      // already expired, which is the common case for an established
+      // perennial crop, since it returns root_length unchanged rather
+      // than recomputing it -- so this does not disturb the just-
+      // restored value) followed by update_root_densities() and
+      // update_fractions() (both private; update() is the only public
+      // entry point that reaches them), which together rebuild
+      // total_fract_root_length[] from the crop's root parameters and
+      // the now-correctly-restored root_length.
+      if (roots_vital)
+         roots_vital->update(1.0,false);
+   } else {
+      ok = false;
+   }
+
+   // --- Accumulated thermal time ---------------------------------------
+   // 2026 FIX (confirmed via g++ -E against the exact build flags used
+   // by this project's Qt build): the crop's GLOBAL accumulated
+   // thermal time is directly settable. thermal_time_common.h's own
+   // version-guard comments are themselves disabled (commented out),
+   // so this build actually compiles the simpler GDDs/GDDs_yesterday
+   // pair rather than the accum_degree_days_normal[]/_clipped[] arrays
+   // the file's comments describe -- both are under the same "public:
+   // Temporarily public..." access label either way. `thermal_time` is
+   // already a directly-accessible member of Crop_complete. The
+   // previous comment here (claiming no public setter exists) was
+   // written against the wrong phenology version -- this build's active
+   // phenology class is Phenology_2013 (PHENOLOGY_VERSION is undefined
+   // in this build's compile flags), not Phenology_2018, and it is
+   // Thermal_time_common's accumulator -- not anything inside the
+   // phenology class itself -- that actually needs restoring.
+   //
+   // This does NOT, by itself, fix the period-local
+   // thermal_time_relative_elapsed used by
+   // Canopy_cover_curve_2017::calc_during_accrescence() (see the
+   // separate fix above) -- that is a SEPARATE, per-period tracker, not
+   // derived from this global accumulator. This fix instead addresses
+   // thermal_time_matchs() (which gates
+   // initiate_accrescence()/initiate_filling()/etc. via
+   // thermal_time_event(), used for this build's normal, non-forced
+   // day-to-day lifecycle triggers) and any other consumer of the
+   // crop's overall accumulated degree-days, so that the crop's own
+   // subsequent natural progression (maturity, harvest, etc.) is timed
+   // consistently with the restored point in the season rather than
+   // computing everything as if from day 1.
+   if (thermal_time) {
+      thermal_time->GDDs           = accum_thermal_time_deg_day; // today
+      thermal_time->GDDs_yesterday = accum_thermal_time_deg_day; // yesterday
+   }
+
+   // 2026 CATCH-UP FIX: the saved state (biomass/GAI/growth_stage/
+   // accum_thermal_time_deg_day, all set above) represents the crop's
+   // condition at the END of the source run's STATEDAY -- but this
+   // build's own INIT_STATE/rec==0 mechanics (see check_state_file.c's
+   // own design comment: "this allows VIC to... start the simulation
+   // at the same time step as the state file") expect the NEW run's
+   // own first processed day (rec==0) to be the day AFTER STATEDAY,
+   // not STATEDAY itself -- confirmed by direct comparison: shifting
+   // this build's own STARTDAY to STATEDAY+1 measurably improved
+   // agreement against a fully continuous reference run for soil
+   // moisture (max discrepancy roughly halved), which only this build's
+   // water-balance processing (full_energy(), entirely outside
+   // Crop_complete) is responsible for and is not something restore_state()
+   // itself can or should influence.
+   //
+   // But shifting STARTDAY by itself left the RESTORED crop state one
+   // calendar day "behind" where it needs to be: rec==0 (now STATEDAY+1)
+   // still receives the raw, un-advanced STATEDAY state above, and the
+   // bootstrap-artifact mechanics already documented elsewhere in this
+   // codebase (see STATE_IO_README.md's "branch date's own output row"
+   // limitation) mean that day's own reported output is discarded
+   // regardless -- so the crop's own visible trajectory, from the
+   // NEXT real day of output onward, was effectively missing exactly
+   // one day of natural progression relative to a fully continuous run,
+   // confirmed directly: GAI/canopy-cover agreement against the
+   // reference run, which was previously exact to within floating-point
+   // precision, degraded measurably once STARTDAY was shifted.
+   //
+   // 2026 NOTE: an earlier attempt to fix this by MOVING this entire
+   // restore hook into full_energy.c (to run between that day's own
+   // VIC_land_unit_start_day() and VIC_land_unit_process_day() calls,
+   // letting that normal, already-existing process_day() call do this
+   // "one day of growth" work on its own) was tried and reverted --
+   // confirmed via direct test that it broke the restore entirely: the
+   // rotation engine's own sowing-event dispatch turned out to fire
+   // INSIDE VIC_land_unit_process_day() itself, not before it, so a
+   // restore hook positioned before that call gets immediately
+   // discarded the moment the sowing event fires and resets the crop
+   // to a fresh planting. This is why this hook still lives in
+   // dist_prec.c, unchanged, running once for every veg tile together
+   // after that day's entire full_energy() call (including its own
+   // process_day() and that day's sowing-event dispatch) has already
+   // completed -- exactly as it always has.
+   //
+   // Fix: since restore_state() itself runs during rec==0's own
+   // processing (after that day's own, now-superseded crop-growth
+   // computation already ran on the wrong, freshly-planted crop, but
+   // before that day's own reported output gets written), call
+   // process_day() here, once, explicitly -- CropSyst's own existing,
+   // comprehensive "advance this crop by one simulated day" entry
+   // point (already covers canopy, roots, biomass, and transpiration
+   // together in one call; see its own implementation for the full
+   // list). This simulates the one day of natural growth that would
+   // otherwise be missing between STATEDAY (what was actually saved)
+   // and STATEDAY+1 (rec==0's own actual calendar date, post-shift),
+   // using the now-correctly-restored state set above as its starting
+   // point rather than the wrong, pre-restore one process_day() was
+   // already called against earlier in this same day's processing.
+   // This should be safe against double-counting specifically because
+   // every value set above (canopy_leaf_growth->restart_with(),
+   // roots_current->initialize(), thermal_time->GDDs, etc.) is an
+   // ABSOLUTE assignment, not a delta -- matching the same reasoning
+   // already relied on for provide_canopy()/provide_biomass_growth()/
+   // transpiration being safely (re-)creatable earlier in this same
+   // function, regardless of what that day's own, now-superseded
+   // processing already did with the wrong starting crop.
+   //
+   // 2026 FURTHER FIX: process_day() ALONE turned out not to be enough
+   // -- confirmed via direct test: GAI/biomass after the catch-up call
+   // came back essentially IDENTICAL to the raw, just-restored values
+   // (e.g. 3.885935 -> 3.88594, not the ~1-day senescence decline this
+   // crop's own trajectory shows elsewhere). Root cause, traced
+   // directly: process_day() itself does not advance
+   // thermal_time_relative_elapsed for the active phenology period --
+   // that happens in start_day(), specifically via phenology.start_day()
+   // recomputing it fresh each call (the same period-local thermal-time
+   // mechanic already documented and relied on elsewhere in this
+   // function, via force_period_relative_elapsed()). Calling
+   // process_day() without first calling start_day() again means
+   // update_cover()/canopy_leaf_growth->process_day() run against the
+   // SAME relative_elapsed this function already set above, producing
+   // no meaningful additional progression. Call start_day() immediately
+   // before process_day() here, matching the normal, two-call daily
+   // sequence (VIC_land_unit_start_day() then VIC_land_unit_process_day()
+   // in the engine's own normal per-day loop) -- same reasoning as
+   // process_day() itself applies to why a second call here is safe:
+   // start_day() recomputes fresh values from current state
+   // (clear_day(), update_temperatures(), phenology.start_day(),
+   // thermal_time_event(), etc.) rather than accumulating deltas
+   // unsafely, so calling it again, now that the correct state is in
+   // place, should correctly recompute this day's own inputs from the
+   // right starting point.
+   start_day();
+   process_day();
+
+   return ok;
+}
+//_restore_state_____________________________________________________2026______/
 bool Crop_complete::create_roots()
 {
    if (soil)                                                                     //061208

@@ -152,6 +152,49 @@ int VIC_land_unit_chemical_transport_and_exchange
 double VIC_land_unit_get
 (unsigned long int variable_code
 /*NYI ,unsigned long int units_code*/);
+/*_2026________________________________________________________________________*/
+/** \brief Dedicated accessors for the prognostic crop state values used by
+   crop/VIC_crop_state_csv.h. See the corresponding comment in
+   agronomic/VIC_land_unit_simulation.h for why these are separate from
+   VIC_CropSyst_get()/VIC_land_unit_get() rather than new variable codes. */
+double VIC_land_unit_get_accum_degree_days();
+int    VIC_land_unit_get_growth_stage_code();
+double VIC_land_unit_get_root_biomass_kg_m2();
+double VIC_land_unit_get_canopy_biomass_kg_m2();
+double VIC_land_unit_get_GAI();
+double VIC_land_unit_get_root_depth_m();
+double VIC_land_unit_get_water_stress_index();
+/* 2026: companions to the above -- see VIC::Land_unit_simulation::
+   get_active_phenology_modifier_for_state()/get_modifier_relative_elapsed_
+   for_state() for the full rationale. active_phenology_modifier encodes
+   which phenology "modifier" period (accrescence/culminescence/senescence)
+   is currently active: 0=none, 1=accrescence, 2=culminescence,
+   3=senescence. modifier_relative_elapsed is how far through that period,
+   as a 0..1 fraction of its own configured duration. */
+int    VIC_land_unit_get_active_phenology_modifier();
+double VIC_land_unit_get_modifier_relative_elapsed();
+/* 2026: companion to the above -- see VIC::Land_unit_simulation::
+   get_cover_attained_max_for_state() for the full rationale: the crop's
+   peak green canopy cover fraction attained BEFORE senescence began. */
+double VIC_land_unit_get_cover_attained_max();
+/*_2026________________________________________________________________________*/
+/** \brief Restores previously-saved prognostic crop state (biomass, green
+   area index, root depth, growth stage) into whichever crop is currently
+   active for this land unit, immediately after that crop has been created
+   as part of a warm-started (INIT_STATE) run. See crop/VIC_crop_state_csv.h
+   for the CSV file this is meant to be driven from, and
+   VIC_crop::CropSyst_proper_crop::restore_state() for the implementation
+   and its documented limitations. Returns 1 (true) if state was applied,
+   0 if there is no active land unit / crop, or it could not be restored. */
+int VIC_land_unit_restore_crop_state
+(double biomass_kg_m2
+,double GAI
+,double root_depth_m
+,int    growth_stage_code /* Normal_crop_event_sequence value */
+,double accum_thermal_time_deg_day
+,int    active_phenology_modifier
+,double modifier_relative_elapsed
+,double cover_attained_max);
 /*_2014-12-08_________________________________________________________________*/
 double VIC_CropSyst_get
 (unsigned long int variable_code

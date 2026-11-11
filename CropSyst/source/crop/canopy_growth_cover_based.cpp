@@ -94,9 +94,73 @@ bool Canopy_growth_cover_based::restart_with
 (float64 restart_biomass
 ,float64 restart_GAI_not_used_in_this_model
 ,bool clumping_unused)                                             modification_
-{  canopy_vital.append(new Canopy_accumulation::Portion
-      (restart_biomass,parameters.cover_initial,0.0/*thermal_time*/));           //130510
+{
+   // 2026 FIX: this model tracks canopy as a cover FRACTION, not GAI --
+   // the incoming restart_GAI parameter was previously accepted but
+   // completely ignored (see its own name: "restart_GAI_not_used_in_
+   // this_model"), and the Portion below was always constructed using
+   // parameters.cover_initial (a fixed, near-zero "just planted"
+   // default) regardless of what state was actually being restored.
+   // This meant a warm-restart of an already-substantially-grown crop
+   // using this canopy model always came back as an essentially bare,
+   // freshly-planted canopy -- explaining why GAI read back as ~0
+   // immediately after restart_with() reported success, even though
+   // biomass (which IS used below) restored correctly.
+   //
+   // Fix: convert the requested GAI to an equivalent cover fraction
+   // using the same Beer-Lambert-style formula already used elsewhere
+   // in this codebase for the LAI-based canopy model (see
+   // Canopy_growth_leaf_area_index_based::restart_with(), which computes
+   // fract_cover = 1.0 - exp(-kc * restart_GAI * clumping)). kc
+   // (light_extinction_coef) is available here via the crop_parameters
+   // member already inherited from the shared Canopy_growth_portioned
+   // base class -- no constructor or header change needed.
+   float64 kc = crop_parameters.morphology.light_extinction_coef;
+   float64 restart_cover =
+      1.0 - exp(-kc * restart_GAI_not_used_in_this_model);
+   canopy_vital.append(new Canopy_accumulation::Portion
+      (restart_biomass,restart_cover,0.0/*thermal_time*/));           //130510
          // probably should have today's thermal_time
+
+   // 2026 FURTHER FIX: adding the portion to canopy_vital above is not
+   // sufficient by itself -- get_GAI() for this model does NOT read
+   // from canopy_vital at all; it computes
+   // cover_actual.calc_green_area_index(), which derives GAI from a
+   // SEPARATE state variable (interception_global_green, on
+   // Canopy_cover_actual/Canopy_cover_abstract) via the exact
+   // mathematical inverse of the formula used above:
+   //   calc_XXXX_area_index(fract) = -ln(1.0 - fract) / light_extinction_coef
+   // Without this, canopy_vital and cover_actual/cover_reference go out
+   // of sync -- biomass (tracked via canopy_vital) restores correctly,
+   // but GAI (read from cover_actual, untouched by the append() above)
+   // does not, exactly matching what was observed (GAI reading -0
+   // immediately after restart_with() reported success). This mirrors
+   // the existing, already-used pattern in respond_to_clipping() below,
+   // which keeps cover_reference/cover_actual in sync with canopy_vital
+   // the same way after a clipping event.
+   cover_reference.set_interception_insolation_global_green(restart_cover);
+   cover_actual   .set_interception_insolation_global_green(restart_cover);
+
+   // 2026 FURTHER FIX #2: setting "today"'s value alone is still not
+   // durable. Canopy_cover_actual::update_cover() -- called every day as
+   // normal crop processing, unconditionally, regardless of growth
+   // stage -- computes actual_canopy_cover_green from scratch each day
+   // and unconditionally overwrites interception_global_green with it
+   // at the end of the function. On the FIRST day after restart this
+   // still shows our correct value (since it hasn't run again yet), but
+   // by the following day, update_cover()'s incremental growth
+   // calculation (interception_global_green_yesterday + today's
+   // computed increment) uses interception_global_green_yesterday --
+   // which we never set, so it still reflects the canopy's pre-restore
+   // (near-zero) state, silently dragging the restored value back down.
+   // interception_global_green_yesterday has no public setter, but
+   // Canopy_growth_cover_based is already declared a friend class of
+   // Canopy_cover_actual (see canopy_cover_continuum.h) specifically --
+   // NOT of Canopy_cover_reference, which does not grant this access --
+   // so direct member access is available only on cover_actual, which
+   // is also the only one get_GAI() actually reads from.
+   cover_actual.interception_global_green_yesterday = restart_cover;
+
    return true;
 }
 //_restart_with_____________________________________________________2011-09-01_/

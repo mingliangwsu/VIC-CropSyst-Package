@@ -16,7 +16,7 @@ where the Crop class is based on CropSyst proper.
 #endif
 #include "VIC_crop_param.h"
 //140810 #include "VIC_crop_common.h"
-class Phenology_interface;
+class Phenology;
 
 #include "crop/canopy_cover_continuum.h"
 

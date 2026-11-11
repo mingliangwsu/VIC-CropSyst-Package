@@ -223,6 +223,28 @@ protected: // Classes
    virtual bool know_culminescence(const Phenology::Period_thermal *culminescence_)modification_; //181109
    virtual bool know_maturity_initiation()                        modification_; //200409
    virtual bool know_N_leaf_stress_factor(float64 N_leaf_stress_factor_);        //200528
+   // 2026: forwards to cover_actual, the object update_cover()'s
+   // senescence-decay formula actually reads cover_attained_max/
+   // cover_to_lose_total from -- see canopy_growth.h's interface
+   // declaration for the full rationale.
+   inline virtual float64 get_cover_attained_max()                        const
+      { return cover_actual.get_cover_attained_max(); }
+   inline virtual bool set_cover_attained_max(float64 cover_attained_max_)  modification_
+      { return cover_actual.set_cover_attained_max(cover_attained_max_); }
+   // 2026 FURTHER FIX: see canopy_growth.h's interface declaration for
+   // the full rationale. Mirrors know_senescence()'s own first two
+   // lines (immediately above -- both go through cover_reference only,
+   // deliberately not touching cover_actual, so this cannot disturb
+   // biomass or any other already-correctly-restored actual-canopy
+   // state), just substituting the correct saved peak for what
+   // know_senescence() would otherwise read from cover_actual's
+   // current (already-decayed, already-restored) cover.
+   inline virtual bool fix_reference_peak_for_senescence
+      (float64 peak_cover, const Phenology::Period_thermal *senescence_) modification_
+      {
+         cover_reference.set_interception_insolation_global_green_at_senescence(peak_cover);
+         return cover_reference.know_senescence(senescence_);
+      }
 
  public:
    virtual float64 get_interception_global_total()                        const; //200228

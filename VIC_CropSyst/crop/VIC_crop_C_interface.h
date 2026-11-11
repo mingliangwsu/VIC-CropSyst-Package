@@ -1,5 +1,14 @@
 #ifndef VIC_crop_C_interfaceH
 #define VIC_crop_C_interfaceH
+/* 2026 NOTICE: verified against build/Xcc/Release/Makefile_Kamiak --
+   crop/VIC_crop_C_interface.cpp has no build rule and is not linked
+   into the V3 executable (it is the legacy V2-style interface; the
+   real V3 driver interface is agronomic/VIC_land_unit_C_interface.h/.cpp,
+   which IS compiled). The VIC_CropSyst_restore_state() addition in this
+   file is therefore inert dead code, kept only for reference/consistency
+   with this file's existing style. The real, compiled entry point is
+   VIC_land_unit_restore_crop_state() in
+   agronomic/VIC_land_unit_C_interface.h/.cpp. See STATE_IO_README.md. */
 #ifdef VCS_V5
 #include "vic_def.h"
 #else
@@ -326,6 +335,28 @@ extern "C" {
       // to have uptake, then it needs to keep track.
       // CropSyst proper does not keep the uptake by layer.
    double VIC_CropSyst_get_uptake_mm(int horizon_number);
+   */
+   /* ____________________________________________________________________________ */
+   /* 2026: state save/restore support for scenario-branching runs.
+      See crop/VIC_crop_state_csv.h for the CSV file format that drives
+      these calls, and VIC_CropSyst_proper_crop::restore_state() for the
+      implementation and its documented limitations (growth stage and
+      biomass/canopy/root are restored; exact within-stage degree-day
+      accumulation currently is not). */
+   int VIC_CropSyst_restore_state
+      (double biomass_kg_m2
+      ,double GAI
+      ,double root_depth_m
+      ,int    growth_stage_code /* Normal_crop_event_sequence value */
+      ,double accum_thermal_time_deg_day);
+   /**< \fn
+   \brief Restores previously-saved prognostic crop state (biomass,
+   green area index, root depth, growth stage) into the currently
+   active crop object, immediately after it has been created (see
+   VIC_CropSyst_create_V3()) for a run that is warm-starting from a
+   saved state file rather than starting the crop from planting.
+   \return 1 (true) if state was applied, 0 if there is no active crop
+   or the restore could not be completed.
    */
 
    /**

@@ -46,6 +46,43 @@ interface_ Canopy_leaf_growth
    virtual bool know_accrescence  (const Phenology::Period_thermal *accrescence)    modification_ {return true;} //181109
    virtual bool know_culminescence(const Phenology::Period_thermal *culminescence_) modification_ {return true;} //181109
    virtual bool know_senescence   (const Phenology::Period_thermal *senescence)     modification_ {return true;} //181109
+   // 2026: get/set for the canopy's peak cover attained before senescence
+   // began -- see Canopy_cover_actual::cover_attained_max
+   // (canopy_cover_continuum.h) and its use in
+   // Canopy_cover_actual::update_cover()'s senescence-decay formula
+   // (canopy_cover_continuum.cpp). Needed because know_senescence()
+   // captures this value from whatever cover is CURRENT at the moment
+   // it is called; a scenario-branching restore that calls
+   // initiate_senescence() after the crop's cover has already been
+   // warm-started to a mid-senescence value would otherwise incorrectly
+   // treat that already-decayed value as the crop's peak, applying a
+   // second, compounding decay on top of the first. Safe no-op defaults
+   // here (matching this file's own convention); see
+   // Canopy_growth_cover_based for the real implementation.
+   inline virtual float64 get_cover_attained_max()                        const
+      { return 0.0; }
+   inline virtual bool set_cover_attained_max(float64 cover_attained_max_)  modification_
+      { (void)cover_attained_max_; return true; }
+   // 2026 FURTHER FIX: set_cover_attained_max() above corrects
+   // Canopy_cover_actual::cover_attained_max, but calc_during_senescence()
+   // (Canopy_cover_curve_2017, driving the REFERENCE/potential
+   // trajectory that actually feeds the reported GAI/cover for
+   // senescence -- see Canopy_cover_actual::update_cover()'s
+   // "if (senescence) actual_canopy_cover_green =
+   // canopy_cover_reference.get_interception_global_green();" line)
+   // uses a SEPARATE, PARALLEL peak tracker on the curve object itself
+   // (CCmax2_actual), computed by know_senescence() from whatever
+   // cover is current on cover_actual AT THAT MOMENT -- the exact same
+   // "captures the already-decayed restored value instead of the true
+   // peak" bug, on a different, previously-unaddressed object. Fix by
+   // reusing the engine's own existing, already-public mechanism: set
+   // the reference curve's tracked cover to the correct peak, then
+   // re-trigger the same recomputation know_senescence() itself does,
+   // now starting from the corrected value. Safe no-op default here;
+   // see Canopy_growth_cover_based for the real implementation.
+   inline virtual bool fix_reference_peak_for_senescence
+      (float64 peak_cover, const Phenology::Period_thermal *senescence) modification_
+      { (void)peak_cover; (void)senescence; return true; }
    virtual bool know_maturity_initiation()                      modification_=0; //200409
    inline virtual bool know_N_leaf_stress_factor
       (float64 N_leaf_stress_factor_)                             {return true;} //200528

@@ -3,9 +3,9 @@
 #include "corn/const.h"
 #include "corn/primitive.h"
 //#define Ref_to_const_float         const float64 *
-#include "soil/soil_interface.h"
+//#include "soil/soil_interface.h"
 #include "crop/growth_stages.hpp"
-#include "crop/phenology_interface.h"
+//#include "crop/phenology_interface.h"
 //______________________________________________________________________________
 namespace VIC_crop
 {
@@ -40,7 +40,7 @@ class Crop_interface
    virtual bool process_harvest()                                  modification_ =0;
    virtual float64 harvest_annual(bool terminate)                  modification_ =0;
    virtual float64 harvest_fruit_tree()                            modification_ =0;
-   virtual const CropSyst::Phenology_interface &ref_phenology()            const =0;
+   virtual const CropSyst::Phenology &ref_phenology()            const =0;
 
 };
 //_2014-05-09_____________________________________________________________________________

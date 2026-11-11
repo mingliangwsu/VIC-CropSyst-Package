@@ -144,6 +144,53 @@ interface_ Crop_model_interface
 
    virtual bool         set_no_more_clippings_this_season()     modification_=0; //040721
 
+   // 2026: added to support scenario-branching "initial state" warm-restart
+   // runs -- see VIC_CropSyst/crop/VIC_crop_state_csv.h and
+   // agronomic/VIC_land_unit_simulation.cpp (Land_unit_simulation::restore_state()).
+   // Pushes a previously-saved state snapshot (biomass, green area index,
+   // rooting depth, growth stage, accumulated thermal time) into this crop
+   // object immediately after it has been (freshly) created, so a run that
+   // starts mid-season can resume growth from where another run's saved
+   // state left off instead of starting from a fresh planting. Given an
+   // inline default body here (matching this file's own convention for
+   // safe base-class defaults) that does nothing and returns false, so
+   // existing concrete crop classes that do not override it are entirely
+   // unaffected -- no other class in this header needs to change. See
+   // Crop_complete::restore_state() (crop_cropsyst.h/.cpp) for the one
+   // override that actually does something, using that class's existing
+   // canopy_leaf_growth, roots_current, and phenology restart hooks.
+   //
+   // 2026 EXTENDED: active_phenology_modifier/modifier_relative_elapsed
+   // -- see Crop_complete::restore_state()'s own comment for why these
+   // were added.
+   inline virtual bool restore_state
+      (float64 biomass_kg_m2
+      ,float64 GAI
+      ,float64 root_depth_m
+      ,Normal_crop_event_sequence growth_stage
+      ,float64 accum_thermal_time_deg_day
+      ,int     active_phenology_modifier
+      ,float64 modifier_relative_elapsed
+      ,float64 cover_attained_max
+      )                                                         modification_
+      { (void)biomass_kg_m2; (void)GAI; (void)root_depth_m;
+        (void)growth_stage; (void)accum_thermal_time_deg_day;
+        (void)active_phenology_modifier; (void)modifier_relative_elapsed;
+        (void)cover_attained_max;
+        return false; }
+
+   // 2026: safe base-class defaults for the companion write-side
+   // accessors -- see Crop_complete::get_active_phenology_modifier()/
+   // get_modifier_relative_elapsed() for the real implementation.
+   inline virtual int     get_active_phenology_modifier()                  const
+      { return 0; }
+   inline virtual float64 get_modifier_relative_elapsed()                  const
+      { return 0.0; }
+   // 2026: safe base-class default -- see Crop_complete::
+   // get_cover_attained_max_for_state() for the real implementation.
+   inline virtual float64 get_cover_attained_max_for_state()               const
+      { return 0.0; }
+
    virtual float64 update_evapotranspiration_max(float64 ET_ref_m) rectification_=0; //190812_010910
       //190812 update_pot_evapotranspiration
    virtual bool get_name(std::wstring &name)                            const=0; //200324

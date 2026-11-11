@@ -267,7 +267,8 @@ bool Canopy_cover_actual::know_N_leaf_stress_factor(float64 N_leaf_stress_factor
 }
 //_know_N_leaf_stress_factor________________________________________2020-05-28_/
 bool Canopy_cover_actual::end_day()                                modification_
-{  interception_global_green_yesterday
+{
+   interception_global_green_yesterday
         = interception_global_green;
    return Canopy_cover_abstract::end_day();
 }

@@ -240,6 +240,23 @@ double VIC_CropSyst_get_uptake_mm(int horizon_number)
    return  VIC_CropSyst_get_return;
 }
 */
+/*_2026___________________________________________VIC_CropSyst_restore_state_*/
+int VIC_CropSyst_restore_state
+(double biomass_kg_m2
+,double GAI
+,double root_depth_m
+,int    growth_stage_code
+,double accum_thermal_time_deg_day)
+{
+   return (active_CropSyst)
+      ? (int)active_CropSyst->restore_state
+           ((float64)biomass_kg_m2
+           ,(float64)GAI
+           ,(float64)root_depth_m
+           ,(Normal_crop_event_sequence)growth_stage_code
+           ,(float64)accum_thermal_time_deg_day)
+      : 0;
+}
 
 #if (VIC_CROPSYST_VERSION>=3)
 const char* getCropSystLogFileName()
